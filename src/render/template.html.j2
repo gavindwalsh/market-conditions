@@ -1,0 +1,54 @@
+{# Market Pulse Dashboard — single self-contained page (§6). Data embedded as
+   JSON; ECharts inlined. No external fetch (opens offline). #}
+<style>{{ css|safe }}</style>
+<header class="masthead">
+  {% if wordmark_data_uri %}<img class="wordmark" src="{{ wordmark_data_uri }}" alt="avos"/>{% else %}<span class="wordmark" style="font-family:Georgia,serif;font-size:22px">avos</span>{% endif %}
+  <h1>Market Pulse</h1>
+  <div class="range-btns">
+    <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(null,this)">All</button>
+  </div>
+  <div class="asof">Run {{ run_date }} ET · Phase {{ phase }}<br/>Data as-of block below each tile</div>
+</header>
+
+<div class="lead">{{ lead or "Daily aggregate pulse on US equity & options market structure, ownership, leverage, and health — each read in the context of its own history." }}</div>
+
+{% for panel in panels %}
+<section class="panel">
+  <h2>{{ loop.index }}. {{ panel.title }}</h2>
+  {% if panel.charts %}
+  <div class="charts">
+    {% for c in panel.charts %}
+    <div class="chart-card">
+      <div class="ctitle has-tip">{{ c.id }} · {{ c.name }}
+        {% if c.notes %}<span class="tip-icon">ⓘ</span>
+        <div class="tip"><b>How it's computed:</b> {{ c.notes }}</div>{% endif %}
+      </div>
+      <div class="csrc">
+        {% if c.value_fmt %}<b>{{ c.value_fmt }}</b>{% endif %}
+        {% if c.percentile is not none %} · {{ c.percentile }}%ile{% endif %}
+        · <span class="asof-stamp {{ 'stale' if c.stale else '' }}">as-of {{ c.asof }}</span>
+        · {{ c.source }}
+      </div>
+      <div class="chart" id="chart-{{ c.id }}"></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+
+<footer>
+  <div><b>Build</b> {{ build_version }} · run {{ run_ts }} ET · size target {{ size_budget }} MB</div>
+  <div><b>Source status:</b> {{ source_status }}</div>
+  <details class="glossary"><summary>Glossary</summary><dl>
+    {% for g in glossary %}<dt>{{ g.term }}</dt><dd>{{ g.defn }}</dd>{% endfor %}
+  </dl></details>
+  <div>Every metric ID links to its DASHBOARD-SPEC.md section. Estimated/nowcast segments are dashed and labeled (§A9.5).</div>
+</footer>
+
+<script>window.__PULSE__ = {{ data_json|safe }};</script>
+{% if echarts_js %}<script>{{ echarts_js|safe }}</script>
+<script>{{ chart_boot|safe }}</script>
+{% else %}
+<!-- ECharts not yet vendored: drop echarts.min.js in src/render/vendor/ to inline it (§6). Tiles render; charts are placeholders. -->
+{% endif %}

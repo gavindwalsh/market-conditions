@@ -1,0 +1,42 @@
+{
+  "asof": "2026-07-09",
+  "cadence": "daily",
+  "id": "LV7",
+  "name": "L1: Box-spread implied yield vs SOFR",
+  "notes": "Median across 5 wide strike pairs, NBBO midpoints. History accumulates from 2026-07-09 (§6 gate applies). Cross-check vs boxtrades.com ±25bp (§7.3). Quotes pulled off-close are wider — prefer near-close runs.",
+  "panel": "leverage",
+  "provenance": "bloomberg_cache",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "1M box − SOFR (bp)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 81.703
+        }
+      ],
+      "role": "context",
+      "unit": null
+    },
+    {
+      "estimated_from": null,
+      "name": "3M box − SOFR (bp)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 57.259
+        }
+      ],
+      "role": "avos",
+      "unit": null
+    }
+  ],
+  "source": "BBG SPX chain (§5.4)",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 57.0
+  },
+  "unit": " bp (tile: 3M)"
+}

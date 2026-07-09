@@ -1,0 +1,188 @@
+{
+  "asof": "2026-07-08",
+  "cadence": "weekly",
+  "id": "RF2",
+  "name": "Retail participation — weekly (est. total)",
+  "notes": "Quote-midpoint classifier (§5.1): identifies ~1/3 of retail trades. Gated 'uncalibrated' until RF9 >= 0.6 (§7.2). SCALED x3.0 to estimated TOTAL retail (identified floor x 3.0; factor from the BHJOS ~1/3 capture rate, confirmed vs ~20% consensus participation; provisional until RF9 fits it empirically). Unscaled floor = shown value / 3.0. SPLICED: solid bars = FINRA official non-ATS (wholesaler) share of consolidated share volume, weekly, ~2-3wk publication lag; lighter bars = our est. total retail participation extending the lag window. DEFINITIONAL SEAM: FINRA counts ALL internalized share volume (retail-dominant but not pure); ours is identified-retail dollars x3. The context line overlays our estimate across the full window for calibration. Daily: RF2D.",
+  "panel": "retail",
+  "provenance": "finra+massive",
+  "series": [
+    {
+      "estimated_from": null,
+      "kind": "bar",
+      "name": "FINRA non-ATS share of volume (official)",
+      "points": [
+        {
+          "date": "2025-12-22",
+          "value": 85.083
+        },
+        {
+          "date": "2025-12-29",
+          "value": 74.984
+        },
+        {
+          "date": "2026-01-05",
+          "value": 62.231
+        },
+        {
+          "date": "2026-01-12",
+          "value": 62.888
+        },
+        {
+          "date": "2026-01-19",
+          "value": 58.732
+        },
+        {
+          "date": "2026-01-26",
+          "value": 57.694
+        },
+        {
+          "date": "2026-02-02",
+          "value": 57.927
+        },
+        {
+          "date": "2026-02-09",
+          "value": 55.891
+        },
+        {
+          "date": "2026-02-16",
+          "value": 57.285
+        },
+        {
+          "date": "2026-02-23",
+          "value": 54.249
+        },
+        {
+          "date": "2026-03-02",
+          "value": 52.607
+        },
+        {
+          "date": "2026-03-09",
+          "value": 57.925
+        },
+        {
+          "date": "2026-03-16",
+          "value": 65.036
+        },
+        {
+          "date": "2026-03-23",
+          "value": 56.251
+        },
+        {
+          "date": "2026-03-30",
+          "value": 53.748
+        },
+        {
+          "date": "2026-04-06",
+          "value": 59.381
+        },
+        {
+          "date": "2026-04-13",
+          "value": 60.05
+        },
+        {
+          "date": "2026-04-20",
+          "value": 61.175
+        },
+        {
+          "date": "2026-04-27",
+          "value": 57.882
+        },
+        {
+          "date": "2026-05-04",
+          "value": 49.694
+        },
+        {
+          "date": "2026-05-11",
+          "value": 57.746
+        },
+        {
+          "date": "2026-05-18",
+          "value": 52.559
+        },
+        {
+          "date": "2026-05-25",
+          "value": 57.452
+        },
+        {
+          "date": "2026-06-01",
+          "value": 52.226
+        },
+        {
+          "date": "2026-06-08",
+          "value": 11.701
+        },
+        {
+          "date": "2026-06-15",
+          "value": 10.978
+        }
+      ],
+      "role": "avos",
+      "unit": "%"
+    },
+    {
+      "estimated_from": null,
+      "kind": "bar",
+      "name": "Our est. total participation (extension)",
+      "points": [
+        {
+          "date": "2026-06-26",
+          "value": 20.278
+        },
+        {
+          "date": "2026-07-03",
+          "value": 19.417
+        },
+        {
+          "date": "2026-07-10",
+          "value": 19.658
+        }
+      ],
+      "role": "nowcast",
+      "unit": "%"
+    },
+    {
+      "estimated_from": null,
+      "name": "Our estimate (full, context)",
+      "points": [
+        {
+          "date": "2026-04-03",
+          "value": 21.423
+        },
+        {
+          "date": "2026-04-10",
+          "value": 21.73
+        },
+        {
+          "date": "2026-05-15",
+          "value": 21.344
+        },
+        {
+          "date": "2026-05-22",
+          "value": 21.169
+        },
+        {
+          "date": "2026-06-26",
+          "value": 20.278
+        },
+        {
+          "date": "2026-07-03",
+          "value": 19.417
+        },
+        {
+          "date": "2026-07-10",
+          "value": 19.658
+        }
+      ],
+      "role": "benchmark",
+      "unit": "%"
+    }
+  ],
+  "source": "Massive tape (classifier)",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 19.7
+  },
+  "unit": "%"
+}

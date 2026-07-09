@@ -1,0 +1,42 @@
+{
+  "asof": "2026-07-09",
+  "cadence": "biweekly",
+  "id": "LV16",
+  "name": "Short interest aggregate (SPX)",
+  "notes": "Accumulates one point per biweekly FINRA SI print (history builds from 2026-07-09). Days-to-cover = median SHORT_INT_RATIO across members.",
+  "panel": "leverage",
+  "provenance": "derived",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "Short interest % of float cap",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 0.0
+        }
+      ],
+      "role": "avos",
+      "unit": "%"
+    },
+    {
+      "estimated_from": null,
+      "name": "Median days-to-cover",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 3.557
+        }
+      ],
+      "role": "context",
+      "unit": "days"
+    }
+  ],
+  "source": "BBG SHORT_INT × Massive prices",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 0.0
+  },
+  "unit": "% of float (tile)"
+}

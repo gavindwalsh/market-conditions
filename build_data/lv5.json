@@ -1,0 +1,30 @@
+{
+  "asof": "2026-07-09",
+  "cadence": "daily",
+  "id": "LV5",
+  "name": "Dealer GEX (OI-convention)",
+  "notes": "OI-convention estimator (dealers +γ calls / −γ puts) — §5.3 revised; levels are estimates, CHANGES are the signal. Extremes today: IWM -1.4, SPCX -0.1, TZA +0.0, NVDA +1.5, AAPL +1.6, SPY +7.4. Universe = retail top-25 + majors + semis (32 names).",
+  "panel": "leverage",
+  "provenance": "massive_snapshot",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "Aggregate OI-convention GEX ($B per 1%)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 14.709
+        }
+      ],
+      "role": "avos",
+      "unit": null
+    }
+  ],
+  "source": "Massive snapshots (OI×γ)",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 14.7
+  },
+  "unit": " $B/1%"
+}

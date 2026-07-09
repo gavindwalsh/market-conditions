@@ -1,0 +1,66 @@
+{
+  "asof": "2026-07-09",
+  "cadence": "quarterly",
+  "id": "LV14",
+  "name": "L4: Broker margin rates",
+  "notes": "*** UNVERIFIED SEED VALUES — do not trust until confirmed against broker pages (see pull/free.py). *** Manual-quarterly posted rates, as-of 2026-07-09. The retail leverage price stack: discount tiered vs full-service base rates.",
+  "panel": "leverage",
+  "provenance": "manual_quarterly",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "IBKR Pro (tiered, <100k)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 4.83
+        }
+      ],
+      "role": "avos",
+      "unit": null
+    },
+    {
+      "estimated_from": null,
+      "name": "Schwab (base)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 10.75
+        }
+      ],
+      "role": "context",
+      "unit": null
+    },
+    {
+      "estimated_from": null,
+      "name": "Fidelity (base)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 10.5
+        }
+      ],
+      "role": "context",
+      "unit": null
+    },
+    {
+      "estimated_from": null,
+      "name": "Robinhood Gold",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": 5.0
+        }
+      ],
+      "role": "context",
+      "unit": null
+    }
+  ],
+  "source": "posted rates (manual, quarterly)",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 5.92
+  },
+  "unit": "% (tile: IBKR−Schwab spread)"
+}

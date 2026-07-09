@@ -1,0 +1,29 @@
+# Market Pulse Dashboard — Phase 1 core deps.
+# Runs on Python 3.11 (matches avos-country-dashboard / equities-pm).
+# The build (compute + render) needs no Bloomberg/Massive package — it reads
+# the deterministic build_data/*.json display layer (§2). Only the pull step
+# needs the data-source clients.
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14           # Parquet lake
+duckdb>=0.10          # lake views / compute (§2 data lake)
+jinja2>=3.1           # HTML render
+requests>=2.31        # FRED / FINRA / EDGAR REST
+truststore>=0.9       # use Windows cert store — required behind the iboss
+                      # TLS-intercepting proxy (sec.gov etc.); see pull/_net.py
+openpyxl>=3.1         # NY Fed HHDC / ICI XLSX, source-map xlsx
+
+# --- Scrape-last-resort only (§3: API first) ---
+beautifulsoup4>=4.12  # Cboe / AAII / NAAIM fallback parsing when no API exists
+lxml>=5.0
+
+# --- Bloomberg pull-only (install separately, requires Bloomberg pip index) ---
+# Not listed here; the bbg pull module auto-installs on first run, matching
+# avos-country-dashboard/refresh_dashboard.py:
+#   pip install xbbg
+#   pip install blpapi --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/
+# Required only on a machine with a running Bloomberg Terminal.
+
+# --- Massive (ex-Polygon) pull-only (Phase 2/3) ---
+# Client added when credentials are procured; likely `requests` + flat-file
+# (S3/gzip) reader — no exotic dep expected. Pinned here once chosen.

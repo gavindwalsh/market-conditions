@@ -1,0 +1,41 @@
+/* Avos house style (§A9 / §6). Colors and type are the brand source of truth. */
+:root{
+  --bg:#EFEFEF; --card:#FFFFFF; --ink:#1E1E1E; --body:#5A5A5A;
+  --green:#4B5C3E; --green-chart:#4F5C41; --lav:#D5CAFF;
+  --s1:#7F77B2; --s2:#A66C3D; --s3:#4F5C41; --s4:#A6B296; --s5:#9AA3C2; --s6:#637F8F;
+  --stale:#C9A227;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);
+  font-family:"Inter Tight",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.45}
+header.masthead{background:var(--green);color:#fff;padding:22px 28px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+header .wordmark{height:26px}
+header h1{font-size:20px;font-weight:600;margin:0;color:#fff}
+header .range-btns{margin-left:auto;display:flex;gap:4px;align-items:center}
+header .range-btns button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font:inherit;font-size:12px;padding:4px 10px;border-radius:6px;cursor:pointer}
+header .range-btns button:hover{background:rgba(255,255,255,.25)}
+header .range-btns button.active{background:#fff;color:var(--green);font-weight:600}
+header .asof{font-size:12px;opacity:.9;text-align:right}
+.lead{background:var(--card);border-left:5px solid var(--green);color:var(--green);
+  font-size:18px;padding:16px 22px;margin:18px 22px}
+.panel{background:transparent;margin:18px 22px}
+.panel > h2{color:var(--ink);font-size:16px;font-weight:600;margin:6px 0 12px;
+  border-bottom:2px solid var(--green);padding-bottom:6px}
+.asof-stamp{font-size:11px}
+.asof-stamp.stale{color:var(--stale);font-weight:600}
+.charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.chart-card{background:var(--card);border-radius:10px;padding:12px}
+.chart-card .ctitle{color:var(--ink);font-size:13px;font-weight:600;margin-bottom:2px;position:relative}
+.chart-card .csrc{font-size:11px;color:var(--body);margin-bottom:6px}
+.chart-card .csrc b{color:var(--ink);font-size:12.5px}
+.tip-icon{color:var(--green);cursor:help;font-size:12px;margin-left:4px}
+.ctitle .tip{display:none;position:absolute;z-index:10;top:100%;left:0;max-width:420px;
+  background:var(--ink);color:#fff;font-weight:400;font-size:12px;line-height:1.45;
+  padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ctitle .tip b{color:var(--lav)}
+.ctitle:hover .tip{display:block}
+.chart{width:100%;height:260px}
+footer{margin:26px 22px;padding-top:14px;border-top:1px solid #ddd;font-size:11.5px;color:var(--body)}
+footer code{background:#e7e7e7;padding:1px 4px;border-radius:3px}
+.glossary dt{color:var(--ink);font-weight:600;margin-top:6px}

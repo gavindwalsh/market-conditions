@@ -1,0 +1,34 @@
+{
+  "asof": "2026-07-09",
+  "cadence": "daily",
+  "id": "SC3",
+  "name": "Semiconductor weight of SPX",
+  "notes": "Σ member weights where GICS industry = 453010. Same accumulation caveat.",
+  "panel": "other",
+  "provenance": "bloomberg_cache",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "Semiconductor weight of SPX",
+      "points": [
+        {
+          "date": "2026-07-08",
+          "value": 16.252
+        },
+        {
+          "date": "2026-07-09",
+          "value": 16.616
+        }
+      ],
+      "role": "avos",
+      "unit": null
+    }
+  ],
+  "source": "BBG member caps (computed)",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 16.62
+  },
+  "unit": "%"
+}

@@ -1,0 +1,30 @@
+{
+  "asof": "2026-07-09",
+  "cadence": "daily",
+  "id": "LV10",
+  "name": "L2: Call-wing richness",
+  "notes": "Positive = upside wings bid (call-demand regime, Citadel ch.20). Universe = snapshot names (32); % SPX members inverted lands with the member-breadth snapshot extension (itemized).",
+  "panel": "leverage",
+  "provenance": "massive_snapshot",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "25Δ call − ATM IV, volume-weighted (1M)",
+      "points": [
+        {
+          "date": "2026-07-09",
+          "value": -0.919
+        }
+      ],
+      "role": "avos",
+      "unit": null
+    }
+  ],
+  "source": "Massive snapshots",
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": -0.92
+  },
+  "unit": " vol pts"
+}

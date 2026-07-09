@@ -1,0 +1,29 @@
+# Secrets — single-line key files (house convention, §2)
+.fred_api_key
+.massive_api_key
+.massive_s3_key
+.massive_s3_keys
+.finra_api_key
+.nasdaq_api_key
+*.key
+
+# Data lake (Tier 3 material — never committed, §2 / §A8)
+data/dashboard/
+
+# Build outputs (regenerated deterministically from build_data/)
+outputs/dashboard/
+pulse_*.html
+
+# The display layer IS committed-optional: keep the latest so a page can be
+# rebuilt offline, but ignore per-day snapshots. Uncomment to track:
+# build_data/*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
