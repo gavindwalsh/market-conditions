@@ -113,6 +113,11 @@ def build() -> dict[str, bool]:
     last_fin_week = None
     if fin is not None and grouped is not None:
         otc = fin[fin["summaryTypeCode"] == "OTC_W_FIRM"].copy()
+        # tiered publication lag: T1 ~2wk, T2/OTCE ~4wk — weeks missing the
+        # slower tiers are incomplete and massively understate volume; drop them
+        tiers_per_wk = otc.groupby("weekStartDate")["tierIdentifier"].nunique()
+        complete = tiers_per_wk[tiers_per_wk >= tiers_per_wk.max()].index
+        otc = otc[otc["weekStartDate"].isin(complete)]
         wk_otc = otc.groupby("weekStartDate")["totalWeeklyShareQuantity"].sum()
         g = grouped.copy()
         g["date"] = pd.to_datetime(g["date"])
@@ -124,7 +129,7 @@ def build() -> dict[str, bool]:
             last_fin_week = both.index.max()
             fdf = both.rename("value").reset_index().rename(columns={"index": "week", "week": "date"})
             fdf.columns = ["date", "value"]
-            s_fin = _display_series(fdf, "FINRA non-ATS share of volume (official)", unit="%")
+            s_fin = _display_series(fdf, "FINRA non-ATS volume / consolidated (official, both-sides)", unit="% (FINRA)")
             s_fin["kind"] = "bar"
             series2.append(s_fin)
     ext = wkdf2 if last_fin_week is None else wkdf2[wkdf2["date"] > last_fin_week]
@@ -148,8 +153,10 @@ def build() -> dict[str, bool]:
                  "~2-3wk publication lag; lighter bars = our est. total retail "
                  "participation extending the lag window. DEFINITIONAL SEAM: FINRA "
                  "counts ALL internalized share volume (retail-dominant but not pure); "
-                 "ours is identified-retail dollars x3. The context line overlays our "
-                 "estimate across the full window for calibration. Daily: RF2D.",
+                 "ours is identified-retail dollars x3. FINRA per-firm rows also count "
+                 "BOTH sides of interdealer trades (~2x true share, hence own axis: "
+                 "trend is the signal, not the level); weeks missing the slower "
+                 "T2/OTCE publication tiers are excluded. Daily: RF2D.",
     })
     _emit("RF2D", "Retail participation — daily (est. total)", "retail",
           [("particip", "Est. total retail $ / tape $ (%)", "avos")], "particip", "%",

@@ -3,14 +3,14 @@
   "cadence": "weekly",
   "id": "RF2",
   "name": "Retail participation — weekly (est. total)",
-  "notes": "Quote-midpoint classifier (§5.1): identifies ~1/3 of retail trades. Gated 'uncalibrated' until RF9 >= 0.6 (§7.2). SCALED x3.0 to estimated TOTAL retail (identified floor x 3.0; factor from the BHJOS ~1/3 capture rate, confirmed vs ~20% consensus participation; provisional until RF9 fits it empirically). Unscaled floor = shown value / 3.0. SPLICED: solid bars = FINRA official non-ATS (wholesaler) share of consolidated share volume, weekly, ~2-3wk publication lag; lighter bars = our est. total retail participation extending the lag window. DEFINITIONAL SEAM: FINRA counts ALL internalized share volume (retail-dominant but not pure); ours is identified-retail dollars x3. The context line overlays our estimate across the full window for calibration. Daily: RF2D.",
+  "notes": "Quote-midpoint classifier (§5.1): identifies ~1/3 of retail trades. Gated 'uncalibrated' until RF9 >= 0.6 (§7.2). SCALED x3.0 to estimated TOTAL retail (identified floor x 3.0; factor from the BHJOS ~1/3 capture rate, confirmed vs ~20% consensus participation; provisional until RF9 fits it empirically). Unscaled floor = shown value / 3.0. SPLICED: solid bars = FINRA official non-ATS (wholesaler) share of consolidated share volume, weekly, ~2-3wk publication lag; lighter bars = our est. total retail participation extending the lag window. DEFINITIONAL SEAM: FINRA counts ALL internalized share volume (retail-dominant but not pure); ours is identified-retail dollars x3. FINRA per-firm rows also count BOTH sides of interdealer trades (~2x true share, hence own axis: trend is the signal, not the level); weeks missing the slower T2/OTCE publication tiers are excluded. Daily: RF2D.",
   "panel": "retail",
   "provenance": "finra+massive",
   "series": [
     {
       "estimated_from": null,
       "kind": "bar",
-      "name": "FINRA non-ATS share of volume (official)",
+      "name": "FINRA non-ATS volume / consolidated (official, both-sides)",
       "points": [
         {
           "date": "2025-12-22",
@@ -107,24 +107,20 @@
         {
           "date": "2026-06-01",
           "value": 52.226
-        },
-        {
-          "date": "2026-06-08",
-          "value": 11.701
-        },
-        {
-          "date": "2026-06-15",
-          "value": 10.978
         }
       ],
       "role": "avos",
-      "unit": "%"
+      "unit": "% (FINRA)"
     },
     {
       "estimated_from": null,
       "kind": "bar",
       "name": "Our est. total participation (extension)",
       "points": [
+        {
+          "date": "2026-06-19",
+          "value": 19.566
+        },
         {
           "date": "2026-06-26",
           "value": 20.278
@@ -155,11 +151,15 @@
         },
         {
           "date": "2026-05-15",
-          "value": 21.344
+          "value": 21.632
         },
         {
           "date": "2026-05-22",
           "value": 21.169
+        },
+        {
+          "date": "2026-06-19",
+          "value": 19.566
         },
         {
           "date": "2026-06-26",
