@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "SC5",
   "name": "Realized cross-sectional dispersion",
-  "notes": "Std-dev of same-day returns across SPX members. Uses TODAY'S membership applied backward (survivorship caveat) until historical membership lands; backfill extends via massive.pull_grouped_range.",
+  "notes": "Per-day std-dev of member daily returns; days with <400 member returns dropped. Uses TODAY'S membership applied backward until historical membership lands; backfill extends via massive.pull_grouped_range.",
   "panel": "other",
   "provenance": "massive_cache",
   "series": [
@@ -1105,10 +1105,15 @@
     }
   ],
   "source": "Massive grouped bars × SPX membership",
+  "status": {
+    "label": "survivorship",
+    "level": "provisional"
+  },
   "tile": {
     "delta": null,
     "percentile": 78.7,
     "value": 2.23
   },
+  "tooltip": "Spread of same-day returns across S&P 500 members — realized dispersion.",
   "unit": "%"
 }

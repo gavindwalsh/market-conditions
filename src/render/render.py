@@ -53,20 +53,39 @@ CHART_BOOT = """
     });
     var dual = units.length>1;
     var axisColor={};   /* unit → color of first series on that axis */
+    /* two-pass color assignment: role colors are reserved up front, then each
+       non-role series takes the next UNUSED palette color — no more duplicate
+       lines (role colors #A66C3D/#4F5C41 are palette members, so index-based
+       lookup collided on 14 of 33 multi-series charts). */
+    var used={};
+    m.series.forEach(function(s){
+      if(s.role==='benchmark') used['#A66C3D']=1;
+      else if(s.role==='avos'||s.role==='nowcast') used['#4F5C41']=1;
+    });
+    var nextColor=function(i){
+      for(var k=0;k<P.length;k++){ if(!used[P[k]]){used[P[k]]=1;return P[k];} }
+      return P[i%%P.length];  /* >6 distinct series: wrap */
+    };
     var series=m.series.map(function(s,i){
-      var color = s.role==='benchmark' ? '#A66C3D' : (s.role==='avos'||s.role==='nowcast' ? '#4F5C41' : P[i%%P.length]);
+      var color = s.role==='benchmark' ? '#A66C3D' : (s.role==='avos'||s.role==='nowcast' ? '#4F5C41' : nextColor(i));
       var dashed = s.role==='nowcast' || !!s.estimated_from;   /* §A9.5: estimates dashed */
       var u=s.unit||fallbackUnit;
       var ax=Math.min(units.indexOf(u),1);                      /* extras share the left axis */
       if(axisColor[ax]===undefined) axisColor[ax]=color;
       var pts=(s.points||[]);
       var isBar = s.kind==='bar';
-      return {name:s.name,type:isBar?'bar':'line',barWidth:isBar?'60%%':undefined,
+      return {name:s.name,type:isBar?'bar':'line',
+              stack:isBar&&s.stack?'total':undefined,
+              barMinWidth:isBar?2:undefined,barMaxWidth:isBar?26:undefined,
               showSymbol:!isBar&&pts.length<40,symbolSize:5,yAxisIndex:dual?ax:0,
               lineStyle:{width:2,color:color,type:dashed?'dashed':'solid'},
               itemStyle:{color:color,opacity:s.role==='nowcast'?0.55:1},
               data:(s.points||[]).map(function(p){return [p.date,p.value];})};
     });
+    /* legend so multi-series charts are readable without the tooltip */
+    var legend = m.series.length>1 ? {top:0,left:2,itemWidth:12,itemHeight:7,
+        itemGap:8,textStyle:{fontSize:10,color:'#5A5A5A'},icon:'roundRect',
+        data:m.series.map(function(s){return s.name;})} : undefined;
     var yAxes;
     if(dual){
       yAxes=[
@@ -84,7 +103,8 @@ CHART_BOOT = """
              nameTextStyle:{color:'#5A5A5A',align:'left'},
              splitLine:{lineStyle:{color:'#e2e2e2'}}};
     }
-    ch.setOption({grid:{left:56,right:dual?56:16,top:26,bottom:24},
+    ch.setOption({grid:{left:56,right:dual?56:16,top:legend?40:26,bottom:24},
+      legend:legend,
       xAxis:{type:'time',axisLine:{lineStyle:{color:'#1E1E1E'}}},
       yAxis:yAxes,
       tooltip:{trigger:'axis'},
@@ -131,6 +151,7 @@ def _fmt_value(v, unit=""):
 def _wordmark_data_uri():
     """Embed the avos wordmark from style_guides/ if reachable (§A9)."""
     candidates = [
+        os.path.join(os.path.dirname(BASE), "avos-lens-data", "docs", "style_guides", "LOGOTYPE-1.png"),
         os.path.join(os.path.dirname(BASE), "equities-pm", "style_guides", "LOGOTYPE-1.png"),
         os.path.join(BASE, "style_guides", "LOGOTYPE-1.png"),
     ]
@@ -156,9 +177,10 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
         charts = []
         for m in config.metrics_for_panel(key):
             d = display.get(m.id)
-            if not d or not d.get("series"):
+            if not d or not (d.get("series") or d.get("table")):
                 continue
-            embed[m.id] = d
+            if d.get("series"):
+                embed[m.id] = d
             tile = d.get("tile", {})
             stale = False
             asof = d.get("asof", "—")
@@ -168,13 +190,21 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
             except Exception:
                 pass
             unit = _clean_unit(d.get("unit", ""))
+            status = d.get("status") or {}
             charts.append({
-                "id": m.id, "name": m.name, "source": d.get("source", m.source),
+                # display JSON name wins (the compute's honest name) — registry
+                # names had drifted on RF1/IS7; registry stays the fallback
+                "id": m.id, "name": d.get("name") or m.name,
+                "source": d.get("source", m.source),
                 "asof": asof, "stale": stale,
                 "value_fmt": _fmt_value(tile.get("value"), unit),
                 "percentile": (round(tile["percentile"]) if tile.get("percentile")
                                is not None else None),
-                "notes": d.get("notes", ""),
+                # hover = one-sentence reading hint; long methodology lives in
+                # APPENDIX.md (§25) — notes kept as fallback for unconverted metrics
+                "tip": d.get("tooltip") or d.get("notes", ""),
+                "badge": status.get("level"), "badge_label": status.get("label"),
+                "table": d.get("table"),
             })
         if charts:
             panels.append({"title": title, "charts": charts})
@@ -201,7 +231,73 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
         with open(tmp, "w", encoding="utf-8") as f:
             f.write(html)
         os.replace(tmp, path)
+    _write_appendix(display)  # §25: methodology appendix, single-sourced
     return latest
+
+
+APPENDIX_PREAMBLE = """\
+# Market Pulse — metric appendix
+
+Generated by the render step from the display layer (`build_data/*.json`) —
+edit methodology text in the emitting compute module, not here. Tooltips on the
+page carry the one-sentence reading hint; this file carries the mechanics.
+
+## Shared methodology
+
+### Retail identification & scaling (§5.1)
+The classifier identifies retail trades as off-exchange (TRF) prints with
+subpenny price improvement (BHJOS, JF 2024) and signs them against the
+prevailing NBBO midpoint (above mid = buy; at-mid excluded). This identifies
+roughly 1/3 of retail activity, so DOLLAR-denominated retail metrics are scaled
+×3.0 to estimated totals — a provisional factor until the RF9 calibration vs
+Nasdaq RTAT fits it empirically (gate: correlation ≥ 0.6, §7.2). Ratios
+(concentration, buy-the-dip, trade size) are scale-invariant and unscaled.
+
+### Small-lot options proxy (§5.2)
+Trades under 10 contracts proxy retail options activity — an observed
+regularity, not identification. Reconciles to published totals (Citadel ch.11).
+
+### FINRA participation anchor (RF2)
+FINRA weekly per-firm non-ATS volume (T1+T2 tiers only; OTCE excluded — it has
+no counterpart in our NMS tape denominator) counts BOTH sides of internalized
+trades, so its level ≈ 2× true share. It is rescaled onto our participation
+definition with k = mean(ours/FINRA) over overlap weeks and rendered as the
+official trend anchor; our estimate extends FINRA's 2–4 week publication lag.
+
+### ETF flow universe
+Curated ~53-fund universe (top of complex, §A3 coverage label) — not all US
+ETFs. Flows via the shares-outstanding method: flow = Δshares × NAV.
+
+### Realized vol conventions
+Realized-vol legs follow the Bloomberg convention (trading-day window, log
+returns, √260 annualization) so chart values tie to Terminal fields; "1M
+realized" = 21 sessions, tenor-matched to 30-day implied.
+
+## Per-metric notes
+"""
+
+
+def _write_appendix(display: dict) -> str:
+    """APPENDIX.md — per-metric methodology, generated from the display layer."""
+    lines = [APPENDIX_PREAMBLE]
+    for key, _title in config.PANELS:
+        for m in config.metrics_for_panel(key):
+            d = display.get(m.id)
+            if not d:
+                continue
+            lines.append(f"### {m.id} — {d.get('name') or m.name}")
+            status = d.get("status") or {}
+            if status:
+                lines.append(f"**Status: {status.get('label') or status.get('level')}**")
+            meta = f"*Source: {d.get('source', m.source)} · cadence: {m.cadence}*"
+            lines.append(meta)
+            if d.get("notes"):
+                lines.append(d["notes"])
+            lines.append("")
+    path = os.path.join(BASE, "APPENDIX.md")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    return path
 
 
 def _source_status_line() -> str:

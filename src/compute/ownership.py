@@ -18,11 +18,17 @@ from .. import store, util
 MIN_QUARTERLY_OBS = 40  # ~10yr of quarterly prints — percentile gate for Q series
 
 
-def _display_series(df: pd.DataFrame, name: str, role: str = "avos", unit: str = None):
-    disp = util.downsample_display(df)
+def _display_series(df: pd.DataFrame, name: str, role: str = "avos", unit: str = None,
+                    ds: str = "auto"):
+    """One display series. ds='auto' applies the §6 downsample (daily last year,
+    monthly last-obs before); ds='none' keeps every point — REQUIRED for bar
+    series that are already aggregated (weekly/monthly/quarterly), because
+    monthly last-obs sampling breaks bar widths and lies about aggregates."""
+    disp = util.downsample_display(df) if ds == "auto" else df.copy()
     return {"name": name, "role": role, "estimated_from": None, "unit": unit,
             "points": [{"date": pd.Timestamp(d).strftime("%Y-%m-%d"), "value": round(float(v), 3)}
-                       for d, v in zip(disp["date"], disp["value"])]}
+                       for d, v in zip(disp["date"], disp["value"])
+                       if pd.notna(v)]}
 
 
 def build_op1() -> bool:
@@ -116,12 +122,15 @@ def build_op2() -> bool:
     total = total[["date", "value"]].sort_values("date")
     total["value"] /= 1e6  # $M → $T
     total["date"] = pd.to_datetime(total["date"])
+    # DFA dates quarter-START convention: the level is as of quarter-END, so
+    # shift for display (and the roll anchor reads straight off the last row)
+    total["date"] = total["date"] + pd.offsets.QuarterEnd(1)
 
     tr = spx_tr.copy()
     tr["date"] = pd.to_datetime(tr["date"])
-    # DFA dates quarter-START convention: level is as of quarter-END (+3mo)
+    tr = tr.sort_values("date")
     last_row = total.iloc[-1]
-    qend = last_row["date"] + pd.offsets.QuarterEnd(1)
+    qend = last_row["date"]  # already quarter-end after the shift
     base = tr[tr["date"] <= qend]
     if base.empty:
         return False
@@ -129,21 +138,27 @@ def build_op2() -> bool:
     fwd = tr[tr["date"] > qend].copy()
     fwd["value"] = last_row["value"] * fwd["value"] / base_tr
     now_val = float(fwd["value"].iloc[-1]) if not fwd.empty else float(last_row["value"])
+    asof = (fwd["date"].iloc[-1] if not fwd.empty else qend).strftime("%Y-%m-%d")
+    # anchor the dashed nowcast at the last official point so the two segments join
+    fwd = pd.concat([pd.DataFrame({"date": [qend], "value": [last_row["value"]]}),
+                     fwd[["date", "value"]]], ignore_index=True)
+    official = total.tail(12)  # last ~3yr; OP1 next to it carries the full history
 
     store.write_display("OP2", {
         "id": "OP2", "name": "Household equity — nowcast", "panel": "ownership",
         "source": "FRED DFA × BBG SPTR (§5.6)", "cadence": "daily",
-        "asof": (fwd["date"].iloc[-1].strftime("%Y-%m-%d") if not fwd.empty
-                 else last_row["date"].strftime("%Y-%m-%d")),
+        "asof": asof,
         "unit": " $T",
-        "series": [_display_series(total, "Household corporate equities (DFA, official)"),
-                   {**_display_series(fwd[["date", "value"]], "Nowcast (SPX-TR rolled)", role="nowcast"),
+        "series": [_display_series(official, "Household corporate equities (DFA, official)"),
+                   {**_display_series(fwd, "Nowcast (SPX-TR rolled)", role="nowcast"),
                     "estimated_from": qend.strftime("%Y-%m-%d")}],
         "tile": {"value": round(now_val, 1), "delta": None, "percentile": None},
         "provenance": "derived",
-        "notes": "Last DFA print rolled with SPX total return; cohort shares frozen "
-                 "(§5.6). Dashed = nowcast; flagged until the next DFA print "
-                 "(Q2 2026 lands 2026-09-11). Percentile suppressed on nowcast.",
+        "tooltip": "Official quarterly household equity rolled forward daily with SPX "
+                   "total return (dashed = nowcast).",
+        "notes": "Last DFA print rolled forward with SPX total return; cohort shares "
+                 "frozen until the next DFA print (Q2 2026 lands 2026-09-11). Official "
+                 "series trimmed to ~12 quarters; percentile suppressed on the nowcast.",
     })
     return True
 
@@ -199,25 +214,40 @@ def build_op567() -> dict[str, bool]:
         "series": ytd_series,
         "tile": {"value": round(float(daily.rolling(20).sum().iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(daily.rolling(20).sum().dropna())},
-        "provenance": "bloomberg_cache", "notes": coverage_note + " Overlaid cumulative-YTD by year.",
+        "provenance": "bloomberg_cache",
+        "tooltip": "Cumulative ETF net flows year-to-date, overlaid by year.",
+        "notes": coverage_note + " Overlaid cumulative-YTD by year.",
     })
 
-    # OP6 — flows by category (20d rolling sum per category)
+    # OP6 — flows by category, stacked WEEKLY bars (CIO 2026-07-10). Ghost rows
+    # (e.g. a holiday with one stray ticker print) NaN-poisoned the old 20d
+    # rolling window and froze the tile 3 weeks stale — drop them first.
     cat = f.pivot_table(index="date", columns="category", values="flow", aggfunc="sum") / 1e3
-    cat = cat.rolling(20).sum().dropna(how="all")
-    series = [_display_series(cat[c].dropna().rename("value").reset_index(), f"{c} (20d, $B)",
-                              role="avos" if c == "leveraged" else "context")
-              for c in cat.columns]
-    lev20 = cat["leveraged"].dropna() if "leveraged" in cat.columns else None
+    cat = cat[cat.notna().sum(axis=1) >= 3].fillna(0.0)
+    weekly = cat.resample("W-FRI").sum()
+    weekly = weekly[weekly.index <= cat.index.max() + pd.Timedelta(days=4)]
+    if len(weekly) > 1:
+        weekly = weekly.iloc[:-1]  # drop the in-progress week
+    weekly = weekly.tail(156)      # ~3 years
+    series = []
+    for c in weekly.columns:
+        sd = _display_series(weekly[c].rename("value").reset_index(),
+                             f"{c} ($B/wk)", role="context", unit="$B", ds="none")
+        sd["kind"], sd["stack"] = "bar", True
+        series.append(sd)
+    lev_w = weekly["leveraged"] if "leveraged" in weekly.columns else None
     store.write_display("OP6", {
         "id": "OP6", "name": "ETF flows by category", "panel": "flows",
-        "source": "BBG Δshares × NAV", "cadence": "daily",
-        "asof": cat.index.max().strftime("%Y-%m-%d"), "unit": " $B (tile: leveraged 20d)",
+        "source": "BBG Δshares × NAV", "cadence": "weekly",
+        "asof": weekly.index.max().strftime("%Y-%m-%d"), "unit": " $B/wk (tile: leveraged)",
         "series": series,
-        "tile": {"value": round(float(lev20.iloc[-1]), 2) if lev20 is not None else None,
+        "tile": {"value": round(float(lev_w.iloc[-1]), 2) if lev_w is not None else None,
                  "delta": None,
-                 "percentile": util.trailing_percentile(lev20) if lev20 is not None else None},
-        "provenance": "bloomberg_cache", "notes": coverage_note,
+                 "percentile": (util.trailing_percentile(lev_w, min_history=52)
+                                if lev_w is not None else None)},
+        "provenance": "bloomberg_cache",
+        "tooltip": "Weekly net ETF flows stacked by category — positives up, redemptions down.",
+        "notes": coverage_note + " Weekly sums per category; in-progress week dropped.",
     })
 
     # OP7 — leveraged AUM total + single-stock slice
@@ -235,7 +265,10 @@ def build_op567() -> dict[str, bool]:
                                    role="context")],
         "tile": {"value": round(float(tot.iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(tot)},
-        "provenance": "bloomberg_cache", "notes": coverage_note,
+        "provenance": "bloomberg_cache",
+        "tooltip": "Assets in the leveraged-ETF complex; second line = the single-stock slice.",
+        "notes": "AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — "
+                 "not all US leveraged ETFs; single-stock slice broken out.",
     })
     return {"OP5": True, "OP6": True, "OP7": True}
 

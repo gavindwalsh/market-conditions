@@ -3,7 +3,7 @@
   "cadence": "monthly",
   "id": "LV15",
   "name": "L4: FINRA margin debt",
-  "notes": "Debit balances in customers' securities margin accounts (monthly, ~3-week lag). Archive 1997–2021 + live page table stitched.",
+  "notes": "FINRA monthly margin statistics (~3-week lag). Archive 1997–2021 + live page table stitched.",
   "panel": "leverage",
   "provenance": "finra_cache",
   "series": [
@@ -2806,5 +2806,6 @@
     "percentile": 99.86,
     "value": 1416.0
   },
+  "tooltip": "Debit balances in securities margin accounts — the stock of retail leverage.",
   "unit": " $B"
 }

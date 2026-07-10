@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "LV11",
   "name": "L3: Variance risk premium",
-  "notes": "Implied 1M minus vol realized over the SUBSEQUENT 21 sessions — the toll paid by option buyers. Series ends ~1 month ago by construction.",
+  "notes": "Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 sessions.",
   "panel": "leverage",
   "provenance": "derived",
   "series": [
@@ -3526,5 +3526,6 @@
     "percentile": 46.53,
     "value": 4.17
   },
+  "tooltip": "Implied vol minus what was subsequently realized — the toll option buyers paid; ends ~1 month ago by construction.",
   "unit": " vol pts"
 }

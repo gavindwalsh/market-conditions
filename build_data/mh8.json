@@ -3,7 +3,7 @@
   "cadence": "weekly",
   "id": "MH8",
   "name": "Sentiment (NAAIM exposure)",
-  "notes": "Active-manager mean equity exposure (0=flat, 100=fully long, ±200 levered). AAII bull−bear leg blocked (survey file now members-only) — see blockers list.",
+  "notes": "NAAIM weekly manager-exposure survey. AAII bull−bear leg blocked (survey file now members-only) — see blockers list.",
   "panel": "internals",
   "provenance": "scrape_cache",
   "series": [
@@ -1150,5 +1150,6 @@
     "percentile": 70.22,
     "value": 83.0
   },
+  "tooltip": "Active-manager equity exposure: 0 flat, 100 fully long, ±200 levered.",
   "unit": ""
 }

@@ -163,7 +163,48 @@ def pull_iv_histories() -> int:
                 store.append_parquet(f"bbg_iv_{name}_{t.lower()}", df, pulled_at=pulled_at); n += 1
         except Exception as e:  # noqa: BLE001
             store.log_run("bbg:iv", "fail", f"{t}: {str(e)[:80]}")
+    # VC6 comparison baskets (semis already covered above)
+    for basket, names in config.IV_BASKETS.items():
+        if basket == "semis":
+            continue
+        for t in names:
+            try:
+                df = hist(f"{t} US Equity", "2016-01-01", field=IV_3M_ATM)
+                store.append_parquet(f"bbg_iv3m_{t.lower()}", df, pulled_at=pulled_at); n += 1
+            except Exception as e:  # noqa: BLE001
+                store.log_run("bbg:iv", "fail", f"{t}: {str(e)[:80]}")
     return n
+
+
+def pull_short_interest_history(start: str = "2023-11-01") -> int:
+    """LV16 backfill: biweekly SHORT_INT + SHORT_INT_RATIO prints per member via
+    bdh (verified live 2026-07-10: bdh serves the biweekly history). One-time —
+    ~500 sequential per-ticker calls; the daily pull_short_interest snapshot
+    keeps the table current afterwards."""
+    from .. import store
+    from datetime import datetime as _dt
+    tickers = index_members()
+    pulled_at = _dt.now().isoformat(timespec="seconds")
+    frames = []
+    for t in tickers:
+        try:
+            h = _blp().bdh(t, ["SHORT_INT", "SHORT_INT_RATIO"], start, date.today().isoformat())
+            if h.empty:
+                continue
+            h.columns = [c[1].lower() for c in h.columns]
+            h = h.rename(columns={"short_int": "short_int", "short_int_ratio": "short_int_ratio"})
+            out = h.reset_index().rename(columns={"index": "date"})
+            out["date"] = pd.to_datetime(out["date"]).dt.strftime("%Y-%m-%d")
+            out["ticker"] = t
+            frames.append(out)
+        except Exception as e:  # noqa: BLE001
+            store.log_run("bbg:si_hist", "fail", f"{t}: {str(e)[:80]}")
+    if not frames:
+        return 0
+    df = pd.concat(frames, ignore_index=True)
+    store.append_parquet("bbg_short_interest_hist", df, pulled_at=pulled_at)
+    store.log_run("bbg:si_hist", "ok", f"{len(frames)} tickers, {len(df)} rows since {start}")
+    return len(frames)
 
 
 def pull_short_interest(tickers: list[str]) -> pd.DataFrame:

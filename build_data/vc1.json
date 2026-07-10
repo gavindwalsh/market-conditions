@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "VC1",
   "name": "Implied correlation",
-  "notes": "Cboe implied correlation indices. Low = single-stock moves dominate index moves (dispersion regime). VC2 spread vs realized lands with member returns (Phase 2).",
+  "notes": "Cboe implied correlation indices; tile ranks COR1M. The spread vs realized correlation is VC2.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -3534,5 +3534,6 @@
     "percentile": 0.18,
     "value": 4.26
   },
+  "tooltip": "Implied correlation — low means single-name moves dominate the index (dispersion regime).",
   "unit": ""
 }

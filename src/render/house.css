@@ -1,7 +1,9 @@
 /* Avos house style (§A9 / §6). Colors and type are the brand source of truth. */
 :root{
   --bg:#EFEFEF; --card:#FFFFFF; --ink:#1E1E1E; --body:#5A5A5A;
-  --green:#4B5C3E; --green-chart:#4F5C41; --lav:#D5CAFF;
+  --green:#4B5C3E; --green-chart:#4F5C41; --lav:#D4C9FF; /* brand COLOR.pdf swatch 3 */
+  /* --s1 is a darkened chart-legible derivative of brand lavender #D4C9FF
+     (the raw swatch fails contrast as a 2px line on white) */
   --s1:#7F77B2; --s2:#A66C3D; --s3:#4F5C41; --s4:#A6B296; --s5:#9AA3C2; --s6:#637F8F;
   --stale:#C9A227;
 }
@@ -36,6 +38,19 @@ header .asof{font-size:12px;opacity:.9;text-align:right}
 .ctitle .tip b{color:var(--lav)}
 .ctitle:hover .tip{display:block}
 .chart{width:100%;height:260px}
+/* status badges (§7.2 explicit banner — was hover-only) */
+.badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.4px;
+  padding:1px 7px;border-radius:9px;margin-left:6px;vertical-align:1px;text-transform:uppercase}
+.badge-uncalibrated,.badge-provisional{background:#F4E5B8;color:#7A6210}
+.badge-unverified{background:#EDD3CE;color:#8A3B2E}
+.badge-building{background:#DDE3EA;color:#44586B}
+/* metric table cards (no-history measures rendered as a table, not a line) */
+.mtable-wrap{overflow-x:auto}
+.mtable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+.mtable th{text-align:left;color:var(--ink);font-weight:600;border-bottom:2px solid var(--green);
+  padding:5px 8px;font-size:11.5px}
+.mtable td{padding:5px 8px;border-bottom:1px solid #e2e2e2;color:var(--body)}
+.mtable td:first-child{color:var(--ink);font-weight:600}
 footer{margin:26px 22px;padding-top:14px;border-top:1px solid #ddd;font-size:11.5px;color:var(--body)}
 footer code{background:#e7e7e7;padding:1px 4px;border-radius:3px}
 .glossary dt{color:var(--ink);font-weight:600;margin-top:6px}

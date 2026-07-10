@@ -3,12 +3,13 @@
   "cadence": "daily",
   "id": "LV6",
   "name": "Leveraged-ETF rebalance notional",
-  "notes": "Σ AUM×L×(L−1)×underlying move across 17 major leveraged funds (curated universe — coverage labeled, §A3). Same-direction flow: both long- and inverse-levered funds chase the day's move at the close.",
+  "notes": "Σ AUM×L×(L−1)×underlying move across 17 major leveraged funds (curated universe, §A3). Both long- and inverse-levered funds chase the day's move at the close, so flow carries the move's sign.",
   "panel": "leverage",
   "provenance": "derived",
   "series": [
     {
       "estimated_from": null,
+      "kind": "bar",
       "name": "Estimated forced EOD flow ($B/day)",
       "points": [
         {
@@ -3054,5 +3055,6 @@
     "percentile": 98.81,
     "value": 5.0
   },
+  "tooltip": "Bars = estimated forced end-of-day leveraged-ETF flow; line = capacity per 1% index move.",
   "unit": " $B (tile: per-1% capacity)"
 }

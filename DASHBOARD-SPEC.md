@@ -82,6 +82,36 @@ Field mnemonics/series IDs marked **[verified]** were tested live in the 2026-07
 
 ## 4. Panels & metric registry
 
+> **Amendment 2026-07-10 (CIO chart review, 27 items — supersedes conflicting
+> rows below; `config.py` registry is authoritative):**
+> - **Killed:** SC1, SC2, SC3 (concentration trio), VC4 (skew panel — combined
+>   two unrelated reads), RF1D/RF2D (RF1/RF2 are now the daily/weekly views).
+> - **Moved:** SC4, SC5 → Internals panel; the "Other" panel is retired.
+> - **Split:** MH1 → MH1 (% above 50/200dma) + MH1B (leadership: RSP/SPY +
+>   NDX/SPX rebased at common start; cumulative A/D line dropped). MH7 slimmed
+>   to MOVE + UST10y + 2s10s (DXY dropped).
+> - **New:** LVT — snapshot table for no-history leverage reads (LV5 GEX, LV7
+>   box, LV10 wings, LV14 broker rates); each returns to a chart as history
+>   accrues. LV16 gained real history via a SHORT_INT bdh backfill (2023-11→).
+> - **Chart forms:** RF1 daily bars; RF3 bars ($B) + share lines dual-axis;
+>   RF5/OP8 bars; MH9 bars+line dual-axis; LV3/OP6/MH5 stacked bars; LV6
+>   signed daily bars; IS2 monthly bars; IS7 weekly bars (insurance filers
+>   excluded from the count).
+> - **Fixes:** realized-vol legs → BBG convention (360 trading days, log
+>   returns, √260) + tenor-matched 1M leg on VC7/VC8; RF2 FINRA anchor
+>   restricted to T1+T2 tiers with a T1-only lag segment and Friday-aligned
+>   week labels; LV13 sign error + missing SOFR subtraction fixed (long index
+>   funds only); LV8 pruned of quarterly-roll artifacts; LV16 float-cap unit
+>   fix; OP2 display anchoring; OP6 ghost-row staleness fix; LV2 5d-avg +
+>   holiday filter with the SPX line parked for LV1.
+> - **VC6:** four equal-weight single-name 3M-IV baskets (semis, hyperscalers,
+>   healthcare, staples) — sector-ETF IV rejected (embeds correlation, not
+>   level-comparable).
+> - **Presentation:** one-sentence tooltips + visible status badges
+>   (uncalibrated/provisional/unverified/building); long methodology moved to
+>   the generated `APPENDIX.md`; legends on multi-series charts; two-pass
+>   palette assignment (no duplicate line colors).
+
 Legend: **Phase** 1 = Bloomberg + free sources · 2 = + Massive stocks · 3 = + Massive options. **Hist** = minimum history to load at first build. Chart forms per house standards §A9.3 (direct series labels where space allows).
 
 ### §4.0 Source assignment under Massive-first (decided 2026-07-08)

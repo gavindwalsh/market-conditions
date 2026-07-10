@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "MH3",
   "name": "Household credit — market-priced (MBS CC spread)",
-  "notes": "Agency MBS current-coupon spread — the market price of household mortgage credit/prepay risk. Consumer ABS OAS legs (cards, autos) pending BBG index-ticker verification (§4 MH3).",
+  "notes": "Agency MBS current-coupon spread — FNMA current coupon minus a 5y/10y Treasury blend. Consumer ABS OAS legs (cards, autos) pending BBG index-ticker verification (§4 MH3).",
   "panel": "credit",
   "provenance": "derived",
   "series": [
@@ -1530,5 +1530,6 @@
     "percentile": 60.58,
     "value": 108.0
   },
+  "tooltip": "Market price of mortgage credit/prepay risk.",
   "unit": " bp"
 }

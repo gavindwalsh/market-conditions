@@ -72,3 +72,13 @@ OPRA daily file is small (~80MB gz, ~1 min process). Tape backfill to
 AAII (403 members-only), ICI weekly link-mining (OP4), RF6 pagination,
 LV9 sanity-gated (non-synchronous closes), IS1/3/5/6 (no DAPI path; EDGAR
 424B4 route sketched), LV14 seed rates UNVERIFIED, Nasdaq key for RF9.
+
+**2026-07-10: 27-item CIO chart review implemented.** See the §4 amendment
+block in DASHBOARD-SPEC.md for the full change list. Highlights: SC1-3/VC4/
+RF1D/RF2D killed; RF1 daily bars; RF2 FINRA anchor fixed (T1+T2 only, T1-only
+lag segment, Friday labels); realized vol → BBG 360d convention; LV13
+sign/SOFR fix; LV16 unit fix + real SI history (bdh backfill 2023-11→); LV8
+roll-artifact prune; OP2/OP6 fixes; stacked bars (LV3/OP6/MH5); MH1 split;
+LVT snapshot table for no-history leverage reads; VC6 = 4 sector IV baskets;
+one-sentence tooltips + status badges + generated APPENDIX.md; legends +
+duplicate-color fix in the renderer.

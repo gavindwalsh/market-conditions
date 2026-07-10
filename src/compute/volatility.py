@@ -34,9 +34,10 @@ def build_vc1() -> bool:
         "tile": {"value": round(float(c1["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(c1["value"])},
         "provenance": "bloomberg_cache",
-        "notes": "Cboe implied correlation indices. Low = single-stock moves dominate "
-                 "index moves (dispersion regime). VC2 spread vs realized lands with "
-                 "member returns (Phase 2).",
+        "tooltip": "Implied correlation — low means single-name moves dominate the index "
+                   "(dispersion regime).",
+        "notes": "Cboe implied correlation indices; tile ranks COR1M. The spread vs "
+                 "realized correlation is VC2.",
     })
     return True
 
@@ -57,15 +58,17 @@ def build_vc3() -> bool:
         "tile": {"value": round(float(ratio["value"].iloc[-1]), 3), "delta": None,
                  "percentile": util.trailing_percentile(ratio["value"])},
         "provenance": "bloomberg_cache",
-        "notes": "Ratio > 1 (near-dated vol above 3-month) marks stress/inversion; "
-                 "persistent low ratio = carry-friendly contango. Per-name slopes "
-                 "for top names extend this row later (§4 VC3).",
+        "tooltip": "VIX/VIX3M above 1 = stress inversion; low = carry-friendly contango.",
+        "notes": "Daily close ratio of VIX to VIX3M. Per-name term-structure slopes for "
+                 "top names are a noted extension.",
     })
     return True
 
 
 def build_mh7() -> bool:
-    parts = {m: _lake_series(m) for m in ("move", "dxy", "ust10y", "ust2y")}
+    # DXY dropped 2026-07-10: its 73-112 range flatlines under MOVE's 39-148
+    # on the shared 'level' axis and it added the least as context
+    parts = {m: _lake_series(m) for m in ("move", "ust10y", "ust2y")}
     if any(v is None for v in parts.values()):
         return False
     curve = parts["ust10y"].rename(columns={"value": "y10"}).merge(
@@ -74,17 +77,18 @@ def build_mh7() -> bool:
     move = parts["move"]
     store.write_display("MH7", {
         "id": "MH7", "name": "Cross-asset context", "panel": "internals",
-        "source": "BBG MOVE/DXY/UST", "cadence": "daily",
+        "source": "BBG MOVE/UST", "cadence": "daily",
         "asof": move["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " (tile: MOVE)",
         "series": [_display_series(move, "MOVE (rates vol)", unit="level"),
-                   _display_series(parts["dxy"], "DXY", role="context", unit="level"),
                    _display_series(parts["ust10y"], "UST 10y (%)", role="context", unit="%"),
                    _display_series(curve[["date", "value"]], "2s10s slope (pct-pts)", role="benchmark", unit="%")],
         "tile": {"value": round(float(move["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(move["value"])},
         "provenance": "bloomberg_cache",
-        "notes": "Rates vol (MOVE), dollar (DXY), 10y yield, 2s10s curve slope — the "
-                 "cross-asset backdrop for the equity reads.",
+        "tooltip": "Rates vol (left) with the 10-year yield and curve slope (right) — "
+                   "the rates backdrop for equities.",
+        "notes": "MOVE on its own level axis; UST 10y and the 2s10s slope (10y − 2y, "
+                 "pct-pts) share the % axis. DXY dropped 2026-07-10.",
     })
     return True
 
@@ -139,9 +143,10 @@ def build_vc2() -> bool:
         "tile": {"value": round(float(df["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "derived",
-        "notes": "Realized correlation from the index-variance identity over SPX members "
-                 "(current membership applied backward). Positive spread = correlation "
-                 "risk premium earned by dispersion sellers.",
+        "tooltip": "Implied minus realized correlation — the premium dispersion sellers "
+                   "are earning.",
+        "notes": "Realized correlation from the index-variance identity over SPX members, "
+                 "21d rolling, current membership applied backward.",
     })
     return True
 
@@ -220,39 +225,58 @@ def build_vc4() -> bool:
 
 
 def build_vc6() -> bool:
-    """VC6: average 3M ATM IV across the top-10 semis (equal-weight v1 —
-    cap-weights when the snapshot covers all names; TSM ADR lacks a member cap)."""
+    """VC6: equal-weight 3M ATM IV baskets — semis vs hyperscalers, healthcare,
+    staples (CIO 2026-07-10). All four lines share the SAME construction
+    (equal-weight single-name IV) so levels are directly comparable; sector-ETF
+    IV was rejected — it embeds cross-name correlation and reads far lower."""
     from .. import config
-    parts = []
-    for t in config.SEMI_TOP10:
-        df = store.read_latest(f"bbg_iv3m_{t.lower()}")
-        if df is None or df.empty:
-            continue
-        d = df[["date", "value"]].copy()
-        d["date"] = pd.to_datetime(d["date"])
-        parts.append(d.set_index("date")["value"].rename(t))
-    if len(parts) < 5:
+
+    def _basket_avg(names: list[str]) -> tuple[pd.DataFrame | None, int]:
+        parts = []
+        for t in names:
+            df = store.read_latest(f"bbg_iv3m_{t.lower()}")
+            if df is None or df.empty:
+                continue
+            d = df[["date", "value"]].copy()
+            d["date"] = pd.to_datetime(d["date"])
+            parts.append(d.set_index("date")["value"].rename(t))
+        if len(parts) < max(3, len(names) // 2):
+            return None, 0
+        avg = pd.concat(parts, axis=1).mean(axis=1).dropna().rename("value").reset_index()
+        return avg, len(parts)
+
+    semis, n_semis = _basket_avg(config.IV_BASKETS["semis"])
+    if semis is None:
         return False
-    avg = pd.concat(parts, axis=1).mean(axis=1).dropna().rename("value").reset_index()
+    series = [_display_series(semis, f"Semis ({n_semis} names)", role="context")]
+    for basket in ("hyperscalers", "healthcare", "staples"):
+        avg, n = _basket_avg(config.IV_BASKETS[basket])
+        if avg is not None:
+            series.append(_display_series(avg, f"{basket.capitalize()} ({n} names)",
+                                          role="context"))
     store.write_display("VC6", {
-        "id": "VC6", "name": "Top-10 semis avg 3M IV", "panel": "volatility",
+        "id": "VC6", "name": "3M IV by sector basket", "panel": "volatility",
         "source": "BBG per-name 3M ATM IV", "cadence": "daily",
-        "asof": avg["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " vol pts",
-        "series": [_display_series(avg, f"Avg 3M ATM IV, {len(parts)} semis (equal-wt)")],
-        "tile": {"value": round(float(avg["value"].iloc[-1]), 1), "delta": None,
-                 "percentile": util.trailing_percentile(avg["value"])},
+        "asof": semis["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " vol pts",
+        "series": series,
+        "tile": {"value": round(float(semis["value"].iloc[-1]), 1), "delta": None,
+                 "percentile": util.trailing_percentile(semis["value"])},
         "provenance": "bloomberg_cache",
-        "notes": "Equal-weight v1 across " + ", ".join(config.SEMI_TOP10) + " (§4 wants "
-                 "cap-weighted — upgrade with full cap coverage). Doubles as the ±1 vol-pt "
-                 "QC reference for Phase-3 snapshot IV (§7.3).",
+        "tooltip": "Equal-weight single-name 3M implied vol by sector basket — same "
+                   "construction, comparable levels.",
+        "notes": "Per-name 3M ATM IV averaged equally within each basket; a basket only "
+                 "renders with at least half its names (min 3). Tile: semis.",
     })
     return True
 
 
-def _realized_252(px: pd.DataFrame) -> pd.DataFrame:
-    """Trailing-1y realized vol (annualized %, 252d rolling) from index closes."""
-    s = px.set_index("date")["value"].pct_change()
-    rv = (s.rolling(252).std() * (252 ** 0.5) * 100.0).dropna()
+def _realized(px: pd.DataFrame, window: int, annualize: float) -> pd.DataFrame:
+    """Rolling realized vol (annualized %) from index closes, log returns.
+    BBG convention (VOLATILITY_360D etc.): trading-day window, sqrt(260)
+    annualization — verified 2026-07-10 vs Terminal (17.61 vs BBG 17.62)."""
+    import numpy as np
+    s = np.log(px.set_index("date")["value"]).diff()
+    rv = (s.rolling(window).std() * (annualize ** 0.5) * 100.0).dropna()
     return rv.rename("value").reset_index()
 
 
@@ -262,7 +286,8 @@ def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
     px = _lake_series(px_mnemonic)
     if px is None:
         return False
-    rv = _realized_252(px)
+    rv360 = _realized(px, 360, 260)   # BBG VOLATILITY_360D convention
+    rv30 = _realized(px, 21, 260)     # ~30-calendar-day: tenor-matched to the 30d IV
     if wings:
         call = store.read_latest(f"bbg_{iv_prefix}_call_wing")
         put = store.read_latest(f"bbg_{iv_prefix}_put_wing")
@@ -274,41 +299,41 @@ def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
             _display_series(put[["date", "value"]], "10% OTM put IV (90% mny)", unit="vol"),
             _display_series(call[["date", "value"]], "10% OTM call IV (110% mny)",
                             role="context", unit="vol"),
-            _display_series(rv, "Realized vol (trailing 1y)", role="benchmark", unit="vol"),
+            _display_series(rv360, "Realized vol (360d, BBG conv.)", role="benchmark", unit="vol"),
         ]
         latest = float(put["value"].iloc[-1])
         pctile = util.trailing_percentile(put["value"])
         asof = put["date"].iloc[-1].strftime("%Y-%m-%d")
         name = f"{idx_name} 10% OTM call/put IV"
-        note = ("30-day IV at 90%/110% moneyness (OTM put / OTM call wings) vs "
-                "realized vol over the trailing 252 sessions. Wing gap = skew; "
-                "either wing above realized = premium to realized. Tile: put wing.")
+        tip = ("Downside and upside 10% OTM wing vol vs realized — the gap between "
+               "wings is the skew.")
+        note = ("90%/110% moneyness 30d IV; realized leg uses log returns over 360 "
+                "trading days, sqrt(260) annualized. Tile: put wing.")
     else:
         atm = store.read_latest(f"bbg_{iv_prefix}_atm")
         if atm is None:
             return False
         atm = atm.sort_values("date").assign(date=lambda d: pd.to_datetime(d["date"]))
         series = [
-            _display_series(atm[["date", "value"]], "ATM IV (30d, calls = puts by parity)",
-                            unit="vol"),
-            _display_series(rv, "Realized vol (trailing 1y)", role="benchmark", unit="vol"),
+            _display_series(atm[["date", "value"]], "ATM IV (30d)", unit="vol"),
+            _display_series(rv30, "Realized vol (1M)", role="context", unit="vol"),
+            _display_series(rv360, "Realized vol (360d, BBG conv.)", role="benchmark", unit="vol"),
         ]
         latest = float(atm["value"].iloc[-1])
         pctile = util.trailing_percentile(atm["value"])
         asof = atm["date"].iloc[-1].strftime("%Y-%m-%d")
         name = f"{idx_name} ATM implied vs realized vol"
-        note = ("30-day ATM implied vol vs realized vol over the trailing 252 "
-                "sessions. ATM call and put IV coincide by put-call parity "
-                "(verified live: identical to 6dp), so one ATM line is shown. "
-                "IV above slow realized = short-dated premium; below = implied "
-                "pricing calmer than the past year.")
+        tip = ("30-day implied vol vs 1-month realized (fast) and 360-day realized "
+               "(slow anchor, Bloomberg convention).")
+        note = ("30d ATM moneyness IV; realized legs use log returns over 21 and 360 "
+                "trading days, sqrt(260) annualized. Tile: ATM IV.")
     store.write_display(mid, {
         "id": mid, "name": name, "panel": "volatility",
         "source": "BBG moneyness IV + index closes", "cadence": "daily",
         "asof": asof, "unit": "vol pts",
         "series": series,
         "tile": {"value": round(latest, 2), "delta": None, "percentile": pctile},
-        "provenance": "bloomberg_cache", "notes": note,
+        "provenance": "bloomberg_cache", "tooltip": tip, "notes": note,
     })
     return True
 
@@ -331,7 +356,8 @@ def build_vc10():
 
 def build() -> dict[str, bool]:
     # VC5 (spot-up/vol-up) dropped 2026-07-09 per CIO
+    # VC4 (skew panel) dropped 2026-07-10 per CIO — combined two unrelated reads
     return {"VC7": build_vc7(), "VC8": build_vc8(), "VC9": build_vc9(),
             "VC10": build_vc10(), "VC1": build_vc1(), "VC2": build_vc2(),
-            "VC3": build_vc3(), "VC4": build_vc4(), "VC6": build_vc6(),
+            "VC3": build_vc3(), "VC6": build_vc6(),
             "MH7": build_mh7()}
