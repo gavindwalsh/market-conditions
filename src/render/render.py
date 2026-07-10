@@ -151,16 +151,16 @@ def _fmt_value(v, unit=""):
 
 
 def _wordmark_data_uri():
-    """Embed the avos wordmark from style_guides/ if reachable (§A9)."""
-    candidates = [
-        os.path.join(os.path.dirname(BASE), "avos-lens-data", "docs", "style_guides", "LOGOTYPE-1.png"),
-        os.path.join(os.path.dirname(BASE), "equities-pm", "style_guides", "LOGOTYPE-1.png"),
-        os.path.join(BASE, "style_guides", "LOGOTYPE-1.png"),
-    ]
-    for p in candidates:
-        if os.path.exists(p):
-            b = base64.b64encode(open(p, "rb").read()).decode()
-            return f"data:image/png;base64,{b}"
+    """Embed the avos wordmark (§A9). The white knockout SVG is VENDORED in-repo
+    so the logo is self-contained and identical in every environment (worktree,
+    main checkout, deploy). Previously this reached into a sibling repo for
+    LOGOTYPE-1.png — a dark-on-WHITE asset that, on the dark header, rendered as a
+    white box with a tiny faint wordmark (and only when that sibling was present,
+    so it differed between local and deploy). Do not reintroduce the PNG here."""
+    p = os.path.join(HERE, "vendor", "avos-wordmark.svg")
+    if os.path.exists(p):
+        b = base64.b64encode(open(p, "rb").read()).decode()
+        return f"data:image/svg+xml;base64,{b}"
     return None
 
 
