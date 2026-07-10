@@ -187,7 +187,11 @@ def process_tape_day(day: str, keep_files: bool = False,
 
     from .. import store
     from ..compute.retail import classify_day
-    scratch = os.path.join(BASE, "data", "dashboard", "_tape_scratch")
+    # TAPE_SCRATCH env lets concurrent lanes use private scratch dirs — the
+    # stale-partial sweep in backfill_tape would otherwise delete another
+    # lane's in-flight download (EC2 lane runner sets one per lane)
+    scratch = os.environ.get("TAPE_SCRATCH") or os.path.join(
+        BASE, "data", "dashboard", "_tape_scratch")
     trades_f = quotes_f = None
     try:
         # reuse a complete prior download if present (a failed run leaves one)
@@ -235,7 +239,8 @@ def backfill_tape(start: str, max_days: int = 5, end: str | None = None,
     tdir = os.path.join(store.LAKE_DIR, RETAIL_TABLE)
     os.makedirs(tdir, exist_ok=True)
     # sweep stale boto3 partials (random suffix after .csv.gz) from killed runs
-    scratch = os.path.join(BASE, "data", "dashboard", "_tape_scratch")
+    scratch = os.environ.get("TAPE_SCRATCH") or os.path.join(
+        BASE, "data", "dashboard", "_tape_scratch")
     if os.path.isdir(scratch):
         for f in os.listdir(scratch):
             if ".csv.gz." in f:
@@ -299,7 +304,8 @@ def process_opra_day(day: str, keep_files: bool = False) -> pd.DataFrame:
     import duckdb
 
     from .. import store
-    scratch = os.path.join(BASE, "data", "dashboard", "_tape_scratch")
+    scratch = os.environ.get("TAPE_SCRATCH") or os.path.join(
+        BASE, "data", "dashboard", "_tape_scratch")
     f = flatfile_download("us_options_opra/trades_v1", day, scratch)
     try:
         con = duckdb.connect()
