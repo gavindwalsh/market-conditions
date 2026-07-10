@@ -32,6 +32,18 @@ REST = "https://api.polygon.io"
 
 GROUPED_TABLE = "massive_grouped_daily"   # one parquet per trading day
 
+# Exchange test/dummy securities (Nasdaq UTP + NYSE/Arca/CTA). They carry
+# absurd prices and periodic fake volume — e.g. ZAZZT printed $87k × 90M sh =
+# $7.8T notional on 2025-05-23, ~2.5× the entire real tape, tripling implied
+# $/share that week. Never real activity; stripped from every grouped read so
+# no tape aggregate (retail $/share, participation denominators, dispersion…)
+# inherits the artifact.
+TEST_SYMBOLS = frozenset({
+    "ZAZZT", "ZBZZT", "ZCZZT", "ZEXIT", "ZIEXT", "ZJZZT", "ZTEST",
+    "ZVZZT", "ZVZZC", "ZWZZT", "ZXZZT", "ZZZOT", "ZBZX",   # Nasdaq
+    "NTEST", "ZTST", "ZXIET",                               # NYSE/Arca/CTA
+})
+
 
 def _key() -> str:
     if not os.path.exists(KEY_FILE):
@@ -130,7 +142,7 @@ def read_grouped(days_back: int | None = None) -> pd.DataFrame | None:
         return None
     df = pd.concat([pd.read_parquet(os.path.join(tdir, f)) for f in files],
                    ignore_index=True)
-    return df[df["ticker"] != "_HOLIDAY_"]
+    return df[(df["ticker"] != "_HOLIDAY_") & (~df["ticker"].isin(TEST_SYMBOLS))]
 
 
 # ---- Flat files (S3) — trades/quotes tape ------------------------------------
@@ -466,4 +478,4 @@ def read_retail_daily() -> pd.DataFrame | None:
         return None
     df = pd.concat([pd.read_parquet(os.path.join(tdir, f)) for f in files],
                    ignore_index=True)
-    return df[df["ticker"] != "_HOLIDAY_"]
+    return df[(df["ticker"] != "_HOLIDAY_") & (~df["ticker"].isin(TEST_SYMBOLS))]

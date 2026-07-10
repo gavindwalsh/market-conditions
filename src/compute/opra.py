@@ -1,6 +1,6 @@
 """opra.py — Phase-3 computes.
 
-From OPRA trades aggregates: LV2 (0DTE whole-market), LV3 (DTE buckets),
+From OPRA trades aggregates: LV3 (DTE buckets, Retail panel),
 RF7/RF8 (small-lot premium — §5.2 proxy, labeled).
 From EOD snapshots (server-side IV/greeks): LV5 OI-convention GEX (§5.3
 revised), LV10 call-wing richness, LV9 synthetic financing vs SOFR (§5.5,
@@ -28,33 +28,16 @@ def _opra() -> pd.DataFrame | None:
     return None if df.empty else df
 
 
-def build_lv2_lv3() -> dict[str, bool]:
+def build_lv3() -> dict[str, bool]:
+    # LV2 (0DTE share, whole-market) dropped 2026-07-10 — redundant given LV3's
+    # 0DTE bucket. LV3 moved to the Retail panel same day (retail short-dated mix).
     df = _opra()
     if df is None:
-        return {"LV2": False, "LV3": False}
+        return {"LV3": False}
     day = df.groupby("date")[["contracts", "c_0dte", "c_1_5", "c_6_30", "c_over30"]].sum()
     day.index = pd.to_datetime(day.index)
     day = day[day["contracts"] > 0]
     asof = day.index[-1].strftime("%Y-%m-%d")
-
-    # SPX-complex series removed 2026-07-10 (CIO) — parked for the LV1 Cboe
-    # cross-check; its 60-70% range doubled the axis and crushed the read.
-    raw = (day["c_0dte"] / day["contracts"] * 100.0)
-    avg = raw.rolling(5, min_periods=2).mean()
-    store.write_display("LV2", {
-        "id": "LV2", "name": "0DTE share — whole market", "panel": "leverage",
-        "source": "Massive OPRA trades", "cadence": "daily", "asof": asof, "unit": "%",
-        "series": [_display_series(avg.rename("value").reset_index(), "0DTE share (5d avg)"),
-                   _display_series(raw.rename("value").reset_index(), "daily", role="context")],
-        "tile": {"value": round(float(avg.iloc[-1]), 1), "delta": None,
-                 "percentile": util.trailing_percentile(avg.dropna())},
-        "provenance": "massive_opra",
-        "tooltip": "Share of option volume expiring same-day; the sawtooth is the "
-                   "Friday weekly-expiry cycle, so read the 5-day average.",
-        "notes": "Volume where expiry = trade date, all underlyings. Raw daily saws "
-                 "structurally (~41% Fridays vs ~21-24% midweek — single-name/ETF "
-                 "weeklies expire Friday). SPX-complex series parked for LV1.",
-    })
 
     # LV3 stacked weekly bars (CIO 2026-07-10) — buckets sum to 100 per week
     series = []
@@ -65,7 +48,7 @@ def build_lv2_lv3() -> dict[str, bool]:
         sd["kind"], sd["stack"] = "bar", True
         series.append(sd)
     store.write_display("LV3", {
-        "id": "LV3", "name": "Volume by DTE bucket", "panel": "leverage",
+        "id": "LV3", "name": "Volume by DTE bucket", "panel": "retail",
         "source": "Massive OPRA trades", "cadence": "daily", "asof": asof,
         "unit": "% (tile: 0DTE)", "series": series,
         "tile": {"value": round(float((day["c_0dte"] / day["contracts"]).iloc[-1] * 100), 1),
@@ -75,7 +58,7 @@ def build_lv2_lv3() -> dict[str, bool]:
                    "stacks to 100%.",
         "notes": "Weekly mean of daily bucket shares of contract volume.",
     })
-    return {"LV2": True, "LV3": True}
+    return {"LV3": True}
 
 
 def build_rf78() -> dict[str, bool]:
@@ -90,37 +73,50 @@ def build_rf78() -> dict[str, bool]:
             ["premium", "smalllot_prem", "smalllot_call_prem"]] = float("nan")
     asof = day.index[-1].strftime("%Y-%m-%d")
 
-    v = (day["smalllot_prem"] / 1e9).rename("value").reset_index()
-    share = (day["smalllot_prem"] / day["premium"] * 100.0).rename("value").reset_index()
+    # Small-lot daily series saw hard (thin small-lot tape + the weekly-expiry
+    # cycle), so smooth on a 5-trading-day (1wk) trailing mean — same house
+    # 5-day house smoothing pattern. min_periods=2 skips over the nulled feed days.
+    def _sm(s: pd.Series) -> pd.Series:
+        return s.rolling(5, min_periods=2).mean()
+
+    prem = _sm(day["smalllot_prem"] / 1e9)
+    share = _sm(day["smalllot_prem"] / day["premium"] * 100.0)
     store.write_display("RF7", {
         "id": "RF7", "name": "Small-lot options premium (proxy)", "panel": "retail",
         "source": "Massive OPRA trades", "cadence": "daily", "asof": asof,
         "unit": " $B (tile)", "series": [
-            _display_series(v, "Small-lot premium ($B/day)", unit="$B"),
-            _display_series(share, "Share of all premium (%)", role="context", unit="%")],
-        "tile": {"value": round(float(v["value"].dropna().iloc[-1]), 2), "delta": None,
-                 "percentile": util.trailing_percentile(v["value"].dropna())},
+            _display_series(prem.rename("value").reset_index(),
+                            "Small-lot premium — 5d avg ($B/day)", unit="$B"),
+            _display_series(share.rename("value").reset_index(),
+                            "Share of all premium — 5d avg (%)", role="context", unit="%")],
+        "tile": {"value": round(float(prem.dropna().iloc[-1]), 2), "delta": None,
+                 "percentile": util.trailing_percentile(prem.dropna())},
         "provenance": "massive_opra",
-        "tooltip": "Small-lot (<10 contract) option premium per day — a retail proxy.",
-        "notes": PROXY_NOTE + " Zero-premium feed days rendered as gaps, not zeros.",
+        "tooltip": "Small-lot (<10 contract) option premium per day (retail proxy), "
+                   "smoothed on a 5-day trailing average.",
+        "notes": PROXY_NOTE + " 5-day trailing mean; zero-premium feed days rendered as "
+                 "gaps, not zeros.",
     })
 
-    callsh = (day["smalllot_call_prem"] / day["smalllot_prem"] * 100.0).rename("value").reset_index()
+    callsh = _sm(day["smalllot_call_prem"] / day["smalllot_prem"] * 100.0)
     semis = df[df["underlying"].isin(set(config.SEMI_TOP10))]
-    semi_p = (semis.groupby("date")["smalllot_prem"].sum() / 1e9)
+    semi_p = semis.groupby("date")["smalllot_prem"].sum() / 1e9
     semi_p.index = pd.to_datetime(semi_p.index)
+    semi_p = _sm(semi_p.sort_index())
     store.write_display("RF8", {
         "id": "RF8", "name": "Small-lot call share / semi premium", "panel": "retail",
         "source": "Massive OPRA trades", "cadence": "daily", "asof": asof,
         "unit": "% (tile: call share)", "series": [
-            _display_series(callsh, "Call share of small-lot premium (%)", unit="%"),
-            _display_series(semi_p.rename("value").reset_index(), "Semi small-lot premium ($B)",
-                            role="benchmark", unit="$B")],
-        "tile": {"value": round(float(callsh["value"].dropna().iloc[-1]), 1), "delta": None,
-                 "percentile": util.trailing_percentile(callsh["value"].dropna())},
+            _display_series(callsh.rename("value").reset_index(),
+                            "Call share of small-lot premium — 5d avg (%)", unit="%"),
+            _display_series(semi_p.rename("value").reset_index(),
+                            "Semi small-lot premium — 5d avg ($B)", role="benchmark", unit="$B")],
+        "tile": {"value": round(float(callsh.dropna().iloc[-1]), 1), "delta": None,
+                 "percentile": util.trailing_percentile(callsh.dropna())},
         "provenance": "massive_opra",
-        "tooltip": "Call share of small-lot premium; second line = small-lot premium in semis.",
-        "notes": PROXY_NOTE,
+        "tooltip": "Call share of small-lot premium (5-day average); second line = "
+                   "small-lot premium in semis.",
+        "notes": PROXY_NOTE + " 5-day trailing mean.",
     })
     return {"RF7": True, "RF8": True}
 
@@ -291,7 +287,7 @@ def build_lv9() -> bool:
 
 
 def build() -> dict[str, bool]:
-    out = build_lv2_lv3()
+    out = build_lv3()
     out.update(build_rf78())
     out.update({"LV5": build_lv5(), "LV10": build_lv10(), "LV9": build_lv9()})
     from .leverage import build_lvt

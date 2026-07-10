@@ -98,8 +98,8 @@ IV_BASKETS = {
 
 # Panel order + names per CIO feedback 2026-07-09 (§6 updated to match)
 PANELS = [
-    ("retail", "Retail Flows"),
     ("volatility", "Volatility and Correlation"),
+    ("retail", "Retail"),
     ("leverage", "Leverage"),
     ("flows", "Flows"),            # ETF flows + MOC (split from Ownership & Passive)
     ("ownership", "Ownership"),
@@ -147,6 +147,9 @@ _REGISTRY_ROWS = [
     # Panel 3 — Retail Flows
     # RF1D/RF2D dropped 2026-07-10 per CIO — RF1/RF2 are now the daily views.
     _m("RF1", "retail", "Retail net flow — daily (est. total)", "Massive", "daily", 2, "2016→", "5.1"),
+    # RF10 sits 2nd in the panel (dollar-level companion to RF1's net view);
+    # id is internal — cards render by registry order, not id number.
+    _m("RF10", "retail", "Retail dollar volume — weekly (est. total)", "Massive+FINRA", "weekly", 2, "2023→", "5.1"),
     _m("RF2", "retail", "Retail participation (FINRA-anchored)", "Massive+FINRA", "weekly", 2, "2016→", "5.1"),
     _m("RF3", "retail", "Retail concentration", "Massive", "daily", 2, "2016→", "5.1"),
     _m("RF4", "retail", "Buy-the-dip ratio", "Massive+BBG", "daily", 2, "2016→"),
@@ -154,11 +157,12 @@ _REGISTRY_ROWS = [
     _m("RF6", "retail", "Wholesaler volume (structural check)", "FINRA", "weekly", 1, "2016→"),
     _m("RF7", "retail", "Small-lot options premium (proxy)", "Massive OPRA", "daily", 3, "at feed", "5.2"),
     _m("RF8", "retail", "Small-lot call share / semi premium", "Massive OPRA", "daily", 3, "at feed", "5.2"),
+    # LV3 moved Leverage->Retail 2026-07-10 (retail 0DTE/short-dated options mix);
+    # LV2 (0DTE share whole-market) dropped same day — redundant given LV3's 0DTE bucket.
+    _m("LV3", "retail", "Volume by DTE bucket", "Massive OPRA", "daily", 3, "at feed"),
     _m("RF9", "retail", "Validation series (vs RTAT10)", "Nasdaq", "daily", 2, "rolling"),
     # Panel 4 — Leverage & Its Price
     _m("LV1", "leverage", "0DTE share — SPX complex", "Cboe", "daily", 1, "2022→"),
-    _m("LV2", "leverage", "0DTE share — whole market", "Massive OPRA", "daily", 3, "at feed"),
-    _m("LV3", "leverage", "Volume by DTE bucket", "Massive OPRA", "daily", 3, "at feed"),
     _m("LV4", "leverage", "Options/stock notional ratio", "Massive OPRA", "daily", 3, "at feed"),
     # LV5/LV7/LV10/LV14 render via the LVT snapshot table until history accrues
     # (CIO 2026-07-10); computes keep accumulating their series JSONs.

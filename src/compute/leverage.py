@@ -160,26 +160,31 @@ def build_lv6() -> bool:
         return False
     flow = pd.concat(flows, axis=1).sum(axis=1) / 1e3   # $M → $B
     cap = pd.concat(caps, axis=1).sum(axis=1) / 1e3
-    df = flow.dropna().rename("value").reset_index()
     cdf = cap.dropna().rename("value").reset_index()
-    # signed daily BARS (CIO 2026-07-10): the sign flips ~every other day by
-    # construction (flow ∝ signed index move) — smoothing would net it to ~0
-    flow_sd = _display_series(df, "Estimated forced EOD flow ($B/day)")
-    flow_sd["kind"] = "bar"
+    # The signed daily flow flips sign with the index move (flow ∝ signed move),
+    # so the raw series saws every other day and nets to ~0 under smoothing.
+    # Plot its MAGNITUDE instead — |forced flow|, 5-day averaged — which reads as
+    # rebalance INTENSITY and doesn't cancel (supersedes the signed bars).
+    absflow = flow.abs().rolling(5, min_periods=2).mean()
+    adf = absflow.dropna().rename("value").reset_index()
     store.write_display("LV6", {
         "id": "LV6", "name": "Leveraged-ETF rebalance notional", "panel": "leverage",
         "source": "BBG AUM × Massive moves", "cadence": "daily",
-        "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B (tile: per-1% capacity)",
-        "series": [flow_sd,
-                   _display_series(cdf, "Rebalance capacity per 1% move ($B)", role="context")],
+        "asof": adf["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B (tile: per-1% capacity)",
+        "series": [
+            _display_series(cdf, "Rebalance capacity per 1% move ($B)", unit="$B per 1%"),
+            _display_series(adf, "Forced EOD flow magnitude — 5d avg ($B/day)",
+                            role="context", unit="$B/day"),
+        ],
         "tile": {"value": round(float(cdf["value"].iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(cdf["value"])},
         "provenance": "derived",
-        "tooltip": "Bars = estimated forced end-of-day leveraged-ETF flow; line = "
-                   "capacity per 1% index move.",
+        "tooltip": "Rebalance capacity per 1% index move (structural); second line = "
+                   "realized forced end-of-day flow magnitude, 5-day average.",
         "notes": f"Σ AUM×L×(L−1)×underlying move across {len(flows)} major leveraged funds "
-                 "(curated universe, §A3). Both long- and inverse-levered funds chase "
-                 "the day's move at the close, so flow carries the move's sign.",
+                 "(curated universe, §A3). Forced flow chases the day's move into the "
+                 "close so it flips sign daily; we plot its magnitude (5d mean) as "
+                 "rebalance intensity rather than the sign-flipping signed series.",
     })
     return True
 

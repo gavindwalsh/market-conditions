@@ -281,13 +281,13 @@ def _realized(px: pd.DataFrame, window: int, annualize: float) -> pd.DataFrame:
 
 
 def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
-                   wings: bool) -> bool:
-    """VC7/VC8 (ATM IV vs realized) and VC9/VC10 (10% OTM wings vs realized)."""
+                   wings: bool, vol_idx: str | None = None) -> bool:
+    """VC7/VC8 (vol index vs realized) and VC9/VC10 (10% OTM wings vs realized)."""
     px = _lake_series(px_mnemonic)
     if px is None:
         return False
     rv360 = _realized(px, 360, 260)   # BBG VOLATILITY_360D convention
-    rv30 = _realized(px, 21, 260)     # ~30-calendar-day: tenor-matched to the 30d IV
+    src = "BBG moneyness IV + index closes"
     if wings:
         call = store.read_latest(f"bbg_{iv_prefix}_call_wing")
         put = store.read_latest(f"bbg_{iv_prefix}_put_wing")
@@ -310,26 +310,26 @@ def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
         note = ("90%/110% moneyness 30d IV; realized leg uses log returns over 360 "
                 "trading days, sqrt(260) annualized. Tile: put wing.")
     else:
-        atm = store.read_latest(f"bbg_{iv_prefix}_atm")
-        if atm is None:
+        vi = _lake_series(vol_idx)
+        if vi is None:
             return False
-        atm = atm.sort_values("date").assign(date=lambda d: pd.to_datetime(d["date"]))
+        vlabel = vol_idx.upper()   # VIX / VXN
         series = [
-            _display_series(atm[["date", "value"]], "ATM IV (30d)", unit="vol"),
-            _display_series(rv30, "Realized vol (1M)", role="context", unit="vol"),
+            _display_series(vi[["date", "value"]], f"{vlabel} (30d implied)", unit="vol"),
             _display_series(rv360, "Realized vol (360d, BBG conv.)", role="benchmark", unit="vol"),
         ]
-        latest = float(atm["value"].iloc[-1])
-        pctile = util.trailing_percentile(atm["value"])
-        asof = atm["date"].iloc[-1].strftime("%Y-%m-%d")
-        name = f"{idx_name} ATM implied vs realized vol"
-        tip = ("30-day implied vol vs 1-month realized (fast) and 360-day realized "
-               "(slow anchor, Bloomberg convention).")
-        note = ("30d ATM moneyness IV; realized legs use log returns over 21 and 360 "
-                "trading days, sqrt(260) annualized. Tile: ATM IV.")
+        latest = float(vi["value"].iloc[-1])
+        pctile = util.trailing_percentile(vi["value"])
+        asof = vi["date"].iloc[-1].strftime("%Y-%m-%d")
+        src = f"BBG {vlabel} + index closes"
+        name = f"{idx_name} implied ({vlabel}) vs realized vol"
+        tip = (f"{vlabel} (30-day implied vol, skew-inclusive) vs 360-day realized "
+               "(Bloomberg convention).")
+        note = (f"{vlabel} implied-vol index vs realized vol from log returns over 360 "
+                f"trading days, sqrt(260) annualized. Tile: {vlabel}.")
     store.write_display(mid, {
         "id": mid, "name": name, "panel": "volatility",
-        "source": "BBG moneyness IV + index closes", "cadence": "daily",
+        "source": src, "cadence": "daily",
         "asof": asof, "unit": "vol pts",
         "series": series,
         "tile": {"value": round(latest, 2), "delta": None, "percentile": pctile},
@@ -339,11 +339,11 @@ def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
 
 
 def build_vc7():
-    return _build_iv_pair("VC7", "SPX", "spx_iv", "spx", wings=False)
+    return _build_iv_pair("VC7", "SPX", "spx_iv", "spx", wings=False, vol_idx="vix")
 
 
 def build_vc8():
-    return _build_iv_pair("VC8", "NDX", "ndx_iv", "ndx", wings=False)
+    return _build_iv_pair("VC8", "NDX", "ndx_iv", "ndx", wings=False, vol_idx="vxn")
 
 
 def build_vc9():

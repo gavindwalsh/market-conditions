@@ -181,6 +181,69 @@ def build() -> dict[str, bool]:
                  "estimate covers weeks FINRA has not published.",
     })
 
+    # RF10: total retail DOLLAR volume — weekly, 2023->. Gross activity in $
+    # (FINRA weekly OTC has no buy/sell split -> NOT net direction; RF1 is the
+    # net view). History = FINRA T1+T2 non-ATS shares dollarized by the weekly
+    # tape $/share and rescaled onto our estimated-total definition; recent
+    # weeks (FINRA's ~4wk publication lag) = the Massive classifier estimate.
+    day["ret_usd_b"] = day["ident_usd"] * F / 1e9
+    wk_usd = day.set_index("date")["ret_usd_b"].resample("W-FRI").agg(["sum", "count"])
+    wk_usd = wk_usd[wk_usd["count"] >= 3]["sum"]
+    series10, fin_cut10, cal10 = [], None, None
+    if fin is not None and grouped is not None:
+        o = fin[fin["summaryTypeCode"] == "OTC_W_FIRM"].copy()
+        o = o[o["tierIdentifier"].isin(["T1", "T2"])]
+        o["week"] = pd.to_datetime(o["weekStartDate"]) + pd.Timedelta(days=4)
+        cmpl = o.groupby("week")["tierIdentifier"].agg(lambda t: {"T1", "T2"} <= set(t))
+        cmpl = cmpl[cmpl].index  # both tiers published (T1 ~2wk lag, T2 ~4wk)
+        g10 = grouped.copy()
+        g10["date"] = pd.to_datetime(g10["date"])
+        g10["week"] = g10["date"] + pd.to_timedelta(4 - g10["date"].dt.weekday, unit="D")
+        g10["notional"] = g10["close"] * g10["volume"]
+        px = g10.groupby("week")["notional"].sum() / g10.groupby("week")["volume"].sum()
+        fin_sh = o[o["week"].isin(cmpl)].groupby("week")["totalWeeklyShareQuantity"].sum()
+        fin_usd = (fin_sh * px.reindex(fin_sh.index)).dropna() / 1e9  # ~2x gross, uncalibrated
+        ov = fin_usd.index.intersection(wk_usd.index)
+        if not fin_usd.empty and len(ov) >= 3:
+            k10 = float((wk_usd.loc[ov] / fin_usd.loc[ov]).mean())
+            cal10 = (fin_usd * k10).sort_index()
+            fin_cut10 = cal10.index.max()
+            hdf = cal10.rename("value").reset_index()
+            hdf.columns = ["date", "value"]
+            s_h = _display_series(hdf, f"FINRA-anchored history (rescaled x{k10:.2f})",
+                                  unit="$B", ds="none")
+            s_h["kind"] = "bar"
+            series10.append(s_h)
+    ext10 = wk_usd if fin_cut10 is None else wk_usd[wk_usd.index > fin_cut10]
+    edf = ext10.rename("value").reset_index()
+    edf.columns = ["date", "value"]
+    s_m = _display_series(edf, "Massive tape (recent, est. total)", role="nowcast",
+                          unit="$B", ds="none")
+    s_m["kind"] = "bar"
+    series10.append(s_m)
+    # tile: latest COMPLETE week (exclude in-progress); percentile vs full splice
+    done10 = wk_usd[wk_usd.index <= day["date"].iloc[-1]]
+    tile10 = float(done10.iloc[-1]) if not done10.empty else float(wk_usd.iloc[-1])
+    full10 = (pd.concat([cal10[cal10.index <= fin_cut10], ext10])
+              if cal10 is not None else wk_usd)
+    store.write_display("RF10", {
+        "id": "RF10", "name": "Retail dollar volume — weekly (est. total)", "panel": "retail",
+        "source": "FINRA weekly OTC × Massive tape", "cadence": "weekly",
+        "asof": asof, "unit": "$B", "series": series10,
+        "tile": {"value": round(tile10, 1), "delta": None,
+                 "percentile": util.trailing_percentile(
+                     full10.reset_index(drop=True), value=tile10, min_history=52)},
+        "provenance": "finra+massive",
+        "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
+        "tooltip": "Estimated total retail dollars traded per week — gross activity, not net "
+                   "(see RF1 for net). FINRA-anchored history spliced with the recent Massive tape.",
+        "notes": FLOOR_NOTE + " Gross dollar volume, not net direction — FINRA weekly OTC has no "
+                 "buy/sell split, so RF1 remains the net view. History = FINRA T1+T2 non-ATS share "
+                 "volume × weekly tape $/share, rescaled onto our estimated-total definition by "
+                 "k = mean(ours/FINRA) over overlap weeks (FINRA per-firm rows count both sides, "
+                 "~2×); recent weeks in FINRA's publication lag are the ×3 classifier estimate.",
+    })
+
     day["avg_size"] = (day["ident_usd"] / day["ident_trades"].clip(lower=1))
     _emit("RF5", "Avg retail trade size", "retail",
           [("avg_size", "Identified retail $ / trade", "avos")], "avg_size", " $", 0,
@@ -207,7 +270,7 @@ def build() -> dict[str, bool]:
 
     rf3 = _build_rf3(df, F)
     rf4 = _build_rf4(day)
-    return {"RF1": rf1, "RF2": True, "RF5": True, "MH9": True, "OP8": True,
+    return {"RF1": rf1, "RF2": True, "RF10": True, "RF5": True, "MH9": True, "OP8": True,
             "RF3": rf3, "RF4": rf4}
 
 

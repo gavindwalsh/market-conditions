@@ -4,7 +4,7 @@
   "id": "LV3",
   "name": "Volume by DTE bucket",
   "notes": "Weekly mean of daily bucket shares of contract volume.",
-  "panel": "leverage",
+  "panel": "retail",
   "provenance": "massive_opra",
   "series": [
     {

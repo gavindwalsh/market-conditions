@@ -37,45 +37,13 @@ realized" = 21 sessions, tenor-matched to 30-day implied.
 
 ## Per-metric notes
 
-### RF1 — Retail net flow — daily (est. total)
-**Status: ×3 est. · uncalibrated**
-*Source: Massive tape (classifier) · cadence: daily*
-Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Dollar values scaled ×3 from the identified floor to estimated total retail; factor provisional until RF9 fits it empirically.
+### VC7 — SPX implied (VIX) vs realized vol
+*Source: BBG VIX + index closes · cadence: daily*
+VIX implied-vol index vs realized vol from log returns over 360 trading days, sqrt(260) annualized. Tile: VIX.
 
-### RF2 — Retail participation — weekly (est. total)
-**Status: ×3 est. · uncalibrated**
-*Source: FINRA weekly OTC × Massive tape (classifier) · cadence: weekly*
-Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Splice: FINRA T1+T2 non-ATS weekly volume (OTCE excluded) rescaled onto our definition by k = mean(ours/FINRA) over overlap weeks — FINRA per-firm rows count both sides of trades, ~2x retail. T1-only weeks in FINRA's publication lag are rescaled separately; our ×3 classifier estimate covers weeks FINRA has not published.
-
-### RF3 — Retail concentration
-**Status: classifier floor**
-*Source: Massive tape × SPX membership · cadence: daily*
-Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Bars ×3-scaled to est. total $; shares use identified $ only; membership = latest BBG SPX snapshot.
-
-### RF4 — Buy-the-dip ratio
-**Status: classifier floor**
-*Source: Massive tape × BBG SPX · cadence: daily*
-Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. 60d rolling mean of midpoint-signed net flow on SPX down days ÷ the all-day rolling mean; scale-invariant.
-
-### RF5 — Avg retail trade size
-*Source: Massive SIP tape (classifier) · cadence: daily*
-Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Identified prints only — the ratio is invariant to the ×3 scale factor.
-
-### RF7 — Small-lot options premium (proxy)
-*Source: Massive OPRA trades · cadence: daily*
-Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regularity, not identification. Zero-premium feed days rendered as gaps, not zeros.
-
-### RF8 — Small-lot call share / semi premium
-*Source: Massive OPRA trades · cadence: daily*
-Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regularity, not identification.
-
-### VC7 — SPX ATM implied vs realized vol
-*Source: BBG moneyness IV + index closes · cadence: daily*
-30d ATM moneyness IV; realized legs use log returns over 21 and 360 trading days, sqrt(260) annualized. Tile: ATM IV.
-
-### VC8 — NDX ATM implied vs realized vol
-*Source: BBG moneyness IV + index closes · cadence: daily*
-30d ATM moneyness IV; realized legs use log returns over 21 and 360 trading days, sqrt(260) annualized. Tile: ATM IV.
+### VC8 — NDX implied (VXN) vs realized vol
+*Source: BBG VXN + index closes · cadence: daily*
+VXN implied-vol index vs realized vol from log returns over 360 trading days, sqrt(260) annualized. Tile: VXN.
 
 ### VC9 — SPX 10% OTM call/put IV
 *Source: BBG moneyness IV + index closes · cadence: daily*
@@ -101,9 +69,42 @@ Cboe implied correlation indices; tile ranks COR1M. The spread vs realized corre
 *Source: BBG COR1M − Massive member returns · cadence: daily*
 Realized correlation from the index-variance identity over SPX members, 21d rolling, current membership applied backward.
 
-### LV2 — 0DTE share — whole market
+### RF1 — Retail net flow — daily (est. total)
+**Status: ×3 est. · uncalibrated**
+*Source: Massive tape (classifier) · cadence: daily*
+Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Dollar values scaled ×3 from the identified floor to estimated total retail; factor provisional until RF9 fits it empirically.
+
+### RF10 — Retail dollar volume — weekly (est. total)
+**Status: ×3 est. · uncalibrated**
+*Source: FINRA weekly OTC × Massive tape · cadence: weekly*
+Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Gross dollar volume, not net direction — FINRA weekly OTC has no buy/sell split, so RF1 remains the net view. History = FINRA T1+T2 non-ATS share volume × weekly tape $/share, rescaled onto our estimated-total definition by k = mean(ours/FINRA) over overlap weeks (FINRA per-firm rows count both sides, ~2×); recent weeks in FINRA's publication lag are the ×3 classifier estimate.
+
+### RF2 — Retail participation — weekly (est. total)
+**Status: ×3 est. · uncalibrated**
+*Source: FINRA weekly OTC × Massive tape (classifier) · cadence: weekly*
+Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Splice: FINRA T1+T2 non-ATS weekly volume (OTCE excluded) rescaled onto our definition by k = mean(ours/FINRA) over overlap weeks — FINRA per-firm rows count both sides of trades, ~2x retail. T1-only weeks in FINRA's publication lag are rescaled separately; our ×3 classifier estimate covers weeks FINRA has not published.
+
+### RF3 — Retail concentration
+**Status: classifier floor**
+*Source: Massive tape × SPX membership · cadence: daily*
+Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Bars ×3-scaled to est. total $; shares use identified $ only; membership = latest BBG SPX snapshot.
+
+### RF4 — Buy-the-dip ratio
+**Status: classifier floor**
+*Source: Massive tape × BBG SPX · cadence: daily*
+Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. 60d rolling mean of midpoint-signed net flow on SPX down days ÷ the all-day rolling mean; scale-invariant.
+
+### RF5 — Avg retail trade size
+*Source: Massive SIP tape (classifier) · cadence: daily*
+Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Identified prints only — the ratio is invariant to the ×3 scale factor.
+
+### RF7 — Small-lot options premium (proxy)
 *Source: Massive OPRA trades · cadence: daily*
-Volume where expiry = trade date, all underlyings. Raw daily saws structurally (~41% Fridays vs ~21-24% midweek — single-name/ETF weeklies expire Friday). SPX-complex series parked for LV1.
+Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regularity, not identification. 5-day trailing mean; zero-premium feed days rendered as gaps, not zeros.
+
+### RF8 — Small-lot call share / semi premium
+*Source: Massive OPRA trades · cadence: daily*
+Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regularity, not identification. 5-day trailing mean.
 
 ### LV3 — Volume by DTE bucket
 *Source: Massive OPRA trades · cadence: daily*
@@ -111,7 +112,7 @@ Weekly mean of daily bucket shares of contract volume.
 
 ### LV6 — Leveraged-ETF rebalance notional
 *Source: BBG AUM × Massive moves · cadence: daily*
-Σ AUM×L×(L−1)×underlying move across 17 major leveraged funds (curated universe, §A3). Both long- and inverse-levered funds chase the day's move at the close, so flow carries the move's sign.
+Σ AUM×L×(L−1)×underlying move across 17 major leveraged funds (curated universe, §A3). Forced flow chases the day's move into the close so it flips sign daily; we plot its magnitude (5d mean) as rebalance intensity rather than the sign-flipping signed series.
 
 ### LV8 — L1: ES roll implied financing
 *Source: BBG ES1/ES2 + FRED SOFR · cadence: daily*
