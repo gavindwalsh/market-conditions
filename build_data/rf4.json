@@ -1,0 +1,231 @@
+{
+  "asof": "2026-07-08",
+  "cadence": "daily",
+  "id": "RF4",
+  "name": "Buy-the-dip ratio",
+  "notes": "Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. 60d rolling mean of midpoint-signed net flow on SPX down days ÷ the all-day rolling mean; scale-invariant.",
+  "panel": "retail",
+  "provenance": "massive_tape",
+  "series": [
+    {
+      "estimated_from": null,
+      "name": "Retail net on down days ÷ all-day avg (60d roll)",
+      "points": [
+        {
+          "date": "2026-04-21",
+          "value": 3.964
+        },
+        {
+          "date": "2026-04-22",
+          "value": 3.998
+        },
+        {
+          "date": "2026-04-23",
+          "value": 3.749
+        },
+        {
+          "date": "2026-04-24",
+          "value": 3.785
+        },
+        {
+          "date": "2026-05-01",
+          "value": 3.62
+        },
+        {
+          "date": "2026-05-04",
+          "value": 3.385
+        },
+        {
+          "date": "2026-05-05",
+          "value": 3.671
+        },
+        {
+          "date": "2026-05-06",
+          "value": 3.814
+        },
+        {
+          "date": "2026-05-07",
+          "value": 3.687
+        },
+        {
+          "date": "2026-05-08",
+          "value": 3.702
+        },
+        {
+          "date": "2026-05-11",
+          "value": 3.632
+        },
+        {
+          "date": "2026-05-12",
+          "value": 3.477
+        },
+        {
+          "date": "2026-05-13",
+          "value": 3.844
+        },
+        {
+          "date": "2026-05-14",
+          "value": 4.215
+        },
+        {
+          "date": "2026-05-15",
+          "value": 3.913
+        },
+        {
+          "date": "2026-05-18",
+          "value": 3.748
+        },
+        {
+          "date": "2026-05-19",
+          "value": 3.601
+        },
+        {
+          "date": "2026-05-20",
+          "value": 3.81
+        },
+        {
+          "date": "2026-05-21",
+          "value": 3.897
+        },
+        {
+          "date": "2026-05-22",
+          "value": 4.299
+        },
+        {
+          "date": "2026-05-26",
+          "value": 4.635
+        },
+        {
+          "date": "2026-05-27",
+          "value": 5.391
+        },
+        {
+          "date": "2026-05-28",
+          "value": 7.142
+        },
+        {
+          "date": "2026-05-29",
+          "value": 5.776
+        },
+        {
+          "date": "2026-06-01",
+          "value": 6.471
+        },
+        {
+          "date": "2026-06-02",
+          "value": 7.012
+        },
+        {
+          "date": "2026-06-03",
+          "value": 7.71
+        },
+        {
+          "date": "2026-06-04",
+          "value": 7.34
+        },
+        {
+          "date": "2026-06-05",
+          "value": 5.4
+        },
+        {
+          "date": "2026-06-08",
+          "value": 5.587
+        },
+        {
+          "date": "2026-06-09",
+          "value": 5.216
+        },
+        {
+          "date": "2026-06-10",
+          "value": 4.731
+        },
+        {
+          "date": "2026-06-11",
+          "value": 7.068
+        },
+        {
+          "date": "2026-06-12",
+          "value": 8.356
+        },
+        {
+          "date": "2026-06-15",
+          "value": 14.433
+        },
+        {
+          "date": "2026-06-16",
+          "value": 9.283
+        },
+        {
+          "date": "2026-06-17",
+          "value": 8.347
+        },
+        {
+          "date": "2026-06-18",
+          "value": 10.845
+        },
+        {
+          "date": "2026-06-22",
+          "value": 11.13
+        },
+        {
+          "date": "2026-06-23",
+          "value": 15.987
+        },
+        {
+          "date": "2026-06-24",
+          "value": 22.172
+        },
+        {
+          "date": "2026-06-25",
+          "value": 83.318
+        },
+        {
+          "date": "2026-06-26",
+          "value": 11.763
+        },
+        {
+          "date": "2026-06-29",
+          "value": 17.33
+        },
+        {
+          "date": "2026-06-30",
+          "value": 55.997
+        },
+        {
+          "date": "2026-07-01",
+          "value": 21.438
+        },
+        {
+          "date": "2026-07-02",
+          "value": 11.461
+        },
+        {
+          "date": "2026-07-06",
+          "value": 11.977
+        },
+        {
+          "date": "2026-07-07",
+          "value": 13.025
+        },
+        {
+          "date": "2026-07-08",
+          "value": 11.763
+        }
+      ],
+      "role": "avos",
+      "unit": null
+    }
+  ],
+  "source": "Massive tape × BBG SPX",
+  "status": {
+    "label": "classifier floor",
+    "level": "provisional"
+  },
+  "tile": {
+    "delta": null,
+    "percentile": null,
+    "value": 11.76
+  },
+  "tooltip": ">1 = retail buys dips harder than its average day.",
+  "unit": "×"
+}

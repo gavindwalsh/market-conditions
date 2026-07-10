@@ -94,10 +94,19 @@ def nyfed_hhdc() -> dict[str, pd.DataFrame]:
         for sheet in xl.sheet_names:
             if not sheet.endswith("Data"):
                 continue
-            head = xl.parse(sheet, header=None, nrows=1)
+            head = xl.parse(sheet, header=None, nrows=8)
             title = str(head.iloc[0, 0])
             if title_match.lower() in title.lower():
-                df = xl.parse(sheet, header=3)
+                # header row DRIFTS between sheets (balances row 3, transitions
+                # row 4 — the latter shipped columns as 'Unnamed: N'): use the
+                # first row whose second cell is a non-numeric label
+                hrow = 3
+                for r in range(2, 7):
+                    c1 = head.iloc[r, 1]
+                    if isinstance(c1, str) and c1.strip():
+                        hrow = r
+                        break
+                df = xl.parse(sheet, header=hrow)
                 df = df.rename(columns={df.columns[0]: "quarter"})
                 df["date"] = _hhdc_quarter_index(df["quarter"])
                 df = df.dropna(subset=["date"])

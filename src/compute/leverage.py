@@ -63,6 +63,22 @@ def build_lv8() -> bool:
     df = m[["date", "value"]].dropna()
     if df.empty:
         return False
+    # prune quarterly-roll artifacts (CIO 2026-07-10): on generic-contract flip
+    # days ln(ES2/ES1)/0.25 explodes (verified −433bp 2026-03-20, +312bp
+    # 2025-12-19). Drop ±2 business days around the 3rd Friday of Mar/Jun/Sep/Dec
+    # plus a robust backstop vs the rolling median.
+    expiries = []
+    for y in range(df["date"].dt.year.min(), df["date"].dt.year.max() + 1):
+        for mth in (3, 6, 9, 12):
+            fri = pd.date_range(f"{y}-{mth:02d}-01", periods=21, freq="D")
+            fri = [d for d in fri if d.weekday() == 4][2]  # 3rd Friday
+            expiries.append(fri)
+    roll_window = set()
+    for e in expiries:
+        roll_window.update(pd.bdate_range(e - pd.offsets.BDay(2), e + pd.offsets.BDay(2)))
+    df = df[~df["date"].isin(roll_window)].copy()
+    med = df["value"].rolling(60, min_periods=20).median()
+    df = df[((df["value"] - med).abs() <= 150) | med.isna()]
     store.write_display("LV8", {
         "id": "LV8", "name": "L1: ES roll implied financing", "panel": "leverage",
         "source": "BBG ES1/ES2 + FRED SOFR", "cadence": "daily",
@@ -71,9 +87,12 @@ def build_lv8() -> bool:
         "tile": {"value": round(float(df["value"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "derived",
+        "tooltip": "Implied cost of index leverage from the ES futures roll, vs SOFR — "
+                   "rich = leverage demand paying up.",
         "notes": "Implied rate = ln(ES2/ES1)/0.25y + trailing SPX dividend yield "
-                 "(SPTR−SPX drift). Rich vs SOFR = long-leverage demand paying up. "
-                 "Noisiest in the ~5 days around quarterly roll (§4 flag).",
+                 "(SPTR−SPX drift), minus SOFR. Days within ±2bd of quarterly expiry "
+                 "dropped (generic-contract roll artifacts) plus a ±150bp-vs-rolling-"
+                 "median backstop.",
     })
     return True
 
@@ -105,8 +124,10 @@ def build_lv11() -> bool:
         "tile": {"value": round(float(tile_df["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(tile_df["value"])},
         "provenance": "derived",
-        "notes": "Implied 1M minus vol realized over the SUBSEQUENT 21 sessions — the "
-                 "toll paid by option buyers. Series ends ~1 month ago by construction.",
+        "tooltip": "Implied vol minus what was subsequently realized — the toll option "
+                   "buyers paid; ends ~1 month ago by construction.",
+        "notes": "Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 "
+                 "sessions.",
     })
     return True
 
@@ -141,26 +162,38 @@ def build_lv6() -> bool:
     cap = pd.concat(caps, axis=1).sum(axis=1) / 1e3
     df = flow.dropna().rename("value").reset_index()
     cdf = cap.dropna().rename("value").reset_index()
+    # signed daily BARS (CIO 2026-07-10): the sign flips ~every other day by
+    # construction (flow ∝ signed index move) — smoothing would net it to ~0
+    flow_sd = _display_series(df, "Estimated forced EOD flow ($B/day)")
+    flow_sd["kind"] = "bar"
     store.write_display("LV6", {
         "id": "LV6", "name": "Leveraged-ETF rebalance notional", "panel": "leverage",
         "source": "BBG AUM × Massive moves", "cadence": "daily",
         "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B (tile: per-1% capacity)",
-        "series": [_display_series(df, "Estimated forced EOD flow ($B/day)"),
+        "series": [flow_sd,
                    _display_series(cdf, "Rebalance capacity per 1% move ($B)", role="context")],
         "tile": {"value": round(float(cdf["value"].iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(cdf["value"])},
         "provenance": "derived",
+        "tooltip": "Bars = estimated forced end-of-day leveraged-ETF flow; line = "
+                   "capacity per 1% index move.",
         "notes": f"Σ AUM×L×(L−1)×underlying move across {len(flows)} major leveraged funds "
-                 "(curated universe — coverage labeled, §A3). Same-direction flow: both "
-                 "long- and inverse-levered funds chase the day's move at the close.",
+                 "(curated universe, §A3). Both long- and inverse-levered funds chase "
+                 "the day's move at the close, so flow carries the move's sign.",
     })
     return True
 
 
 def build_lv13() -> bool:
-    """LV13: leveraged-ETF financing residual (§5.8) — NAV return minus
-    [L×index − fee/252]; rolling 20d mean ×252/(L−1) ≈ embedded financing
-    spread. Median across the 2x/3x index complex, vs SOFR."""
+    """LV13: leveraged-ETF financing residual (§5.8, corrected 2026-07-10).
+
+    Model: nav_ret = L×r − fee/252 − (L−1)×fin/252, so the embedded financing
+    rate is fin = −resid×252/(L−1) — the pre-fix code dropped the minus (the
+    chart printed MINUS the gross rate, hence 'persistent negative financing')
+    and never subtracted SOFR despite the label. Long index funds only:
+    inverse funds' estimator sign opposes (rebate, not borrow) and mixing them
+    made the median whipsaw between two clusters; SOXL/SOXS excluded — they
+    track the ICE Semi index, not SMH (±38bp/day proxy error)."""
     grouped = massive.read_grouped()
     f = store.read_latest("fred_sofr")
     if grouped is None or f is None:
@@ -169,76 +202,114 @@ def build_lv13() -> bool:
                                  aggfunc="last").sort_index()
     closes.index = pd.to_datetime(closes.index)
     rets = closes.pct_change()
-    spreads = []
+    sofr = f.sort_values("date")[["date", "value"]].copy()
+    sofr["date"] = pd.to_datetime(sofr["date"])
+    sofr = sofr.set_index("date")["value"]
+
+    fins = []
     for t, (cat, L) in config.ETF_UNIVERSE.items():
-        if cat != "leveraged" or abs(L) < 2:
-            continue
+        if cat != "leveraged" or L < 2:
+            continue  # long index funds only (see docstring)
         u = config.LEV_ETF_UNDERLYING.get(t)
         e = _etf(t)
-        if e is None or u is None or u not in rets.columns:
+        if e is None or u not in ("QQQ", "SPY") or u not in rets.columns:
             continue
-        if u not in ("QQQ", "SPY", "SMH"):
-            continue  # single-stock levs carry idiosyncratic borrow — index complex only (§5.8)
         nav_ret = e.set_index("date")["nav"].pct_change()
         r = rets[u].reindex(nav_ret.index)
         resid = nav_ret - (L * r - LEV_FEE_ANNUAL / 252)
-        spread = resid.rolling(20).mean() * 252 / (L - 1) * 100.0  # pct-pts
-        spreads.append(spread.rename(t))
-    if not spreads:
+        fin = -resid.rolling(20).mean() * 252 / (L - 1) * 100.0  # pct-pts, gross
+        fins.append(fin.rename(t))
+    if not fins:
         return False
-    med = pd.concat(spreads, axis=1).median(axis=1).dropna() * 100.0  # → bp
-    df = med.rename("value").reset_index().rename(columns={"index": "date"})
+    med = pd.concat(fins, axis=1).median(axis=1).dropna()          # gross, pct-pts
+    spread = ((med - sofr.reindex(med.index).ffill()) * 100.0).dropna()  # bp vs SOFR
+    df = spread.rename("value").reset_index()
     df.columns = ["date", "value"]
+    store.log_run("compute:LV13", "detail",
+                  f"last spread {df['value'].iloc[-1]:+.0f}bp vs SOFR "
+                  f"({len(fins)} funds: TQQQ/QLD/UPRO/SSO)")
     store.write_display("LV13", {
         "id": "LV13", "name": "L3: Leveraged-ETF financing residual", "panel": "leverage",
         "source": "BBG NAV × Massive index returns", "cadence": "weekly estimate",
-        "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " bp",
-        "series": [_display_series(df, "Median embedded financing spread (bp, 20d roll)")],
+        "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " bp vs SOFR",
+        "series": [_display_series(df, "Median embedded financing − SOFR (bp, 20d roll)")],
         "tile": {"value": round(float(df["value"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "derived",
-        "notes": "NAV return − [L×index − fee/252], annualized /(L−1) (§5.8). Flat "
-                 f"{LEV_FEE_ANNUAL*100:.1f}% fee assumption across funds (labeled approximation). "
-                 "Index 2x/3x complex only; compare vs LV7/LV8 for the leverage-cost stack.",
+        "status": {"level": "provisional", "label": "new methodology"},
+        "tooltip": "Financing spread embedded in leveraged-ETF NAV drag, vs SOFR — "
+                   "the cost levered funds actually pay.",
+        "notes": "fin = −[nav_ret − (L×index − fee/252)]×252/(L−1), 20d mean, median "
+                 "over TQQQ/QLD/UPRO/SSO, minus same-day SOFR (§5.8 corrected "
+                 "2026-07-10). Flat 0.9% fee assumption; distributions not added back "
+                 "(periodic downward spikes possible).",
     })
     return True
 
 
 def build_lv16() -> bool:
     """LV16: aggregate SPX short interest — Σ(short shares × price) / Σ float
-    cap + median days-to-cover proxy (SHORT_INT_RATIO). Accumulates biweekly."""
-    si = store.read_all("bbg_short_interest")
+    cap + median days-to-cover (SHORT_INT_RATIO). History from the 2026-07-10
+    bdh backfill (bbg_short_interest_hist, 2023-11→) + daily snapshot appends.
+
+    Fixed 2026-07-10: float_cap is in raw DOLLARS (AAPL ≈ 4.5e12), the old
+    /1e6 assumed $M and made the series print 0.000. Prices: last grouped
+    close on/before each print date. Float caps: CURRENT snapshot applied
+    backward (survivorship/repricing caveat, labeled)."""
+    hist = store.read_latest("bbg_short_interest_hist")
+    snap_si = store.read_all("bbg_short_interest")
     members = store.read_all("bbg_spx_members")
-    grouped = massive.read_grouped(days_back=5)
-    if si is None or members is None or grouped is None:
+    grouped = massive.read_grouped()
+    if members is None or grouped is None or (hist is None and snap_si is None):
         return False
     from .structure import _bbg_to_massive
-    px = grouped.sort_values("date").groupby("ticker")["close"].last()
+    parts = [x for x in (hist, snap_si) if x is not None and not x.empty]
+    si = pd.concat(parts, ignore_index=True)
+    si["date"] = pd.to_datetime(si["date"])
+    si = si.sort_values("date").drop_duplicates(["date", "ticker"], keep="last")
+
+    g = grouped[["date", "ticker", "close"]].copy()
+    g["date"] = pd.to_datetime(g["date"])
+    closes = g.pivot_table(index="date", columns="ticker", values="close",
+                           aggfunc="last").sort_index().ffill()
+
+    snap = members[members["date"] == members["date"].max()].drop_duplicates("ticker")
+    fc_total = snap.set_index("ticker")["float_cap"].sum()
+
     rows = []
-    for d, g in si.groupby("date"):
-        g = g.drop_duplicates("ticker", keep="last").copy()
-        g["sym"] = g["ticker"].map(_bbg_to_massive)
-        g["px"] = g["sym"].map(px)
-        snap = members[members["date"] == members["date"].max()].drop_duplicates("ticker")
-        fc = snap.set_index("ticker")["float_cap"]
-        si_usd = (g["short_int"] * g["px"]).sum()
-        rows.append({"date": d, "si_pct": si_usd / fc.sum() / 1e6 * 100.0,
-                     "dtc": g["short_int_ratio"].median()})
+    for d, gg in si.groupby("date"):
+        gg = gg.copy()
+        gg["sym"] = gg["ticker"].map(_bbg_to_massive)
+        px_dates = closes.index[closes.index <= d]
+        if len(px_dates) == 0:
+            continue
+        px = closes.loc[px_dates[-1]]
+        gg["px"] = gg["sym"].map(px)
+        si_usd = (gg["short_int"] * gg["px"]).sum()
+        if si_usd <= 0:
+            continue
+        rows.append({"date": d, "si_pct": si_usd / fc_total * 100.0,
+                     "dtc": gg["short_int_ratio"].median()})
+    if not rows:
+        return False
     df = pd.DataFrame(rows).sort_values("date")
-    df["date"] = pd.to_datetime(df["date"])
     store.write_display("LV16", {
         "id": "LV16", "name": "Short interest aggregate (SPX)", "panel": "leverage",
         "source": "BBG SHORT_INT × Massive prices", "cadence": "biweekly",
         "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": "% of float (tile)",
         "series": [_display_series(df[["date", "si_pct"]].rename(columns={"si_pct": "value"}),
-                                   "Short interest % of float cap", unit="%"),
+                                   "Short interest % of float cap", unit="%", ds="none"),
                    _display_series(df[["date", "dtc"]].rename(columns={"dtc": "value"}),
-                                   "Median days-to-cover", role="context", unit="days")],
+                                   "Median days-to-cover", role="context", unit="days",
+                                   ds="none")],
         "tile": {"value": round(float(df["si_pct"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(df["si_pct"], min_history=26)},
         "provenance": "derived",
-        "notes": "Accumulates one point per biweekly FINRA SI print (history builds from "
-                 "2026-07-09). Days-to-cover = median SHORT_INT_RATIO across members.",
+        "status": {"level": "provisional", "label": "current floats"},
+        "tooltip": "SPX short interest as % of float (biweekly prints); line = median "
+                   "days-to-cover.",
+        "notes": "Biweekly FINRA prints via BBG bdh backfill (2023-11→) + daily "
+                 "accumulation. Denominator = CURRENT float caps applied backward.",
     })
     return True
 
@@ -277,6 +348,7 @@ def build_lv7() -> bool:
         "tile": {"value": round(float(tile["value"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(tile["value"])},
         "provenance": "bloomberg_cache",
+        "tooltip": "Equity-implied borrow rate from SPX box spreads, vs SOFR.",
         "notes": "Median across 5 wide strike pairs, NBBO midpoints. History accumulates "
                  "from 2026-07-09 (§6 gate applies). Cross-check vs boxtrades.com ±25bp "
                  "(§7.3). Quotes pulled off-close are wider — prefer near-close runs.",
@@ -304,11 +376,14 @@ def build_lv14() -> bool:
         "series": series,
         "tile": {"value": round(spread, 2), "delta": None, "percentile": None},
         "provenance": "manual_quarterly",
-        "notes": ("" if BROKER_RATES_VERIFIED else
-                  "*** UNVERIFIED SEED VALUES — do not trust until confirmed against "
-                  "broker pages (see pull/free.py). *** ")
-                 + f"Manual-quarterly posted rates, as-of {BROKER_RATES_ASOF}. The retail "
-                 "leverage price stack: discount tiered vs full-service base rates.",
+        "status": (None if BROKER_RATES_VERIFIED
+                   else {"level": "unverified", "label": "unverified seeds"}),
+        "tooltip": "Posted broker margin rates — the price of retail leverage.",
+        "notes": f"Manual-quarterly posted rates, as-of {BROKER_RATES_ASOF}. Discount "
+                 "tiered vs full-service base rates."
+                 + ("" if BROKER_RATES_VERIFIED else
+                    " SEED VALUES pending verification against broker pages "
+                    "(pull/free.py)."),
     })
     return True
 
@@ -332,13 +407,80 @@ def build_lv15() -> bool:
         "tile": {"value": round(float(md["bn"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(md["bn"], min_history=120)},
         "provenance": "finra_cache",
-        "notes": "Debit balances in customers' securities margin accounts (monthly, "
-                 "~3-week lag). Archive 1997–2021 + live page table stitched.",
+        "tooltip": "Debit balances in securities margin accounts — the stock of retail "
+                   "leverage.",
+        "notes": "FINRA monthly margin statistics (~3-week lag). Archive 1997–2021 + "
+                 "live page table stitched.",
+    })
+    return True
+
+
+def build_lvt() -> bool:
+    """LVT: snapshot TABLE for the no-history leverage measures (CIO 2026-07-10)
+    — LV5 GEX, LV7 box yields, LV10 call wings, LV14 broker rates. Each keeps
+    computing/accumulating its own display JSON; this card is what the page
+    shows until they have chartable history. Runs LAST in build()."""
+    display = store.load_all_display()
+    rows, asofs = [], []
+
+    lv5 = display.get("LV5")
+    if lv5 and lv5.get("series") and lv5["series"][0].get("points"):
+        pts = lv5["series"][0]["points"]
+        ext = lv5.get("extremes") or {}
+        flag = ", ".join(f"{k} {v:+.1f}" for k, v in list(ext.items())[:4]) or "OI-convention"
+        rows.append(["Dealer GEX, aggregate (LV5)", f"{pts[-1]['value']:+,.1f} $B/1%",
+                     lv5.get("asof", "—"), flag])
+        asofs.append(lv5.get("asof"))
+
+    lv7 = display.get("LV7")
+    if lv7 and lv7.get("series"):
+        for s in lv7["series"]:
+            if s.get("points"):
+                rows.append([f"Box − SOFR, {s['name'].split(' ')[0]} (LV7)",
+                             f"{s['points'][-1]['value']:+,.0f} bp",
+                             lv7.get("asof", "—"), "near-close quotes preferred"])
+        asofs.append(lv7.get("asof"))
+
+    lv10 = display.get("LV10")
+    if lv10 and lv10.get("series") and lv10["series"][0].get("points"):
+        rows.append(["Call-wing richness (LV10)",
+                     f"{lv10['series'][0]['points'][-1]['value']:+,.2f} vol pts",
+                     lv10.get("asof", "—"), "+ = upside chased"])
+        asofs.append(lv10.get("asof"))
+
+    lv14 = display.get("LV14")
+    if lv14 and lv14.get("series"):
+        from ..pull.free import BROKER_RATES_VERIFIED
+        for s in lv14["series"]:
+            if s.get("points"):
+                rows.append([f"Margin rate — {s['name']} (LV14)",
+                             f"{s['points'][-1]['value']:,.2f} %",
+                             lv14.get("asof", "—"),
+                             "" if BROKER_RATES_VERIFIED else "UNVERIFIED"])
+        asofs.append(lv14.get("asof"))
+
+    if not rows:
+        return False
+    store.write_display("LVT", {
+        "id": "LVT", "name": "Leverage levels — snapshot", "panel": "leverage",
+        "source": "derived", "cadence": "daily",
+        "asof": max(a for a in asofs if a), "unit": "",
+        "series": [],
+        "table": {"columns": ["Measure", "Latest", "As-of", "Flag"], "rows": rows},
+        "tile": {"value": None, "delta": None, "percentile": None},
+        "provenance": "derived",
+        "status": {"level": "building", "label": "history accruing"},
+        "tooltip": "Point-in-time leverage reads without chartable history yet — each "
+                   "returns as a chart as its history accrues.",
+        "notes": "Aggregates the latest LV5/LV7/LV10/LV14 values; those metrics keep "
+                 "accumulating their own series behind the scenes.",
     })
     return True
 
 
 def build() -> dict[str, bool]:
+    # LVT is assembled at the END of the opra pass (compute order runs leverage
+    # before opra, and LVT needs opra's LV5/LV10 from the SAME run)
     return {"LV6": build_lv6(), "LV7": build_lv7(), "LV8": build_lv8(),
             "LV11": build_lv11(), "LV13": build_lv13(), "LV14": build_lv14(),
             "LV15": build_lv15(), "LV16": build_lv16()}

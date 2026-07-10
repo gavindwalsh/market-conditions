@@ -1,10 +1,8 @@
 """structure.py — Panel 1 computes (§4 SC1–SC4).
 
-SC1/SC2/SC3 derive from the daily member snapshot (weights computed from
-float-adjusted caps — see pull/bbg.py: S&P weights not entitled via DAPI).
-Their history accumulates one point per run day, so percentiles stay gated
-(§6 young-series rule) until a year has accumulated or the weight-entitlement
-backfill lands. SC4 (DSPX) has full history from inception → percentile live.
+SC1/SC2/SC3 killed 2026-07-10 per CIO (registry rows removed); build_sc123
+kept below for reference but no longer wired into build(). SC4 (DSPX) has
+full history from inception → percentile live.
 
 SEMIS_GICS: GICS industry 453010 (§4). The snapshot stores numeric codes
 (e.g. 452020.0), so match on int.
@@ -88,8 +86,10 @@ def build_sc4() -> bool:
         "tile": {"value": round(float(dspx["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(dspx["value"])},
         "provenance": "bloomberg_cache",
+        "tooltip": "Cboe implied dispersion — how much single names are expected to move "
+                   "independently of the index.",
         "notes": "Cboe implied-dispersion index, full history from inception. "
-                 "Cboe EOD CSV is the §4 fallback if the BBG pull fails.",
+                 "Cboe EOD CSV is the fallback if the BBG pull fails.",
     })
     return True
 
@@ -130,12 +130,17 @@ def build_sc5() -> bool:
         "tile": {"value": round(float(s["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(s["value"])},
         "provenance": "massive_cache",
-        "notes": "Std-dev of same-day returns across SPX members. Uses TODAY'S "
-                 "membership applied backward (survivorship caveat) until historical "
-                 "membership lands; backfill extends via massive.pull_grouped_range.",
+        "tooltip": "Spread of same-day returns across S&P 500 members — realized "
+                   "dispersion.",
+        "status": {"level": "provisional", "label": "survivorship"},
+        "notes": "Per-day std-dev of member daily returns; days with <400 member "
+                 "returns dropped. Uses TODAY'S membership applied backward until "
+                 "historical membership lands; backfill extends via "
+                 "massive.pull_grouped_range.",
     })
     return True
 
 
 def build() -> dict[str, bool]:
-    return {"SC1-3": build_sc123(), "SC4": build_sc4(), "SC5": build_sc5()}
+    # SC1-3 (concentration trio) killed 2026-07-10 per CIO — registry rows removed
+    return {"SC4": build_sc4(), "SC5": build_sc5()}

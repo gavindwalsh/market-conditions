@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "LV14",
   "name": "L4: Broker margin rates",
-  "notes": "*** UNVERIFIED SEED VALUES — do not trust until confirmed against broker pages (see pull/free.py). *** Manual-quarterly posted rates, as-of 2026-07-09. The retail leverage price stack: discount tiered vs full-service base rates.",
+  "notes": "Manual-quarterly posted rates, as-of 2026-07-09. Discount tiered vs full-service base rates. SEED VALUES pending verification against broker pages (pull/free.py).",
   "panel": "leverage",
   "provenance": "manual_quarterly",
   "series": [
@@ -57,10 +57,15 @@
     }
   ],
   "source": "posted rates (manual, quarterly)",
+  "status": {
+    "label": "unverified seeds",
+    "level": "unverified"
+  },
   "tile": {
     "delta": null,
     "percentile": null,
     "value": 5.92
   },
+  "tooltip": "Posted broker margin rates — the price of retail leverage.",
   "unit": "% (tile: IBKR−Schwab spread)"
 }

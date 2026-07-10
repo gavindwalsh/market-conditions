@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "SC4",
   "name": "Implied dispersion (DSPX)",
-  "notes": "Cboe implied-dispersion index, full history from inception. Cboe EOD CSV is the §4 fallback if the BBG pull fails.",
+  "notes": "Cboe implied-dispersion index, full history from inception. Cboe EOD CSV is the fallback if the BBG pull fails.",
   "panel": "other",
   "provenance": "bloomberg_cache",
   "series": [
@@ -1562,5 +1562,6 @@
     "percentile": 99.88,
     "value": 47.56
   },
+  "tooltip": "Cboe implied dispersion — how much single names are expected to move independently of the index.",
   "unit": ""
 }

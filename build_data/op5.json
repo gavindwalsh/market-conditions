@@ -3578,5 +3578,6 @@
     "percentile": 97.66,
     "value": 58.8
   },
+  "tooltip": "Cumulative ETF net flows year-to-date, overlaid by year.",
   "unit": " $B (tile: 20d sum)"
 }

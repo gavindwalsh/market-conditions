@@ -39,6 +39,7 @@ def build_mh2() -> bool:
         ],
         "tile": {"value": tile_val, "delta": None, "percentile": pct},
         "provenance": "fred_cache",
+        "tooltip": "Investment-grade and high-yield credit spreads; wider = stress.",
         "notes": "ICE BofA US Corporate (IG) and High Yield OAS. BBG LUACOAS/LF98OAS "
                  "become primary when the Terminal pull lands (±10bp cross-check, §7.3).",
     })
@@ -70,17 +71,25 @@ def build_mh4() -> bool:
         "series": [_display_series(spread, "PMMS 30y − 10y UST (bp)")],
         "tile": {"value": tile_val, "delta": None, "percentile": pct},
         "provenance": "fred_cache",
+        "tooltip": "What new mortgage borrowers pay over the 10-year Treasury.",
         "notes": "Primary mortgage spread. Optimal Blue daily locks, card APR − FF (G.19), "
                  "auto 60mo, and the FHFA lock-in gap extend this row later (§4 MH4).",
     })
     return True
 
 
+def _s(series: pd.Series, name: str, role: str = "context", unit: str = None):
+    df = series.rename("value").reset_index()
+    df.columns = ["date", "value"]
+    return _display_series(df, name, role=role, unit=unit)
+
+
 def build_mh1() -> bool:
-    """MH1 breadth: % SPX members above 50dma/200dma, A/D line, RSP/SPY ratio,
-    NDX/SPX relative. Members from grouped bars × current membership (same
-    survivorship caveat as SC5); 200dma coverage extends as the grouped
-    backfill deepens — dates with insufficient lookback are simply absent."""
+    """MH1 breadth (split 2026-07-10 per CIO): % SPX members above 50dma/200dma
+    ONLY — leadership ratios moved to MH1B; the cumulative A/D line was dropped
+    (survivorship compounds over a multi-year cumsum and it forced a dual axis).
+    Members from grouped bars × current membership (survivorship caveat as SC5);
+    200dma coverage extends as the grouped backfill deepens."""
     from ..pull import massive
     from .structure import _bbg_to_massive
     grouped = massive.read_grouped()
@@ -100,51 +109,73 @@ def build_mh1() -> bool:
     pct200 = ((wide > ma200).sum(axis=1) / wide.notna().sum(axis=1).clip(lower=1) * 100.0).where(
         ma200.notna().sum(axis=1) >= 400).dropna()
 
-    rets = wide.pct_change()
-    ad = (rets > 0).sum(axis=1) - (rets < 0).sum(axis=1)
-    ad_line = ad.cumsum().dropna()
-
-    etfs = grouped[grouped["ticker"].isin({"RSP", "SPY"})].pivot_table(
-        index="date", columns="ticker", values="close", aggfunc="last").sort_index()
-    etfs.index = pd.to_datetime(etfs.index)
-    rsp_spy = (etfs["RSP"] / etfs["SPY"]).dropna() if {"RSP", "SPY"} <= set(etfs.columns) else pd.Series(dtype=float)
-
-    ndx = store.read_latest("bbg_ndx"); spx = store.read_latest("bbg_spx")
-    ndx_spx = pd.Series(dtype=float)
-    if ndx is not None and spx is not None:
-        j = ndx[["date", "value"]].rename(columns={"value": "n"}).merge(
-            spx[["date", "value"]].rename(columns={"value": "s"}), on="date")
-        j["date"] = pd.to_datetime(j["date"])
-        ndx_spx = j.set_index("date").eval("n / s")
-
     if pct50.empty:
         return False
 
-    def _s(series, name, role="context"):
-        df = series.rename("value").reset_index().rename(columns={"index": "date", series.index.name or "index": "date"})
-        df.columns = ["date", "value"]
-        return _display_series(df, name, role=role)
-
-    series = [{**_s(pct50, "% members > 50dma", role="avos"), "unit": "%"}]
+    series = [_s(pct50, "% members > 50dma", role="avos", unit="%")]
     if not pct200.empty:
-        series.append({**_s(pct200, "% members > 200dma"), "unit": "%"})
-    series.append({**_s(ad_line, "A/D line (cumulative)"), "unit": "cum"})
-    if not rsp_spy.empty:
-        series.append({**_s(rsp_spy / rsp_spy.iloc[0] * 100, "RSP/SPY (rebased)"), "unit": "%"})
-    if not ndx_spx.empty:
-        series.append({**_s(ndx_spx / ndx_spx.iloc[0] * 100, "NDX/SPX (rebased)", role="benchmark"), "unit": "%"})
+        series.append(_s(pct200, "% members > 200dma", unit="%"))
 
     store.write_display("MH1", {
-        "id": "MH1", "name": "Breadth", "panel": "internals",
-        "source": "Massive grouped bars × membership + BBG", "cadence": "daily",
+        "id": "MH1", "name": "Breadth (% above moving averages)", "panel": "internals",
+        "source": "Massive grouped bars × membership", "cadence": "daily",
         "asof": pct50.index[-1].strftime("%Y-%m-%d"), "unit": "% (tile: >50dma)",
         "series": series,
         "tile": {"value": round(float(pct50.iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(pct50)},
         "provenance": "derived",
+        "tooltip": "Share of S&P 500 members above their 50- and 200-day averages.",
         "notes": "Membership = current list applied backward (survivorship caveat). "
                  "200dma series appears once the grouped-bars backfill provides the "
-                 "lookback. Ratio series rebased to 100 at window start.",
+                 "lookback. Leadership ratios: MH1B.",
+    })
+    return True
+
+
+def build_mh1b() -> bool:
+    """MH1B leadership: RSP/SPY and NDX/SPX, both rebased to 100 at their
+    COMMON start (the old MH1 rebased NDX/SPX at its own 2010 start → 237 vs
+    ~100 crushed everything sharing the axis)."""
+    from ..pull import massive
+    grouped = massive.read_grouped()
+    if grouped is None or grouped.empty:
+        return False
+    etfs = grouped[grouped["ticker"].isin({"RSP", "SPY"})].pivot_table(
+        index="date", columns="ticker", values="close", aggfunc="last").sort_index()
+    etfs.index = pd.to_datetime(etfs.index)
+    if not {"RSP", "SPY"} <= set(etfs.columns):
+        return False
+    rsp_spy = (etfs["RSP"] / etfs["SPY"]).dropna()
+
+    ndx = store.read_latest("bbg_ndx"); spx = store.read_latest("bbg_spx")
+    if ndx is None or spx is None:
+        return False
+    j = ndx[["date", "value"]].rename(columns={"value": "n"}).merge(
+        spx[["date", "value"]].rename(columns={"value": "s"}), on="date")
+    j["date"] = pd.to_datetime(j["date"])
+    ndx_spx = j.set_index("date").eval("n / s").dropna()
+
+    start = max(rsp_spy.index.min(), ndx_spx.index.min())
+    rsp_spy = rsp_spy[rsp_spy.index >= start]
+    ndx_spx = ndx_spx[ndx_spx.index >= start]
+    if rsp_spy.empty or ndx_spx.empty:
+        return False
+    rsp_spy = rsp_spy / rsp_spy.iloc[0] * 100.0
+    ndx_spx = ndx_spx / ndx_spx.iloc[0] * 100.0
+
+    store.write_display("MH1B", {
+        "id": "MH1B", "name": "Leadership (RSP/SPY, NDX/SPX)", "panel": "internals",
+        "source": "Massive grouped bars + BBG", "cadence": "daily",
+        "asof": rsp_spy.index[-1].strftime("%Y-%m-%d"), "unit": "rebased (tile: RSP/SPY)",
+        "series": [_s(rsp_spy, "RSP/SPY (equal-weight vs cap-weight)", unit="rebased"),
+                   _s(ndx_spx, "NDX/SPX (mega-cap growth vs broad)", unit="rebased")],
+        "tile": {"value": round(float(rsp_spy.iloc[-1]), 1), "delta": None,
+                 "percentile": util.trailing_percentile(rsp_spy)},
+        "provenance": "derived",
+        "tooltip": "Equal-weight vs cap-weight and NDX vs SPX, rebased to 100 — "
+                   "falling RSP/SPY = mega-cap leadership.",
+        "notes": f"Both ratios rebased to 100 at the common window start "
+                 f"({start.strftime('%Y-%m-%d')}).",
     })
     return True
 
@@ -176,31 +207,36 @@ def build_mh3() -> bool:
         "tile": {"value": round(float(df["value"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "derived",
-        "notes": "Agency MBS current-coupon spread — the market price of household "
-                 "mortgage credit/prepay risk. Consumer ABS OAS legs (cards, autos) "
-                 "pending BBG index-ticker verification (§4 MH3).",
+        "tooltip": "Market price of mortgage credit/prepay risk.",
+        "notes": "Agency MBS current-coupon spread — FNMA current coupon minus a 5y/10y "
+                 "Treasury blend. Consumer ABS OAS legs (cards, autos) pending BBG "
+                 "index-ticker verification (§4 MH3).",
     })
     return True
 
 
 def build_mh5() -> bool:
-    """MH5 (v1): household debt balances by product, quarterly (NY Fed HHDC).
+    """MH5: household debt balances by product, quarterly (NY Fed HHDC) —
+    stacked bars on ONE $T axis (CIO 2026-07-10; the stack totals to the tile).
     G.19 monthly + H.8 weekly nowcast extend this row later (§4)."""
     bal = store.read_latest("hhdc_balances")
     if bal is None or bal.empty:
         return False
     bal = bal.sort_values("date")
-    products = [c for c in bal.columns if c not in ("date", "pulled_at", "Total")]
+    products = [c for c in bal.columns
+                if c not in ("date", "pulled_at", "Total")
+                and pd.api.types.is_numeric_dtype(bal[c])]
+    # largest-first so Mortgage sits at the bottom of the stack
+    products = sorted(products, key=lambda p: -float(bal[p].iloc[-1] or 0))
     series = []
-    for i, p in enumerate(products):
+    for p in products:
         s = bal[["date", p]].dropna().rename(columns={p: "value"})
-        if s.empty or not pd.api.types.is_numeric_dtype(s["value"]):
+        if s.empty:
             continue
-        # mortgage (~$12T) gets its own axis so the smaller products are readable
-        u = "$T mortgage" if "mortgage" in str(p).lower() else "$T other"
-        series.append(_display_series(s, str(p), role="avos" if i == 0 else "context", unit=u))
-    total = bal[["date"] + [p for p in products
-                            if pd.api.types.is_numeric_dtype(bal[p])]].set_index("date").sum(axis=1)
+        sd = _display_series(s, str(p), role="context", unit="$T", ds="none")
+        sd["kind"], sd["stack"] = "bar", True
+        series.append(sd)
+    total = bal.set_index("date")[products].sum(axis=1)
     asof = bal["date"].max().strftime("%Y-%m-%d")
     store.write_display("MH5", {
         "id": "MH5", "name": "Household credit — balances by product", "panel": "credit",
@@ -210,8 +246,10 @@ def build_mh5() -> bool:
         "tile": {"value": round(float(total.iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(total, min_history=40)},
         "provenance": "nyfed_cache",
-        "notes": "Quarterly HHDC balances (mortgage, HELOC, auto, card, student). "
-                 "G.19 monthly and H.8 weekly nowcast legs land later (§4 MH5).",
+        "tooltip": "Household debt balances by product — the stack totals to the "
+                   "headline number.",
+        "notes": "Quarterly HHDC balances by product, stacked. G.19 monthly and H.8 "
+                 "weekly nowcast legs land later (§4 MH5).",
     })
     return True
 
@@ -222,14 +260,19 @@ def build_mh6() -> bool:
     if tr is None or tr.empty:
         return False
     tr = tr.sort_values("date")
-    products = [c for c in tr.columns if c not in ("date", "pulled_at")]
+    # sheet headers are ALL-CAPS codes (AUTO, CC, ...) — display-friendly names
+    label = {"AUTO": "Auto", "CC": "Credit card", "MORTGAGE": "Mortgage",
+             "HELOC": "HELOC", "STUDENT LOAN": "Student loan", "OTHER": "Other"}
+    products = [c for c in tr.columns if c not in ("date", "pulled_at", "Total")
+                and pd.api.types.is_numeric_dtype(tr[c])]
     series, tile_s = [], None
     for p in products:
         s = tr[["date", p]].dropna().rename(columns={p: "value"})
-        if s.empty or not pd.api.types.is_numeric_dtype(s["value"]):
+        if s.empty:
             continue
-        role = "avos" if "credit card" in str(p).lower() else "context"
-        series.append(_display_series(s, str(p), role=role))
+        name = label.get(str(p).strip().upper(), str(p).title())
+        role = "avos" if name == "Credit card" else "context"
+        series.append(_display_series(s, name, role=role))
         if role == "avos":
             tile_s = s
     if tile_s is None and series:
@@ -244,8 +287,10 @@ def build_mh6() -> bool:
         "tile": {"value": round(float(tile_s["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(tile_s["value"], min_history=40)},
         "provenance": "nyfed_cache",
-        "notes": "% of balances newly 30+ days delinquent, by product — the earliest "
-                 "household-stress read in the credit stack.",
+        "tooltip": "% of balances newly 30+ days delinquent, by product — the earliest "
+                   "household-stress read.",
+        "notes": "Quarterly HHDC 'New Delinquent Balances by Loan Type' (flow into 30+ "
+                 "delinquency, % of balances).",
     })
     return True
 
@@ -265,14 +310,14 @@ def build_mh8() -> bool:
         "tile": {"value": round(float(df["value"].iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(df["value"], min_history=52)},
         "provenance": "scrape_cache",
-        "notes": "Active-manager mean equity exposure (0=flat, 100=fully long, ±200 "
-                 "levered). AAII bull−bear leg blocked (survey file now members-only) — "
-                 "see blockers list.",
+        "tooltip": "Active-manager equity exposure: 0 flat, 100 fully long, ±200 levered.",
+        "notes": "NAAIM weekly manager-exposure survey. AAII bull−bear leg blocked "
+                 "(survey file now members-only) — see blockers list.",
     })
     return True
 
 
 def build() -> dict[str, bool]:
-    return {"MH1": build_mh1(), "MH2": build_mh2(), "MH3": build_mh3(),
-            "MH4": build_mh4(), "MH5": build_mh5(), "MH6": build_mh6(),
-            "MH8": build_mh8()}
+    return {"MH1": build_mh1(), "MH1B": build_mh1b(), "MH2": build_mh2(),
+            "MH3": build_mh3(), "MH4": build_mh4(), "MH5": build_mh5(),
+            "MH6": build_mh6(), "MH8": build_mh8()}

@@ -84,6 +84,18 @@ LEV_ETF_UNDERLYING = {
 # snapshot at pull time when possible; this is the fallback ordering
 SEMI_TOP10 = ["NVDA", "AVGO", "AMD", "TSM", "QCOM", "TXN", "MU", "ADI", "LRCX", "AMAT"]
 
+# VC6 comparison baskets (CIO 2026-07-10): equal-weight single-name 3M ATM IV,
+# SAME construction as the semis line so levels are comparable. Sector ETF IV
+# (XLV/XLP) was rejected: basket-level IV embeds cross-name correlation and
+# sits structurally lower (XLV ≈ 16 vs single-name avgs ≈ 30+) — trend-only
+# comparability isn't worth the level confusion on one chart.
+IV_BASKETS = {
+    "semis": SEMI_TOP10,  # existing line, unchanged
+    "hyperscalers": ["MSFT", "AMZN", "GOOGL", "META", "ORCL"],
+    "healthcare": ["LLY", "UNH", "JNJ", "ABBV", "MRK"],
+    "staples": ["PG", "COST", "WMT", "KO", "PEP"],
+}
+
 # Panel order + names per CIO feedback 2026-07-09 (§6 updated to match)
 PANELS = [
     ("retail", "Retail Flows"),
@@ -94,7 +106,7 @@ PANELS = [
     ("credit", "Credit"),          # split from Market Health
     ("internals", "Internals"),    # split from Market Health
     ("issuance", "Issuance"),
-    ("other", "Other"),            # was Structure & Concentration
+    # "Other" panel retired 2026-07-10: SC1-3 killed, SC4/SC5 → Internals
 ]
 
 
@@ -119,12 +131,10 @@ def _m(*args, **kw):
 
 # ---- registry (seeded from §4; phase gates match §4.0 Massive-first) --------
 _REGISTRY_ROWS = [
-    # Panel 1 — Structure & Concentration
-    _m("SC1", "other", "Top-10 weight of S&P 500", "BBG", "daily", 1, "2000→"),
-    _m("SC2", "other", "Effective N / HHI", "BBG", "daily", 1, "2000→"),
-    _m("SC3", "other", "Semiconductor weight of SPX", "BBG", "daily", 1, "2010→"),
-    _m("SC4", "other", "Implied dispersion (DSPX)", "BBG/Cboe", "daily", 1, "inception→"),
-    _m("SC5", "other", "Realized cross-sectional dispersion", "Massive/BBG-top50", "daily", 2, "2005→"),
+    # SC1/SC2/SC3 (concentration trio) killed 2026-07-10 per CIO.
+    # SC4/SC5 moved to the Internals panel (same decision).
+    _m("SC4", "internals", "Implied dispersion (DSPX)", "BBG/Cboe", "daily", 1, "inception→"),
+    _m("SC5", "internals", "Realized cross-sectional dispersion", "Massive/BBG-top50", "daily", 2, "2005→"),
     # Panel 2 — Ownership & Passive
     _m("OP1", "ownership", "Household equity by wealth cohort", "FRED DFA", "quarterly", 1, "1989→"),
     _m("OP2", "ownership", "Household-equity nowcast", "BBG+OP1", "daily", 1, "—", "5.6"),
@@ -135,8 +145,9 @@ _REGISTRY_ROWS = [
     _m("OP7", "ownership", "Leveraged ETF AUM", "BBG", "daily", 1, "2018→"),
     _m("OP8", "flows", "MOC auction share", "Massive", "daily", 2, "at feed"),
     # Panel 3 — Retail Flows
-    _m("RF1", "retail", "Retail net flow ($, shares)", "Massive", "daily", 2, "2016→", "5.1"),
-    _m("RF2", "retail", "Retail participation", "Massive", "daily", 2, "2016→", "5.1"),
+    # RF1D/RF2D dropped 2026-07-10 per CIO — RF1/RF2 are now the daily views.
+    _m("RF1", "retail", "Retail net flow — daily (est. total)", "Massive", "daily", 2, "2016→", "5.1"),
+    _m("RF2", "retail", "Retail participation (FINRA-anchored)", "Massive+FINRA", "weekly", 2, "2016→", "5.1"),
     _m("RF3", "retail", "Retail concentration", "Massive", "daily", 2, "2016→", "5.1"),
     _m("RF4", "retail", "Buy-the-dip ratio", "Massive+BBG", "daily", 2, "2016→"),
     _m("RF5", "retail", "Avg retail trade size", "Massive", "daily", 2, "2016→"),
@@ -144,54 +155,58 @@ _REGISTRY_ROWS = [
     _m("RF7", "retail", "Small-lot options premium (proxy)", "Massive OPRA", "daily", 3, "at feed", "5.2"),
     _m("RF8", "retail", "Small-lot call share / semi premium", "Massive OPRA", "daily", 3, "at feed", "5.2"),
     _m("RF9", "retail", "Validation series (vs RTAT10)", "Nasdaq", "daily", 2, "rolling"),
-    _m("RF1D", "retail", "Retail net flow — daily bars", "Massive", "daily", 2, "at feed", "5.1"),
-    _m("RF2D", "retail", "Retail participation — daily bars", "Massive", "daily", 2, "at feed", "5.1"),
     # Panel 4 — Leverage & Its Price
     _m("LV1", "leverage", "0DTE share — SPX complex", "Cboe", "daily", 1, "2022→"),
     _m("LV2", "leverage", "0DTE share — whole market", "Massive OPRA", "daily", 3, "at feed"),
     _m("LV3", "leverage", "Volume by DTE bucket", "Massive OPRA", "daily", 3, "at feed"),
     _m("LV4", "leverage", "Options/stock notional ratio", "Massive OPRA", "daily", 3, "at feed"),
-    _m("LV5", "leverage", "Net delta & gamma; dealer GEX", "Massive OPRA", "daily", 3, "at feed", "5.3,5.10"),
+    # LV5/LV7/LV10/LV14 render via the LVT snapshot table until history accrues
+    # (CIO 2026-07-10); computes keep accumulating their series JSONs.
     _m("LV6", "leverage", "Leveraged-ETF rebalance notional", "BBG+OP7", "daily", 1, "2020→"),
-    _m("LV7", "leverage", "L1 Box-spread implied yield vs SOFR", "BBG/OPRA", "daily", 1, "build→", "5.4"),
     _m("LV8", "leverage", "L1 ES roll implied financing", "BBG", "daily", 1, "2018→"),
     _m("LV9", "leverage", "L2 Single-name synthetic financing", "Massive OPRA", "daily", 3, "at feed", "5.5,5.10"),
-    _m("LV10", "leverage", "L2 Call-wing richness", "Massive OPRA", "daily", 3, "at feed", "5.10"),
     _m("LV11", "leverage", "L3 Variance risk premium", "BBG", "daily", 1, "2010→"),
     _m("LV12", "leverage", "L3 Realized retail toll", "Massive OPRA", "daily", 3, "at feed", "5.7"),
     _m("LV13", "leverage", "L3 Leveraged-ETF financing residual", "BBG", "weekly", 1, "2020→", "5.8"),
-    _m("LV14", "leverage", "L4 Broker margin rates", "scrape", "quarterly", 1, "build→"),
     _m("LV15", "leverage", "L4 FINRA margin debt", "FINRA", "monthly", 1, "1997→"),
-    _m("LV16", "leverage", "Short interest aggregate", "BBG", "biweekly", 1, "2010→"),
+    _m("LV16", "leverage", "Short interest aggregate", "BBG", "biweekly", 1, "2023-11→"),
+    # LVT: no-history leverage measures (LV5 GEX, LV7 box, LV10 wings, LV14
+    # rates) shown as one snapshot TABLE until each accrues chartable history
+    # (CIO 2026-07-10). Their computes keep writing series JSONs so the flip
+    # back to charts is automatic later.
+    _m("LVT", "leverage", "Leverage levels — snapshot", "derived", "daily", 1, "—"),
     # Panel — Volatility and Correlation (vol first, then correlation; CIO 2026-07-09)
     _m("VC7", "volatility", "SPX ATM implied vs realized vol", "BBG", "daily", 1, "2010→"),
     _m("VC8", "volatility", "NDX ATM implied vs realized vol", "BBG", "daily", 1, "2010→"),
     _m("VC9", "volatility", "SPX 10% OTM call/put IV", "BBG", "daily", 1, "2010→"),
     _m("VC10", "volatility", "NDX 10% OTM call/put IV", "BBG", "daily", 1, "2010→"),
     _m("VC3", "volatility", "Vol term structure", "BBG", "daily", 1, "2010→"),
-    _m("VC4", "volatility", "Skew panel (SPX P1; member breadth P3)", "BBG/Massive", "daily", 1, "build→", "5.10"),
-    _m("VC6", "volatility", "Top-10 semis avg 3M IV", "BBG", "daily", 1, "2016→"),
+    # VC4 (skew panel) dropped 2026-07-10 per CIO — combined two unrelated reads
+    _m("VC6", "volatility", "3M IV by sector basket", "BBG", "daily", 1, "2016→"),
     _m("VC1", "volatility", "Implied correlation", "BBG", "daily", 1, "inception→"),
     _m("VC2", "volatility", "Implied − realized correlation spread", "BBG", "daily", 1, "2010→"),
     # VC5 spot-up/vol-up dropped 2026-07-09 (CIO: no longer interesting)
     # Panel 6 — Market Health
-    _m("MH1", "internals", "Breadth", "BBG", "daily", 1, "2010→"),
+    # MH1 split 2026-07-10 per CIO: MH1 = moving-average breadth only;
+    # MH1B = leadership ratios (was crammed into one 5-line chart)
+    _m("MH1", "internals", "Breadth (% above moving averages)", "BBG", "daily", 1, "2010→"),
+    _m("MH1B", "internals", "Leadership (RSP/SPY, NDX/SPX)", "Massive+BBG", "daily", 1, "2023-11→"),
     _m("MH2", "credit", "Corporate credit (IG/HY OAS)", "BBG/FRED", "daily", 1, "2010→"),
     _m("MH3", "credit", "Household credit — market-priced", "BBG", "daily", 1, "2015→"),
     _m("MH4", "credit", "Household credit — borrowing rates", "FRED+", "weekly", 1, "2015→"),
     _m("MH5", "credit", "Household credit — amounts", "FRED+NYFed", "weekly", 1, "2010→"),
     _m("MH6", "credit", "Delinquency transitions", "NY Fed HHDC", "quarterly", 1, "2003→"),
-    _m("MH7", "internals", "Cross-asset context", "BBG", "daily", 1, "2010→"),
+    _m("MH7", "internals", "Rates backdrop (MOVE, 10y, 2s10s)", "BBG", "daily", 1, "2010→"),
     _m("MH8", "internals", "Sentiment (AAII/NAAIM)", "scrape", "weekly", 1, "2010→"),
     _m("MH9", "internals", "Off-exchange + odd-lot share", "Massive", "daily", 2, "at feed"),
     # Panel 7 — Issuance
     _m("IS1", "issuance", "IPO forward pipeline", "BBG", "daily", 1, "build→"),
     _m("IS2", "issuance", "Filing rate (S-1/F-1)", "EDGAR", "weekly", 1, "2020→"),
     _m("IS3", "issuance", "Pricing outcomes", "BBG", "weekly", 1, "2020→"),
-    _m("IS4", "issuance", "Aftermarket appetite", "BBG", "daily", 1, "2018→"),
+    _m("IS4", "issuance", "Aftermarket appetite (IPO ETF vs SPY)", "Massive", "daily", 1, "2023-11→"),
     _m("IS5", "issuance", "Lockup calendar", "BBG", "weekly", 1, "build→"),
     _m("IS6", "issuance", "Net equity supply", "BBG", "monthly", 1, "2015→"),
-    _m("IS7", "issuance", "ETF launches by category", "BBG+EDGAR", "weekly", 1, "2020→"),
+    _m("IS7", "issuance", "Fund registration filings (pipeline proxy)", "EDGAR", "weekly", 1, "2020→"),
     _m("IS8", "issuance", "Adoption velocity", "OP7", "weekly", 1, "2022→"),
 ]
 

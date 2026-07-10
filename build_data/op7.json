@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "OP7",
   "name": "Leveraged ETF AUM",
-  "notes": "Curated 53-fund universe (top of complex, §A3 coverage label) — not all US ETFs. Flows = Δshares × NAV.",
+  "notes": "AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — not all US leveraged ETFs; single-stock slice broken out.",
   "panel": "ownership",
   "provenance": "bloomberg_cache",
   "series": [
@@ -2690,5 +2690,6 @@
     "percentile": 98.81,
     "value": 101.5
   },
+  "tooltip": "Assets in the leveraged-ETF complex; second line = the single-stock slice.",
   "unit": " $B"
 }

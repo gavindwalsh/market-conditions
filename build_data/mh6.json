@@ -3,13 +3,13 @@
   "cadence": "quarterly",
   "id": "MH6",
   "name": "Delinquency transitions (30+)",
-  "notes": "% of balances newly 30+ days delinquent, by product — the earliest household-stress read in the credit stack.",
+  "notes": "Quarterly HHDC 'New Delinquent Balances by Loan Type' (flow into 30+ delinquency, % of balances).",
   "panel": "credit",
   "provenance": "nyfed_cache",
   "series": [
     {
       "estimated_from": null,
-      "name": "Unnamed: 1",
+      "name": "Auto",
       "points": [
         {
           "date": "2003-03-31",
@@ -389,7 +389,7 @@
     },
     {
       "estimated_from": null,
-      "name": "Unnamed: 2",
+      "name": "Credit card",
       "points": [
         {
           "date": "2003-03-31",
@@ -764,12 +764,12 @@
           "value": 8.61
         }
       ],
-      "role": "context",
+      "role": "avos",
       "unit": null
     },
     {
       "estimated_from": null,
-      "name": "Unnamed: 3",
+      "name": "Mortgage",
       "points": [
         {
           "date": "2003-03-31",
@@ -1149,7 +1149,7 @@
     },
     {
       "estimated_from": null,
-      "name": "Unnamed: 4",
+      "name": "HELOC",
       "points": [
         {
           "date": "2003-03-31",
@@ -1529,7 +1529,7 @@
     },
     {
       "estimated_from": null,
-      "name": "Unnamed: 5",
+      "name": "Student loan",
       "points": [
         {
           "date": "2004-03-31",
@@ -1893,7 +1893,7 @@
     },
     {
       "estimated_from": null,
-      "name": "Unnamed: 6",
+      "name": "Other",
       "points": [
         {
           "date": "2003-03-31",
@@ -2270,393 +2270,14 @@
       ],
       "role": "context",
       "unit": null
-    },
-    {
-      "estimated_from": null,
-      "name": "Unnamed: 7",
-      "points": [
-        {
-          "date": "2003-03-31",
-          "value": 6.64
-        },
-        {
-          "date": "2003-06-30",
-          "value": 6.73
-        },
-        {
-          "date": "2003-09-30",
-          "value": 6.39
-        },
-        {
-          "date": "2003-12-31",
-          "value": 6.27
-        },
-        {
-          "date": "2004-03-31",
-          "value": 5.96
-        },
-        {
-          "date": "2004-06-30",
-          "value": 5.87
-        },
-        {
-          "date": "2004-09-30",
-          "value": 5.74
-        },
-        {
-          "date": "2004-12-31",
-          "value": 5.58
-        },
-        {
-          "date": "2005-03-31",
-          "value": 5.42
-        },
-        {
-          "date": "2005-06-30",
-          "value": 5.29
-        },
-        {
-          "date": "2005-09-30",
-          "value": 5.39
-        },
-        {
-          "date": "2005-12-31",
-          "value": 5.32
-        },
-        {
-          "date": "2006-03-31",
-          "value": 5.37
-        },
-        {
-          "date": "2006-06-30",
-          "value": 5.51
-        },
-        {
-          "date": "2006-09-30",
-          "value": 5.64
-        },
-        {
-          "date": "2006-12-31",
-          "value": 6.01
-        },
-        {
-          "date": "2007-03-31",
-          "value": 6.44
-        },
-        {
-          "date": "2007-06-30",
-          "value": 6.82
-        },
-        {
-          "date": "2007-09-30",
-          "value": 7.32
-        },
-        {
-          "date": "2007-12-31",
-          "value": 8.1
-        },
-        {
-          "date": "2008-03-31",
-          "value": 8.75
-        },
-        {
-          "date": "2008-06-30",
-          "value": 9.4
-        },
-        {
-          "date": "2008-09-30",
-          "value": 10.11
-        },
-        {
-          "date": "2008-12-31",
-          "value": 10.93
-        },
-        {
-          "date": "2009-03-31",
-          "value": 11.53
-        },
-        {
-          "date": "2009-06-30",
-          "value": 11.95
-        },
-        {
-          "date": "2009-09-30",
-          "value": 11.95
-        },
-        {
-          "date": "2009-12-31",
-          "value": 11.35
-        },
-        {
-          "date": "2010-03-31",
-          "value": 10.83
-        },
-        {
-          "date": "2010-06-30",
-          "value": 10.2
-        },
-        {
-          "date": "2010-09-30",
-          "value": 9.65
-        },
-        {
-          "date": "2010-12-31",
-          "value": 9.01
-        },
-        {
-          "date": "2011-03-31",
-          "value": 8.56
-        },
-        {
-          "date": "2011-06-30",
-          "value": 8.11
-        },
-        {
-          "date": "2011-09-30",
-          "value": 8.09
-        },
-        {
-          "date": "2011-12-31",
-          "value": 7.89
-        },
-        {
-          "date": "2012-03-31",
-          "value": 7.51
-        },
-        {
-          "date": "2012-06-30",
-          "value": 7.35
-        },
-        {
-          "date": "2012-09-30",
-          "value": 6.84
-        },
-        {
-          "date": "2012-12-31",
-          "value": 6.57
-        },
-        {
-          "date": "2013-03-31",
-          "value": 6.41
-        },
-        {
-          "date": "2013-06-30",
-          "value": 6.14
-        },
-        {
-          "date": "2013-09-30",
-          "value": 5.97
-        },
-        {
-          "date": "2013-12-31",
-          "value": 5.83
-        },
-        {
-          "date": "2014-03-31",
-          "value": 5.64
-        },
-        {
-          "date": "2014-06-30",
-          "value": 5.47
-        },
-        {
-          "date": "2014-09-30",
-          "value": 5.36
-        },
-        {
-          "date": "2014-12-31",
-          "value": 5.14
-        },
-        {
-          "date": "2015-03-31",
-          "value": 4.96
-        },
-        {
-          "date": "2015-06-30",
-          "value": 5.0
-        },
-        {
-          "date": "2015-09-30",
-          "value": 4.88
-        },
-        {
-          "date": "2015-12-31",
-          "value": 4.84
-        },
-        {
-          "date": "2016-03-31",
-          "value": 4.71
-        },
-        {
-          "date": "2016-06-30",
-          "value": 4.53
-        },
-        {
-          "date": "2016-09-30",
-          "value": 4.55
-        },
-        {
-          "date": "2016-12-31",
-          "value": 4.55
-        },
-        {
-          "date": "2017-03-31",
-          "value": 4.68
-        },
-        {
-          "date": "2017-06-30",
-          "value": 4.76
-        },
-        {
-          "date": "2017-09-30",
-          "value": 4.67
-        },
-        {
-          "date": "2017-12-31",
-          "value": 4.57
-        },
-        {
-          "date": "2018-03-31",
-          "value": 4.54
-        },
-        {
-          "date": "2018-06-30",
-          "value": 4.52
-        },
-        {
-          "date": "2018-09-30",
-          "value": 4.64
-        },
-        {
-          "date": "2018-12-31",
-          "value": 4.65
-        },
-        {
-          "date": "2019-03-31",
-          "value": 4.67
-        },
-        {
-          "date": "2019-06-30",
-          "value": 4.67
-        },
-        {
-          "date": "2019-09-30",
-          "value": 4.6
-        },
-        {
-          "date": "2019-12-31",
-          "value": 4.67
-        },
-        {
-          "date": "2020-03-31",
-          "value": 4.61
-        },
-        {
-          "date": "2020-06-30",
-          "value": 3.99
-        },
-        {
-          "date": "2020-09-30",
-          "value": 3.31
-        },
-        {
-          "date": "2020-12-31",
-          "value": 2.66
-        },
-        {
-          "date": "2021-03-31",
-          "value": 2.13
-        },
-        {
-          "date": "2021-06-30",
-          "value": 1.99
-        },
-        {
-          "date": "2021-09-30",
-          "value": 1.93
-        },
-        {
-          "date": "2021-12-31",
-          "value": 2.03
-        },
-        {
-          "date": "2022-03-31",
-          "value": 2.12
-        },
-        {
-          "date": "2022-06-30",
-          "value": 2.41
-        },
-        {
-          "date": "2022-09-30",
-          "value": 2.65
-        },
-        {
-          "date": "2022-12-31",
-          "value": 2.82
-        },
-        {
-          "date": "2023-03-31",
-          "value": 3.0
-        },
-        {
-          "date": "2023-06-30",
-          "value": 3.18
-        },
-        {
-          "date": "2023-09-30",
-          "value": 3.41
-        },
-        {
-          "date": "2023-12-31",
-          "value": 3.64
-        },
-        {
-          "date": "2024-03-31",
-          "value": 3.88
-        },
-        {
-          "date": "2024-06-30",
-          "value": 3.95
-        },
-        {
-          "date": "2024-09-30",
-          "value": 4.13
-        },
-        {
-          "date": "2024-12-31",
-          "value": 4.14
-        },
-        {
-          "date": "2025-03-31",
-          "value": 4.87
-        },
-        {
-          "date": "2025-06-30",
-          "value": 5.255
-        },
-        {
-          "date": "2025-09-30",
-          "value": 5.33
-        },
-        {
-          "date": "2025-12-31",
-          "value": 5.642
-        },
-        {
-          "date": "2026-03-31",
-          "value": 5.08
-        }
-      ],
-      "role": "context",
-      "unit": null
     }
   ],
   "source": "NY Fed HHDC",
   "tile": {
     "delta": null,
-    "percentile": 67.2,
-    "value": 7.72
+    "percentile": 59.68,
+    "value": 8.61
   },
+  "tooltip": "% of balances newly 30+ days delinquent, by product — the earliest household-stress read.",
   "unit": "% (tile: credit card)"
 }

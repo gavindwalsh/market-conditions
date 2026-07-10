@@ -21,7 +21,11 @@ PROXY_NOTE = "Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regu
 
 def _opra() -> pd.DataFrame | None:
     df = massive.read_opra_daily()
-    return None if df is None or df.empty else df
+    if df is None or df.empty:
+        return None
+    # holiday placeholder rows produce 0/0=NaN points on ~10 market holidays
+    df = df[df["underlying"] != "_HOLIDAY_"]
+    return None if df.empty else df
 
 
 def build_lv2_lv3() -> dict[str, bool]:
@@ -30,37 +34,46 @@ def build_lv2_lv3() -> dict[str, bool]:
         return {"LV2": False, "LV3": False}
     day = df.groupby("date")[["contracts", "c_0dte", "c_1_5", "c_6_30", "c_over30"]].sum()
     day.index = pd.to_datetime(day.index)
+    day = day[day["contracts"] > 0]
     asof = day.index[-1].strftime("%Y-%m-%d")
 
-    v = (day["c_0dte"] / day["contracts"] * 100.0).rename("value").reset_index()
-    spx = df[df["underlying"].isin(["SPX", "SPXW"])].groupby("date")[["contracts", "c_0dte"]].sum()
-    spx.index = pd.to_datetime(spx.index)
-    sv = (spx["c_0dte"] / spx["contracts"] * 100.0).rename("value").reset_index()
+    # SPX-complex series removed 2026-07-10 (CIO) — parked for the LV1 Cboe
+    # cross-check; its 60-70% range doubled the axis and crushed the read.
+    raw = (day["c_0dte"] / day["contracts"] * 100.0)
+    avg = raw.rolling(5, min_periods=2).mean()
     store.write_display("LV2", {
         "id": "LV2", "name": "0DTE share — whole market", "panel": "leverage",
         "source": "Massive OPRA trades", "cadence": "daily", "asof": asof, "unit": "%",
-        "series": [_display_series(v, "All underlyings 0DTE share"),
-                   _display_series(sv, "SPX complex (LV1 cross-check)", role="benchmark")],
-        "tile": {"value": round(float(v["value"].iloc[-1]), 1), "delta": None,
-                 "percentile": util.trailing_percentile(v["value"])},
+        "series": [_display_series(avg.rename("value").reset_index(), "0DTE share (5d avg)"),
+                   _display_series(raw.rename("value").reset_index(), "daily", role="context")],
+        "tile": {"value": round(float(avg.iloc[-1]), 1), "delta": None,
+                 "percentile": util.trailing_percentile(avg.dropna())},
         "provenance": "massive_opra",
-        "notes": "Volume where expiry = trade date. SPX-complex series doubles as the "
-                 "§7.3 LV1 (Cboe) cross-check once LV1 is wired.",
+        "tooltip": "Share of option volume expiring same-day; the sawtooth is the "
+                   "Friday weekly-expiry cycle, so read the 5-day average.",
+        "notes": "Volume where expiry = trade date, all underlyings. Raw daily saws "
+                 "structurally (~41% Fridays vs ~21-24% midweek — single-name/ETF "
+                 "weeklies expire Friday). SPX-complex series parked for LV1.",
     })
 
+    # LV3 stacked weekly bars (CIO 2026-07-10) — buckets sum to 100 per week
     series = []
     for col, label in (("c_0dte", "0 DTE"), ("c_1_5", "1–5"), ("c_6_30", "6–30"), ("c_over30", ">30")):
-        raw = day[col] / day["contracts"] * 100.0
-        s = raw.rolling(5, min_periods=2).mean().rename("value").reset_index()
-        series.append(_display_series(s, f"{label} days (5d avg)",
-                                      role="avos" if col == "c_0dte" else "context"))
+        wk = (day[col] / day["contracts"] * 100.0).resample("W-FRI").mean().dropna()
+        sd = _display_series(wk.rename("value").reset_index(), f"{label} days",
+                             role="context", unit="%", ds="none")
+        sd["kind"], sd["stack"] = "bar", True
+        series.append(sd)
     store.write_display("LV3", {
         "id": "LV3", "name": "Volume by DTE bucket", "panel": "leverage",
         "source": "Massive OPRA trades", "cadence": "daily", "asof": asof,
         "unit": "% (tile: 0DTE)", "series": series,
         "tile": {"value": round(float((day["c_0dte"] / day["contracts"]).iloc[-1] * 100), 1),
                  "delta": None, "percentile": None},
-        "provenance": "massive_opra", "notes": "Share of contract volume by days-to-expiry, 5-day rolling average (raw daily is choppy — expiry cycles).",
+        "provenance": "massive_opra",
+        "tooltip": "Composition of option volume by days-to-expiry — weekly average, "
+                   "stacks to 100%.",
+        "notes": "Weekly mean of daily bucket shares of contract volume.",
     })
     return {"LV2": True, "LV3": True}
 
@@ -71,6 +84,10 @@ def build_rf78() -> dict[str, bool]:
         return {"RF7": False, "RF8": False}
     day = df.groupby("date")[["premium", "smalllot_prem", "smalllot_call_prem"]].sum()
     day.index = pd.to_datetime(day.index)
+    # zero prints are feed artifacts, not $0 of premium — null them out rather
+    # than drawing the line to zero (CIO 2026-07-10); NaNs drop from display
+    day.loc[(day["premium"] <= 0) | (day["smalllot_prem"] <= 0),
+            ["premium", "smalllot_prem", "smalllot_call_prem"]] = float("nan")
     asof = day.index[-1].strftime("%Y-%m-%d")
 
     v = (day["smalllot_prem"] / 1e9).rename("value").reset_index()
@@ -81,9 +98,11 @@ def build_rf78() -> dict[str, bool]:
         "unit": " $B (tile)", "series": [
             _display_series(v, "Small-lot premium ($B/day)", unit="$B"),
             _display_series(share, "Share of all premium (%)", role="context", unit="%")],
-        "tile": {"value": round(float(v["value"].iloc[-1]), 2), "delta": None,
-                 "percentile": util.trailing_percentile(v["value"])},
-        "provenance": "massive_opra", "notes": PROXY_NOTE,
+        "tile": {"value": round(float(v["value"].dropna().iloc[-1]), 2), "delta": None,
+                 "percentile": util.trailing_percentile(v["value"].dropna())},
+        "provenance": "massive_opra",
+        "tooltip": "Small-lot (<10 contract) option premium per day — a retail proxy.",
+        "notes": PROXY_NOTE + " Zero-premium feed days rendered as gaps, not zeros.",
     })
 
     callsh = (day["smalllot_call_prem"] / day["smalllot_prem"] * 100.0).rename("value").reset_index()
@@ -97,9 +116,11 @@ def build_rf78() -> dict[str, bool]:
             _display_series(callsh, "Call share of small-lot premium (%)", unit="%"),
             _display_series(semi_p.rename("value").reset_index(), "Semi small-lot premium ($B)",
                             role="benchmark", unit="$B")],
-        "tile": {"value": round(float(callsh["value"].iloc[-1]), 1), "delta": None,
-                 "percentile": util.trailing_percentile(callsh["value"])},
-        "provenance": "massive_opra", "notes": PROXY_NOTE,
+        "tile": {"value": round(float(callsh["value"].dropna().iloc[-1]), 1), "delta": None,
+                 "percentile": util.trailing_percentile(callsh["value"].dropna())},
+        "provenance": "massive_opra",
+        "tooltip": "Call share of small-lot premium; second line = small-lot premium in semis.",
+        "notes": PROXY_NOTE,
     })
     return {"RF7": True, "RF8": True}
 
@@ -137,10 +158,12 @@ def build_lv5() -> bool:
         "tile": {"value": round(float(tdf["value"].iloc[-1]), 1), "delta": None,
                  "percentile": None},
         "provenance": "massive_snapshot",
-        "notes": "OI-convention estimator (dealers +γ calls / −γ puts) — §5.3 revised; "
-                 "levels are estimates, CHANGES are the signal. Extremes today: "
-                 + ", ".join(f"{k} {v:+.1f}" for k, v in top.items())
-                 + ". Universe = retail top-25 + majors + semis (32 names).",
+        # live extremes carried as data (LVT table row), NOT baked into prose
+        "extremes": {k: round(float(v), 1) for k, v in top.items()},
+        "status": {"level": "provisional", "label": "OI-convention"},
+        "tooltip": "Dealer gamma exposure estimate — changes are the signal, not levels.",
+        "notes": "OI-convention estimator (dealers +γ calls / −γ puts, §5.3 revised). "
+                 "Universe = retail top-25 + majors + semis (~32 names).",
     })
     return True
 
@@ -191,9 +214,11 @@ def build_lv10() -> bool:
         "tile": {"value": round(float(df["value"].iloc[-1]), 2), "delta": None,
                  "percentile": None},
         "provenance": "massive_snapshot",
-        "notes": "Positive = upside wings bid (call-demand regime, Citadel ch.20). "
-                 "Universe = snapshot names (32); % SPX members inverted lands with "
-                 "the member-breadth snapshot extension (itemized).",
+        "status": {"level": "provisional", "label": "snapshot universe"},
+        "tooltip": "Positive = upside call wings bid vs ATM (call-demand regime).",
+        "notes": "25Δ call IV − ATM IV per name (20-45d expiry), volume-weighted across "
+                 "the ~32-name snapshot universe; % SPX members inverted lands with the "
+                 "member-breadth extension.",
     })
     return True
 
@@ -269,4 +294,6 @@ def build() -> dict[str, bool]:
     out = build_lv2_lv3()
     out.update(build_rf78())
     out.update({"LV5": build_lv5(), "LV10": build_lv10(), "LV9": build_lv9()})
+    from .leverage import build_lvt
+    out["LVT"] = build_lvt()  # last: needs this run's LV5/LV10 + leverage's LV7/LV14
     return out

@@ -3506,5 +3506,6 @@
     "percentile": 5.28,
     "value": 267.0
   },
+  "tooltip": "Investment-grade and high-yield credit spreads; wider = stress.",
   "unit": " bp (tile: HY OAS)"
 }

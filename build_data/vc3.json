@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "VC3",
   "name": "Vol term structure (VIX/VIX3M)",
-  "notes": "Ratio > 1 (near-dated vol above 3-month) marks stress/inversion; persistent low ratio = carry-friendly contango. Per-name slopes for top names extend this row later (§4 VC3).",
+  "notes": "Daily close ratio of VIX to VIX3M. Per-name term-structure slopes for top names are a noted extension.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -1774,5 +1774,6 @@
     "percentile": 24.55,
     "value": 0.843
   },
+  "tooltip": "VIX/VIX3M above 1 = stress inversion; low = carry-friendly contango.",
   "unit": "×"
 }

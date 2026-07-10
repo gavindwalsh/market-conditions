@@ -38,5 +38,6 @@
     "percentile": null,
     "value": 57.0
   },
+  "tooltip": "Equity-implied borrow rate from SPX box spreads, vs SOFR.",
   "unit": " bp (tile: 3M)"
 }

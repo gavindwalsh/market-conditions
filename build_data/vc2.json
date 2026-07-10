@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "VC2",
   "name": "Implied − realized correlation spread",
-  "notes": "Realized correlation from the index-variance identity over SPX members (current membership applied backward). Positive spread = correlation risk premium earned by dispersion sellers.",
+  "notes": "Realized correlation from the index-variance identity over SPX members, 21d rolling, current membership applied backward.",
   "panel": "volatility",
   "provenance": "derived",
   "series": [
@@ -2206,5 +2206,6 @@
     "percentile": 23.25,
     "value": -5.19
   },
+  "tooltip": "Implied minus realized correlation — the premium dispersion sellers are earning.",
   "unit": " pts"
 }
