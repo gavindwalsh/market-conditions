@@ -190,26 +190,30 @@ def build_lv6() -> bool:
 
 
 def build_lv13() -> bool:
-    """LV13: leveraged-ETF financing residual (§5.8, corrected 2026-07-10).
+    """LV13: leveraged-ETF financing residual (§5.8; total-return fix 2026-07-10).
 
-    Model: nav_ret = L×r − fee/252 − (L−1)×fin/252, so the embedded financing
-    rate is fin = −resid×252/(L−1) — the pre-fix code dropped the minus (the
-    chart printed MINUS the gross rate, hence 'persistent negative financing')
-    and never subtracted SOFR despite the label. Long index funds only:
-    inverse funds' estimator sign opposes (rebate, not borrow) and mixing them
-    made the median whipsaw between two clusters; SOXL/SOXS excluded — they
-    track the ICE Semi index, not SMH (±38bp/day proxy error)."""
-    grouped = massive.read_grouped()
+    Model: nav_ret = L×r_tr − fee/252 − (L−1)×fin/252, so embedded financing is
+    fin = −resid×252/(L−1). r_tr is the underlying's TOTAL return (SPTR / XNDX),
+    NOT price return: the fund's swaps earn the index total return, so price-only
+    left the index dividend yield in the residual and read as apparent NEGATIVE
+    financing (a ~−(L/(L−1))×div bias, lumpy around quarterly ex-dates). Long
+    index funds only (inverse funds' estimator sign opposes); SPY/QQQ funds only
+    (SOXL/SOXS track the ICE Semi index, not SMH)."""
     f = store.read_latest("fred_sofr")
-    if grouped is None or f is None:
+    if f is None:
         return False
-    closes = grouped.pivot_table(index="date", columns="ticker", values="close",
-                                 aggfunc="last").sort_index()
-    closes.index = pd.to_datetime(closes.index)
-    rets = closes.pct_change()
     sofr = f.sort_values("date")[["date", "value"]].copy()
     sofr["date"] = pd.to_datetime(sofr["date"])
     sofr = sofr.set_index("date")["value"]
+
+    # underlying -> total-return index series; daily TR return backs financing out
+    tr_of = {"SPY": "spx_tr", "QQQ": "ndx_tr"}
+    tr_ret = {}
+    for u, mnem in tr_of.items():
+        s = _series(mnem)
+        if s is None:
+            return False
+        tr_ret[u] = s.set_index("date")["value"].pct_change()
 
     fins = []
     for t, (cat, L) in config.ETF_UNIVERSE.items():
@@ -217,12 +221,15 @@ def build_lv13() -> bool:
             continue  # long index funds only (see docstring)
         u = config.LEV_ETF_UNDERLYING.get(t)
         e = _etf(t)
-        if e is None or u not in ("QQQ", "SPY") or u not in rets.columns:
+        if e is None or u not in tr_ret:
             continue
         nav_ret = e.set_index("date")["nav"].pct_change()
-        r = rets[u].reindex(nav_ret.index)
+        r = tr_ret[u].reindex(nav_ret.index)
         resid = nav_ret - (L * r - LEV_FEE_ANNUAL / 252)
-        fin = -resid.rolling(20).mean() * 252 / (L - 1) * 100.0  # pct-pts, gross
+        # 60d mean: the residual amplifies ~1bp/day NAV-vs-index tracking noise
+        # into ~250bp of financing, so a short window is unreadable — 60d lands
+        # the latest read on its own trend (20d spikes to ~2x it).
+        fin = -resid.rolling(60).mean() * 252 / (L - 1) * 100.0  # pct-pts, gross
         fins.append(fin.rename(t))
     if not fins:
         return False
@@ -232,22 +239,23 @@ def build_lv13() -> bool:
     df.columns = ["date", "value"]
     store.log_run("compute:LV13", "detail",
                   f"last spread {df['value'].iloc[-1]:+.0f}bp vs SOFR "
-                  f"({len(fins)} funds: TQQQ/QLD/UPRO/SSO)")
+                  f"({len(fins)} funds, total-return basis)")
     store.write_display("LV13", {
         "id": "LV13", "name": "L3: Leveraged-ETF financing residual", "panel": "leverage",
-        "source": "BBG NAV × Massive index returns", "cadence": "weekly estimate",
+        "source": "BBG NAV × total-return index", "cadence": "weekly estimate",
         "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " bp vs SOFR",
-        "series": [_display_series(df, "Median embedded financing − SOFR (bp, 20d roll)")],
+        "series": [_display_series(df, "Median embedded financing − SOFR (bp, 60d roll)")],
         "tile": {"value": round(float(df["value"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "derived",
         "status": {"level": "provisional", "label": "new methodology"},
         "tooltip": "Financing spread embedded in leveraged-ETF NAV drag, vs SOFR — "
                    "the cost levered funds actually pay.",
-        "notes": "fin = −[nav_ret − (L×index − fee/252)]×252/(L−1), 20d mean, median "
-                 "over TQQQ/QLD/UPRO/SSO, minus same-day SOFR (§5.8 corrected "
-                 "2026-07-10). Flat 0.9% fee assumption; distributions not added back "
-                 "(periodic downward spikes possible).",
+        "notes": "fin = −[nav_ret − (L×TR − fee/252)]×252/(L−1), 60d mean, median over "
+                 "TQQQ/QLD/UPRO/SSO, minus same-day SOFR. Underlying leg = TOTAL return "
+                 "(SPTR/XNDX), so index dividends don't leak in as negative financing "
+                 "(§5.8, total-return fix 2026-07-10). Level is a noisy estimate (the "
+                 "residual amplifies tracking error) — read the trend. Flat 0.9% fee.",
     })
     return True
 

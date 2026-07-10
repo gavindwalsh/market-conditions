@@ -94,8 +94,9 @@ INDEX_SERIES = {
     "ust10y": ("USGG10YR Index", "2010-01-01"),
     "ust2y": ("USGG2YR Index", "2010-01-01"),
     "spx": ("SPX Index", "2010-01-01"),          # RF4, VC5 denominators
-    "spx_tr": ("SPTR Index", "2010-01-01"),      # OP2 nowcast (total return)
+    "spx_tr": ("SPTR Index", "2010-01-01"),      # OP2 nowcast + LV13 (total return)
     "ndx": ("NDX Index", "2010-01-01"),          # MH1 NDX/SPX rel, VC5
+    "ndx_tr": ("XNDX Index", "2010-01-01"),      # LV13 (Nasdaq-100 total return)
     "vxn": ("VXN Index", "2010-01-01"),          # VC5 spot-up/vol-up (NDX 1M IV)
     "es1": ("ES1 Index", "2018-01-01"),          # LV8 roll financing
     "es2": ("ES2 Index", "2018-01-01"),

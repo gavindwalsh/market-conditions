@@ -124,8 +124,8 @@ Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 sessions.
 
 ### LV13 — L3: Leveraged-ETF financing residual
 **Status: new methodology**
-*Source: BBG NAV × Massive index returns · cadence: weekly*
-fin = −[nav_ret − (L×index − fee/252)]×252/(L−1), 20d mean, median over TQQQ/QLD/UPRO/SSO, minus same-day SOFR (§5.8 corrected 2026-07-10). Flat 0.9% fee assumption; distributions not added back (periodic downward spikes possible).
+*Source: BBG NAV × total-return index · cadence: weekly*
+fin = −[nav_ret − (L×TR − fee/252)]×252/(L−1), 60d mean, median over TQQQ/QLD/UPRO/SSO, minus same-day SOFR. Underlying leg = TOTAL return (SPTR/XNDX), so index dividends don't leak in as negative financing (§5.8, total-return fix 2026-07-10). Level is a noisy estimate (the residual amplifies tracking error) — read the trend. Flat 0.9% fee.
 
 ### LV15 — L4: FINRA margin debt
 *Source: FINRA margin statistics · cadence: monthly*
