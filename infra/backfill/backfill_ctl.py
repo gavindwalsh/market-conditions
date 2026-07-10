@@ -220,6 +220,33 @@ def seed_lake(bucket: str):
     sh(cmd)
 
 
+# ---- launch helpers -------------------------------------------------------------
+def _run_instances(spot: bool) -> tuple[str | None, str]:
+    """Launch one instance from the template. Returns (instance_id, "") on
+    success or (None, stderr) on failure. Retries only the IAM instance-profile
+    propagation lag — capacity/quota errors won't self-heal, so they return
+    immediately for the caller to handle (e.g. Spot->on-demand fallback)."""
+    market = json.dumps({"MarketType": "spot", "SpotOptions": {
+        "SpotInstanceType": "one-time", "InstanceInterruptionBehavior": "terminate"}})
+    cmd = ["aws", "ec2", "run-instances", "--launch-template",
+           f"LaunchTemplateName={NAME}", "--count", "1",
+           "--region", REGION, "--output", "json"]
+    if spot:
+        cmd += ["--instance-market-options", market]
+    last = ""
+    for attempt in range(4):
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode == 0:
+            return json.loads(r.stdout)["Instances"][0]["InstanceId"], ""
+        last = r.stderr.strip()
+        if "iam instance profile" in last.lower() or "invalid iam" in last.lower():
+            print(f"  waiting for IAM instance-profile propagation ({attempt + 1}/4)...")
+            time.sleep(10)
+            continue
+        break  # any other error is surfaced immediately
+    return None, last
+
+
 # ---- subcommands ----------------------------------------------------------------
 def cmd_launch(args):
     inst = find_instance()
@@ -235,24 +262,18 @@ def cmd_launch(args):
     upload_bootstrap(bucket)
     seed_lake(bucket)
 
-    market = json.dumps({"MarketType": "spot", "SpotOptions": {
-        "SpotInstanceType": "one-time", "InstanceInterruptionBehavior": "terminate"}})
-    cmd = ["ec2", "run-instances", "--launch-template",
-           f"LaunchTemplateName={NAME}", "--count", "1"]
-    if not args.on_demand:
-        cmd += ["--instance-market-options", market]
-    js = None
-    for attempt in range(4):  # tolerate IAM instance-profile propagation lag
-        js = aws_json(*cmd, check=False)
-        if js:
-            break
-        print(f"  run-instances not accepted yet, retrying ({attempt + 1}/4)...")
-        time.sleep(10)
-    if not js:
-        sys.exit("run-instances failed after retries — see aws error above")
-    iid = js["Instances"][0]["InstanceId"]
+    spot = not args.on_demand
+    iid, err = _run_instances(spot)
+    if not iid and spot and "InsufficientInstanceCapacity" in err:
+        print(f"  Spot capacity for {INSTANCE_TYPE} unavailable in {REGION} right now "
+              "— falling back to on-demand\n"
+              "  (~$0.38/hr; a ~2-4h backfill is well under $2, and no reclaim risk).")
+        spot = False
+        iid, err = _run_instances(spot)
+    if not iid:
+        sys.exit(f"run-instances failed:\n{err}")
     print(f"\nlaunched {iid} ({INSTANCE_TYPE}, "
-          f"{'ON-DEMAND' if args.on_demand else 'Spot'}) — waiting for running state")
+          f"{'Spot' if spot else 'ON-DEMAND'}) — waiting for running state")
     sh(["aws", "ec2", "wait", "instance-running", "--instance-ids", iid,
         "--region", REGION])
     print(f"""
