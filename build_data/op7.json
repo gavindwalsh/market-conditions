@@ -4,7 +4,7 @@
   "id": "OP7",
   "name": "Leveraged ETF AUM",
   "notes": "AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — not all US leveraged ETFs; single-stock slice broken out.",
-  "panel": "ownership",
+  "panel": "flows",
   "provenance": "bloomberg_cache",
   "series": [
     {

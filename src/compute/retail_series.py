@@ -250,14 +250,7 @@ def build() -> dict[str, bool]:
           bars=True, tooltip="Average dollar size of an identified retail trade.",
           note="Identified prints only — the ratio is invariant to the ×3 scale factor.")
 
-    day["moc_pct"] = day["moc"] / day["tape_vol"] * 100.0
-    _emit("OP8", "MOC auction share", "ownership",
-          [("moc_pct", "Closing-auction volume / total (%)", "avos")], "moc_pct", "%",
-          bars=True, shared_note=False,
-          tooltip="Share of the day's volume done in the closing auction.",
-          note="SIP conditions 8+19 (volume-updating closing prints); "
-               "official-close price prints (15) excluded.")
-
+    # OP8 (MOC auction share) killed 2026-07-10 — not interesting (CIO).
     day["offexch_pct"] = day["offexch"] / day["tape_vol"] * 100.0
     day["oddlot_pct"] = day["oddlot"] / day["tape_trades"] * 100.0
     _emit("MH9", "Off-exchange + odd-lot share", "health",
@@ -270,7 +263,7 @@ def build() -> dict[str, bool]:
 
     rf3 = _build_rf3(df, F)
     rf4 = _build_rf4(day)
-    return {"RF1": rf1, "RF2": True, "RF10": True, "RF5": True, "MH9": True, "OP8": True,
+    return {"RF1": rf1, "RF2": True, "RF10": True, "RF5": True, "MH9": True,
             "RF3": rf3, "RF4": rf4}
 
 

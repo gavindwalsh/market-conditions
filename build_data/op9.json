@@ -3,7 +3,7 @@
   "cadence": "monthly",
   "id": "OP9",
   "name": "Personal saving rate",
-  "notes": "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA).",
+  "notes": "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA). Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [
@@ -3258,6 +3258,7 @@
     "percentile": 4.94,
     "value": 3.0
   },
-  "tooltip": "Personal saving as a share of disposable personal income (monthly).",
-  "unit": "%"
+  "tooltip": "Personal saving as a share of disposable personal income (monthly). The 2020-21 stimulus spikes run off the top so the rest is legible.",
+  "unit": "%",
+  "y_max": 18.2
 }

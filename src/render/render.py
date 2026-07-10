@@ -86,10 +86,12 @@ CHART_BOOT = """
     var legend = m.series.length>1 ? {top:0,left:2,itemWidth:12,itemHeight:7,
         itemGap:8,textStyle:{fontSize:10,color:'#5A5A5A'},icon:'roundRect',
         data:m.series.map(function(s){return s.name;})} : undefined;
+    /* optional axis clamps (points beyond run off-chart) — e.g. hide COVID spikes */
+    var yMax = (m.y_max===undefined?null:m.y_max), yMin = (m.y_min===undefined?null:m.y_min);
     var yAxes;
     if(dual){
       yAxes=[
-        {type:'value',scale:true,position:'left',name:units[0],
+        {type:'value',scale:true,position:'left',name:units[0],max:yMax,min:yMin,
          nameTextStyle:{color:axisColor[0]||'#5A5A5A',align:'left'},
          axisLabel:{color:axisColor[0]||'#5A5A5A'},
          splitLine:{lineStyle:{color:'#e2e2e2'}}},
@@ -99,7 +101,7 @@ CHART_BOOT = """
          splitLine:{show:false}}
       ];
     } else {
-      yAxes={type:'value',scale:true,name:units[0]||fallbackUnit,
+      yAxes={type:'value',scale:true,name:units[0]||fallbackUnit,max:yMax,min:yMin,
              nameTextStyle:{color:'#5A5A5A',align:'left'},
              splitLine:{lineStyle:{color:'#e2e2e2'}}};
     }

@@ -257,7 +257,7 @@ def build_op567() -> dict[str, bool]:
                                      if u not in ("QQQ", "SPY", "SMH")])]
     stot = single.groupby("date")["aum"].sum() / 1e3
     store.write_display("OP7", {
-        "id": "OP7", "name": "Leveraged ETF AUM", "panel": "ownership",
+        "id": "OP7", "name": "Leveraged ETF AUM", "panel": "flows",
         "source": "BBG FUND_TOTAL_ASSETS", "cadence": "daily",
         "asof": tot.index.max().strftime("%Y-%m-%d"), "unit": " $B",
         "series": [_display_series(tot.rename("value").reset_index(), "Leveraged complex AUM ($B)"),
@@ -275,9 +275,12 @@ def build_op567() -> dict[str, bool]:
 
 def _build_fred_line(mid: str, mnemonic: str, name: str, unit: str, cadence: str,
                      source: str, tooltip: str, note: str, fmt: int = 1,
-                     min_hist: int = MIN_QUARTERLY_OBS, status: dict | None = None) -> bool:
+                     min_hist: int = MIN_QUARTERLY_OBS, status: dict | None = None,
+                     clip_pandemic: bool = False) -> bool:
     """One FRED series → one-line chart (Households panel). Monthly/quarterly
-    levels or ratios; percentile ranks the latest print vs its own history."""
+    levels or ratios; percentile ranks the latest print vs its own history.
+    clip_pandemic caps the y-axis to the pre/post-COVID range so the 2020-21
+    stimulus spikes run off-chart instead of flattening the rest of the series."""
     df = store.read_latest(f"fred_{mnemonic}")
     if df is None or df.empty:
         return False
@@ -292,6 +295,10 @@ def _build_fred_line(mid: str, mnemonic: str, name: str, unit: str, cadence: str
                  "percentile": util.trailing_percentile(s["value"], min_history=min_hist)},
         "provenance": "fred_cache", "tooltip": tooltip, "notes": note,
     }
+    if clip_pandemic:
+        ex = s[(s["date"] < "2020-03-01") | (s["date"] > "2021-12-31")]
+        if not ex.empty:
+            payload["y_max"] = round(float(ex["value"].max()) * 1.05, fmt)
     if status:
         payload["status"] = status
     store.write_display(mid, payload)
@@ -299,31 +306,27 @@ def _build_fred_line(mid: str, mnemonic: str, name: str, unit: str, cadence: str
 
 
 def build_households() -> dict[str, bool]:
-    """OP9-12: household saving + debt-burden series from FRED."""
+    """OP9-11: household saving + debt-burden series from FRED."""
     return {
         "OP9": _build_fred_line(
             "OP9", "psavert", "Personal saving rate", "%", "monthly", "FRED PSAVERT",
-            "Personal saving as a share of disposable personal income (monthly).",
-            "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA).",
-            fmt=1, min_hist=120),
+            "Personal saving as a share of disposable personal income (monthly). "
+            "The 2020-21 stimulus spikes run off the top so the rest is legible.",
+            "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA). "
+            "Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
+            fmt=1, min_hist=120, clip_pandemic=True),
         "OP10": _build_fred_line(
             "OP10", "pmsave", "Personal saving (level)", " $B", "monthly", "FRED PMSAVE",
-            "Total personal saving in dollars (monthly, annual-rate).",
-            "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA).",
-            fmt=0, min_hist=120),
+            "Total personal saving in dollars (monthly, annual-rate). The 2020-21 "
+            "stimulus spikes run off the top so the rest is legible.",
+            "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA). "
+            "Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
+            fmt=0, min_hist=120, clip_pandemic=True),
         "OP11": _build_fred_line(
             "OP11", "tdsp", "Debt service ratio", "%", "quarterly", "FRED TDSP",
             "Household debt-service payments as a share of disposable income.",
             "TDSP — required mortgage + consumer debt payments / disposable income "
             "(Fed, quarterly).", fmt=1),
-        "OP12": _build_fred_line(
-            "OP12", "fodsp", "Financial obligations ratio", "%", "quarterly", "FRED FODSP",
-            "Broader than debt service — adds rent, auto leases, homeowner insurance "
-            "and property tax. DISCONTINUED by the Fed; series ends 2023-Q3.",
-            "FODSP — debt service plus rent, auto leases, homeowners insurance and "
-            "property tax, / disposable income (Fed, quarterly). DISCONTINUED 2023-Q3 "
-            "(no live successor on FRED) — shown for the historical FOR-vs-DSR gap.",
-            fmt=1, status={"level": "provisional", "label": "discontinued 2023-Q3"}),
     }
 
 

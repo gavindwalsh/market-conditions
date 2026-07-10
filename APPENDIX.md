@@ -149,9 +149,9 @@ Curated 53-fund universe (top of complex, §A3 coverage label) — not all US ET
 *Source: BBG Δshares × NAV · cadence: daily*
 Curated 53-fund universe (top of complex, §A3 coverage label) — not all US ETFs. Flows = Δshares × NAV. Weekly sums per category; in-progress week dropped.
 
-### OP8 — MOC auction share
-*Source: Massive SIP tape (classifier) · cadence: daily*
-SIP conditions 8+19 (volume-updating closing prints); official-close price prints (15) excluded.
+### OP7 — Leveraged ETF AUM
+*Source: BBG FUND_TOTAL_ASSETS · cadence: daily*
+AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — not all US leveraged ETFs; single-stock slice broken out.
 
 ### OP1 — Household equity by wealth cohort
 *Source: FRED DFA [verified 2026-07-08] · cadence: quarterly*
@@ -167,24 +167,15 @@ Last DFA print rolled forward with SPX total return; cohort shares frozen until 
 
 ### OP9 — Personal saving rate
 *Source: FRED PSAVERT · cadence: monthly*
-PSAVERT — personal saving / disposable personal income (BEA, monthly, SA).
+PSAVERT — personal saving / disposable personal income (BEA, monthly, SA). Y-axis capped below the 2020-21 COVID spikes (they run off-chart).
 
 ### OP10 — Personal saving (level)
 *Source: FRED PMSAVE · cadence: monthly*
-PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA).
+PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA). Y-axis capped below the 2020-21 COVID spikes (they run off-chart).
 
 ### OP11 — Debt service ratio
 *Source: FRED TDSP · cadence: quarterly*
 TDSP — required mortgage + consumer debt payments / disposable income (Fed, quarterly).
-
-### OP12 — Financial obligations ratio
-**Status: discontinued 2023-Q3**
-*Source: FRED FODSP · cadence: quarterly*
-FODSP — debt service plus rent, auto leases, homeowners insurance and property tax, / disposable income (Fed, quarterly). DISCONTINUED 2023-Q3 (no live successor on FRED) — shown for the historical FOR-vs-DSR gap.
-
-### OP7 — Leveraged ETF AUM
-*Source: BBG FUND_TOTAL_ASSETS · cadence: daily*
-AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — not all US leveraged ETFs; single-stock slice broken out.
 
 ### MH2 — Corporate credit (IG/HY OAS)
 *Source: FRED ICE BofA (fallback; BBG primary pending) · cadence: daily*

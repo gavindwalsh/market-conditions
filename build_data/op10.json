@@ -3,7 +3,7 @@
   "cadence": "monthly",
   "id": "OP10",
   "name": "Personal saving (level)",
-  "notes": "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA).",
+  "notes": "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA). Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [
@@ -3258,6 +3258,7 @@
     "percentile": 79.79,
     "value": 704.0
   },
-  "tooltip": "Total personal saving in dollars (monthly, annual-rate).",
-  "unit": " $B"
+  "tooltip": "Total personal saving in dollars (monthly, annual-rate). The 2020-21 stimulus spikes run off the top so the rest is legible.",
+  "unit": " $B",
+  "y_max": 1478.0
 }

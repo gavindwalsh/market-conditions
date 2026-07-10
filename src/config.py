@@ -140,15 +140,16 @@ _REGISTRY_ROWS = [
     _m("OP2", "ownership", "Household-equity nowcast", "BBG+OP1", "daily", 1, "—", "5.6"),
     _m("OP3", "ownership", "Household cash % of financial assets", "FRED Z.1", "quarterly", 1, "1990→"),
     _m("OP4", "ownership", "Cash-ratio weekly nowcast", "ICI+FRED", "weekly", 1, "—", "5.6"),
-    # OP9-12 — household saving + debt burden (FRED), added to the Households panel
+    # OP9-11 — household saving + debt burden (FRED), Households panel.
+    # OP12 (FODSP) killed 2026-07-10 — series discontinued by the Fed at 2023-Q3.
     _m("OP9", "ownership", "Personal saving rate", "FRED PSAVERT", "monthly", 1, "1959→"),
     _m("OP10", "ownership", "Personal saving (level)", "FRED PMSAVE", "monthly", 1, "1959→"),
     _m("OP11", "ownership", "Debt service ratio", "FRED TDSP", "quarterly", 1, "2005→"),
-    _m("OP12", "ownership", "Financial obligations ratio", "FRED FODSP", "quarterly", 1, "1980–2023"),
     _m("OP5", "flows", "ETF net flows", "BBG", "daily", 1, "2015→"),
     _m("OP6", "flows", "ETF flows by category", "BBG", "daily", 1, "2018→"),
-    _m("OP7", "ownership", "Leveraged ETF AUM", "BBG", "daily", 1, "2018→"),
-    _m("OP8", "flows", "MOC auction share", "Massive", "daily", 2, "at feed"),
+    # OP7 moved Households->Flows 2026-07-10 (end of Flows).
+    # OP8 (MOC auction share) killed 2026-07-10 — not interesting.
+    _m("OP7", "flows", "Leveraged ETF AUM", "BBG", "daily", 1, "2018→"),
     # Panel 3 — Retail Flows
     # RF1D/RF2D dropped 2026-07-10 per CIO — RF1/RF2 are now the daily views.
     _m("RF1", "retail", "Retail net flow — daily (est. total)", "Massive", "daily", 2, "2016→", "5.1"),
