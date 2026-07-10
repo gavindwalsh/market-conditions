@@ -2,9 +2,9 @@
   "asof": "2026-06-08",
   "cadence": "daily",
   "id": "LV11",
-  "name": "L3: Variance risk premium",
+  "name": "Variance risk premium",
   "notes": "Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 sessions.",
-  "panel": "leverage",
+  "panel": "volatility",
   "provenance": "derived",
   "series": [
     {

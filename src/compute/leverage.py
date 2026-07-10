@@ -117,7 +117,7 @@ def build_lv11() -> bool:
     if tile_df is None:
         return False
     store.write_display("LV11", {
-        "id": "LV11", "name": "L3: Variance risk premium", "panel": "leverage",
+        "id": "LV11", "name": "Variance risk premium", "panel": "volatility",
         "source": "BBG VIX/VXN vs realized", "cadence": "daily",
         "asof": tile_df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " vol pts",
         "series": out_series,

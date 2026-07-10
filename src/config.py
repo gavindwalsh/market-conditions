@@ -102,7 +102,7 @@ PANELS = [
     ("retail", "Retail"),
     ("leverage", "Leverage"),
     ("flows", "Flows"),            # ETF flows + MOC (split from Ownership & Passive)
-    ("ownership", "Ownership"),
+    ("ownership", "Households"),
     ("credit", "Credit"),          # split from Market Health
     ("internals", "Internals"),    # split from Market Health
     ("issuance", "Issuance"),
@@ -140,6 +140,11 @@ _REGISTRY_ROWS = [
     _m("OP2", "ownership", "Household-equity nowcast", "BBG+OP1", "daily", 1, "—", "5.6"),
     _m("OP3", "ownership", "Household cash % of financial assets", "FRED Z.1", "quarterly", 1, "1990→"),
     _m("OP4", "ownership", "Cash-ratio weekly nowcast", "ICI+FRED", "weekly", 1, "—", "5.6"),
+    # OP9-12 — household saving + debt burden (FRED), added to the Households panel
+    _m("OP9", "ownership", "Personal saving rate", "FRED PSAVERT", "monthly", 1, "1959→"),
+    _m("OP10", "ownership", "Personal saving (level)", "FRED PMSAVE", "monthly", 1, "1959→"),
+    _m("OP11", "ownership", "Debt service ratio", "FRED TDSP", "quarterly", 1, "2005→"),
+    _m("OP12", "ownership", "Financial obligations ratio", "FRED FODSP", "quarterly", 1, "1980–2023"),
     _m("OP5", "flows", "ETF net flows", "BBG", "daily", 1, "2015→"),
     _m("OP6", "flows", "ETF flows by category", "BBG", "daily", 1, "2018→"),
     _m("OP7", "ownership", "Leveraged ETF AUM", "BBG", "daily", 1, "2018→"),
@@ -169,7 +174,6 @@ _REGISTRY_ROWS = [
     _m("LV6", "leverage", "Leveraged-ETF rebalance notional", "BBG+OP7", "daily", 1, "2020→"),
     _m("LV8", "leverage", "L1 ES roll implied financing", "BBG", "daily", 1, "2018→"),
     _m("LV9", "leverage", "L2 Single-name synthetic financing", "Massive OPRA", "daily", 3, "at feed", "5.5,5.10"),
-    _m("LV11", "leverage", "L3 Variance risk premium", "BBG", "daily", 1, "2010→"),
     _m("LV12", "leverage", "L3 Realized retail toll", "Massive OPRA", "daily", 3, "at feed", "5.7"),
     _m("LV13", "leverage", "L3 Leveraged-ETF financing residual", "BBG", "weekly", 1, "2020→", "5.8"),
     _m("LV15", "leverage", "L4 FINRA margin debt", "FINRA", "monthly", 1, "1997→"),
@@ -189,6 +193,8 @@ _REGISTRY_ROWS = [
     _m("VC6", "volatility", "3M IV by sector basket", "BBG", "daily", 1, "2016→"),
     _m("VC1", "volatility", "Implied correlation", "BBG", "daily", 1, "inception→"),
     _m("VC2", "volatility", "Implied − realized correlation spread", "BBG", "daily", 1, "2010→"),
+    # LV11 moved Leverage->Volatility 2026-07-10 (it's a vol metric: VIX/VXN vs realized)
+    _m("LV11", "volatility", "Variance risk premium", "BBG", "daily", 1, "2010→"),
     # VC5 spot-up/vol-up dropped 2026-07-09 (CIO: no longer interesting)
     # Panel 6 — Market Health
     # MH1 split 2026-07-10 per CIO: MH1 = moving-average breadth only;

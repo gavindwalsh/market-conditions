@@ -69,6 +69,10 @@ Cboe implied correlation indices; tile ranks COR1M. The spread vs realized corre
 *Source: BBG COR1M − Massive member returns · cadence: daily*
 Realized correlation from the index-variance identity over SPX members, 21d rolling, current membership applied backward.
 
+### LV11 — Variance risk premium
+*Source: BBG VIX/VXN vs realized · cadence: daily*
+Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 sessions.
+
 ### RF1 — Retail net flow — daily (est. total)
 **Status: ×3 est. · uncalibrated**
 *Source: Massive tape (classifier) · cadence: daily*
@@ -118,10 +122,6 @@ Weekly mean of daily bucket shares of contract volume.
 *Source: BBG ES1/ES2 + FRED SOFR · cadence: daily*
 Implied rate = ln(ES2/ES1)/0.25y + trailing SPX dividend yield (SPTR−SPX drift), minus SOFR. Days within ±2bd of quarterly expiry dropped (generic-contract roll artifacts) plus a ±150bp-vs-rolling-median backstop.
 
-### LV11 — L3: Variance risk premium
-*Source: BBG VIX/VXN vs realized · cadence: daily*
-Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 sessions.
-
 ### LV13 — L3: Leveraged-ETF financing residual
 **Status: new methodology**
 *Source: BBG NAV × total-return index · cadence: weekly*
@@ -164,6 +164,23 @@ Last DFA print rolled forward with SPX total return; cohort shares frozen until 
 ### OP3 — Household cash % of financial assets
 *Source: FRED Z.1 B.101 [verified 2026-07-08] · cadence: quarterly*
 (checkable+currency + time/savings + MMF) / total financial assets, households (Z.1 B.101). OP4 weekly nowcast (dashed) pending ICI+H.8.
+
+### OP9 — Personal saving rate
+*Source: FRED PSAVERT · cadence: monthly*
+PSAVERT — personal saving / disposable personal income (BEA, monthly, SA).
+
+### OP10 — Personal saving (level)
+*Source: FRED PMSAVE · cadence: monthly*
+PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA).
+
+### OP11 — Debt service ratio
+*Source: FRED TDSP · cadence: quarterly*
+TDSP — required mortgage + consumer debt payments / disposable income (Fed, quarterly).
+
+### OP12 — Financial obligations ratio
+**Status: discontinued 2023-Q3**
+*Source: FRED FODSP · cadence: quarterly*
+FODSP — debt service plus rent, auto leases, homeowners insurance and property tax, / disposable income (Fed, quarterly). DISCONTINUED 2023-Q3 (no live successor on FRED) — shown for the historical FOR-vs-DSR gap.
 
 ### OP7 — Leveraged ETF AUM
 *Source: BBG FUND_TOTAL_ASSETS · cadence: daily*

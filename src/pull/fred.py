@@ -52,6 +52,11 @@ SERIES = {
     "hh_checkable": "BOGZ1FL193020005Q",    # checkable deposits + currency
     "hh_time_savings": "BOGZ1FL193030205Q", # other deposits incl time+savings (IMA)
     "hh_mmf": "BOGZ1FL193034005Q",          # money market fund shares
+    # OP9-12 — household saving + debt burden (Households panel)
+    "psavert": "PSAVERT",   # personal saving rate, % of DPI (monthly)
+    "pmsave": "PMSAVE",     # personal saving, $B SAAR (monthly)
+    "tdsp": "TDSP",         # household debt service payments, % of DPI (quarterly)
+    "fodsp": "FODSP",       # financial obligations ratio, % of DPI (quarterly)
 }
 
 

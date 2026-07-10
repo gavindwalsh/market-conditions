@@ -273,7 +273,62 @@ def build_op567() -> dict[str, bool]:
     return {"OP5": True, "OP6": True, "OP7": True}
 
 
+def _build_fred_line(mid: str, mnemonic: str, name: str, unit: str, cadence: str,
+                     source: str, tooltip: str, note: str, fmt: int = 1,
+                     min_hist: int = MIN_QUARTERLY_OBS, status: dict | None = None) -> bool:
+    """One FRED series → one-line chart (Households panel). Monthly/quarterly
+    levels or ratios; percentile ranks the latest print vs its own history."""
+    df = store.read_latest(f"fred_{mnemonic}")
+    if df is None or df.empty:
+        return False
+    s = df[["date", "value"]].sort_values("date").copy()
+    s["date"] = pd.to_datetime(s["date"])
+    payload = {
+        "id": mid, "name": name, "panel": "ownership",
+        "source": source, "cadence": cadence,
+        "asof": s["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": unit,
+        "series": [_display_series(s, name)],
+        "tile": {"value": round(float(s["value"].iloc[-1]), fmt), "delta": None,
+                 "percentile": util.trailing_percentile(s["value"], min_history=min_hist)},
+        "provenance": "fred_cache", "tooltip": tooltip, "notes": note,
+    }
+    if status:
+        payload["status"] = status
+    store.write_display(mid, payload)
+    return True
+
+
+def build_households() -> dict[str, bool]:
+    """OP9-12: household saving + debt-burden series from FRED."""
+    return {
+        "OP9": _build_fred_line(
+            "OP9", "psavert", "Personal saving rate", "%", "monthly", "FRED PSAVERT",
+            "Personal saving as a share of disposable personal income (monthly).",
+            "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA).",
+            fmt=1, min_hist=120),
+        "OP10": _build_fred_line(
+            "OP10", "pmsave", "Personal saving (level)", " $B", "monthly", "FRED PMSAVE",
+            "Total personal saving in dollars (monthly, annual-rate).",
+            "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA).",
+            fmt=0, min_hist=120),
+        "OP11": _build_fred_line(
+            "OP11", "tdsp", "Debt service ratio", "%", "quarterly", "FRED TDSP",
+            "Household debt-service payments as a share of disposable income.",
+            "TDSP — required mortgage + consumer debt payments / disposable income "
+            "(Fed, quarterly).", fmt=1),
+        "OP12": _build_fred_line(
+            "OP12", "fodsp", "Financial obligations ratio", "%", "quarterly", "FRED FODSP",
+            "Broader than debt service — adds rent, auto leases, homeowner insurance "
+            "and property tax. DISCONTINUED by the Fed; series ends 2023-Q3.",
+            "FODSP — debt service plus rent, auto leases, homeowners insurance and "
+            "property tax, / disposable income (Fed, quarterly). DISCONTINUED 2023-Q3 "
+            "(no live successor on FRED) — shown for the historical FOR-vs-DSR gap.",
+            fmt=1, status={"level": "provisional", "label": "discontinued 2023-Q3"}),
+    }
+
+
 def build() -> dict[str, bool]:
     out = {"OP1": build_op1(), "OP2": build_op2(), "OP3": build_op3()}
     out.update(build_op567())
+    out.update(build_households())
     return out
