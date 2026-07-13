@@ -14,6 +14,8 @@ Phase 1 wires FRED today; BBG + free sources fill in as their pull+compute land
 """
 from __future__ import annotations
 
+from . import quiet  # noqa: F401 — import side effect: silence known-benign warnings
+
 import argparse
 import traceback
 from datetime import date

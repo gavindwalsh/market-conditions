@@ -15,6 +15,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from src import quiet  # noqa: F401,E402 — side effect: silence known-benign warnings
 from src.compute import opra, retail_series  # noqa: E402
 from src.pull import massive  # noqa: E402
 from src.render import render  # noqa: E402
