@@ -145,6 +145,17 @@ def read_grouped(days_back: int | None = None) -> pd.DataFrame | None:
     return df[(df["ticker"] != "_HOLIDAY_") & (~df["ticker"].isin(TEST_SYMBOLS))]
 
 
+def latest_grouped_day() -> str | None:
+    """Most recent ACTUAL trading day in the grouped-daily lake — weekends and
+    holiday-marker days excluded. The daily grouped pull runs first and refreshes
+    this to the true last business day, so the tape/OPRA pull can target it
+    instead of a literal 'yesterday' that lands on a weekend or holiday."""
+    df = read_grouped(days_back=15)
+    if df is None or df.empty:
+        return None
+    return pd.to_datetime(df["date"]).max().strftime("%Y-%m-%d")
+
+
 # ---- Flat files (S3) — trades/quotes tape ------------------------------------
 def flatfile_download(dataset: str, day: str, dest_dir: str) -> str:
     """Download one day's flat file (e.g. us_stocks_sip/trades_v1) to dest_dir.

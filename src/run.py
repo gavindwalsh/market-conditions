@@ -75,19 +75,27 @@ def pull_all():
 
         from .pull import massive
         _safe("massive:grouped", massive.pull_grouped_phase2)
-        # full-tape RF1 pass — SKIP if the day is already in the lake (backfill
-        # lanes or a prior run may have done it; re-doing costs ~13GB + 30min)
+        # full-tape RF1 pass — target the most recent ACTUAL trading day (from
+        # the grouped lake the step above just refreshed), so Mondays/holidays
+        # pull Friday's tape rather than an empty 'yesterday'. SKIP if the day is
+        # already in the lake (backfill lanes or a prior run may have done it;
+        # re-doing costs ~13GB + 30min).
         from datetime import timedelta
-        yday = (date.today() - timedelta(days=1)).isoformat()
-        if not _os.path.exists(_os.path.join(store.LAKE_DIR, massive.RETAIL_TABLE, f"{yday}.parquet")):
-            _safe("massive:tape", massive.process_tape_day, yday)
+        bday = massive.latest_grouped_day()
+        if bday is None:  # grouped lake empty — fall back to the last weekday
+            d = date.today() - timedelta(days=1)
+            while d.weekday() >= 5:  # Sat/Sun → step back to Friday
+                d -= timedelta(days=1)
+            bday = d.isoformat()
+        if not _os.path.exists(_os.path.join(store.LAKE_DIR, massive.RETAIL_TABLE, f"{bday}.parquet")):
+            _safe("massive:tape", massive.process_tape_day, bday)
         else:
-            store.log_run("massive:tape", "skip", f"{yday} already in lake")
+            store.log_run("massive:tape", "skip", f"{bday} already in lake")
     if config.PHASE >= 3:
-        if not _os.path.exists(_os.path.join(store.LAKE_DIR, massive.OPRA_TABLE, f"{yday}.parquet")):
-            _safe("massive:opra", massive.process_opra_day, yday)
+        if not _os.path.exists(_os.path.join(store.LAKE_DIR, massive.OPRA_TABLE, f"{bday}.parquet")):
+            _safe("massive:opra", massive.process_opra_day, bday)
         else:
-            store.log_run("massive:opra", "skip", f"{yday} already in lake")
+            store.log_run("massive:opra", "skip", f"{bday} already in lake")
         _safe("massive:snapshots", _pull_snapshot_universe)
 
 
