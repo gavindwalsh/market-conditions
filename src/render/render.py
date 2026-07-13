@@ -115,9 +115,10 @@ CHART_BOOT = """
       series:series});
     var maxX=0; m.series.forEach(function(s){(s.points||[]).forEach(function(p){
       var t=+new Date(p.date); if(t>maxX) maxX=t;});});
-    window.__CHARTS__.push({ch:ch,maxX:maxX});
+    window.__CHARTS__.push({ch:ch,maxX:maxX,id:id,el:el});
     window.addEventListener('resize',function(){ch.resize();});
   });
+  var chartById=function(id){var f=null;window.__CHARTS__.forEach(function(c){if(c.id===id)f=c.ch;});return f;};
   /* header range buttons: months back from each chart's own latest point; null = All */
   window.setRange=function(months,btn){
     document.querySelectorAll('.range-btns button').forEach(function(b){b.classList.remove('active');});
@@ -131,6 +132,53 @@ CHART_BOOT = """
       }
     });
   };
+  /* fullscreen overlay: move the chosen chart's element into the shared panel
+     and resize the (same) instance; move it back on close. Esc / scrim / ✕ close. */
+  var ov=document.getElementById('fs-overlay');
+  var body=document.getElementById('fs-body');
+  var titleEl=ov?ov.querySelector('.fs-title'):null;
+  var srcEl=ov?ov.querySelector('.fs-src'):null;
+  var fsState=null;
+  var fsOpen=function(id){
+    var el=document.getElementById('chart-'+id); if(!el||!ov) return;
+    var card=el.closest('.chart-card');
+    var m=data[id]||{};
+    titleEl.textContent=id+(m.name?' · '+m.name:'');
+    var csrc=card?card.querySelector('.csrc'):null;
+    srcEl.innerHTML=csrc?csrc.innerHTML:'';
+    fsState={el:el,parent:el.parentNode,next:el.nextSibling};
+    body.appendChild(el);
+    ov.hidden=false;
+    /* mirror the header's active range button into the overlay row */
+    var hb=document.querySelectorAll('.masthead .range-btns button');
+    var ob=ov.querySelectorAll('.fs-range button');
+    hb.forEach(function(b,i){if(ob[i])ob[i].classList.toggle('active',b.classList.contains('active'));});
+    var ch=chartById(id);
+    if(ch){ch.resize();requestAnimationFrame(function(){ch.resize();});}
+  };
+  var fsClose=function(){
+    if(!fsState||!ov) return;
+    /* setRange highlights the clicked (overlay) button, clearing the header's —
+       mirror the overlay's active range back so the header stays truthful */
+    var ob=ov.querySelectorAll('.fs-range button');
+    var hb=document.querySelectorAll('.masthead .range-btns button');
+    ob.forEach(function(b,i){if(hb[i])hb[i].classList.toggle('active',b.classList.contains('active'));});
+    if(fsState.next) fsState.parent.insertBefore(fsState.el,fsState.next);
+    else fsState.parent.appendChild(fsState.el);
+    ov.hidden=true;
+    var ch=chartById(fsState.el.id.replace('chart-',''));
+    fsState=null;
+    if(ch){ch.resize();requestAnimationFrame(function(){ch.resize();});}
+  };
+  document.querySelectorAll('.expand-icon').forEach(function(ic){
+    ic.addEventListener('click',function(){fsOpen(ic.getAttribute('data-chart'));});
+    ic.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();fsOpen(ic.getAttribute('data-chart'));}});
+  });
+  if(ov){
+    ov.querySelector('.fs-close').addEventListener('click',fsClose);
+    ov.addEventListener('click',function(e){if(e.target===ov)fsClose();});
+  }
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov&&!ov.hidden)fsClose();});
 })();
 """ % json.dumps(SERIES_PALETTE)
 

@@ -32,12 +32,42 @@ header .asof{font-size:12px;opacity:.9;text-align:right}
 .chart-card .csrc{font-size:11px;color:var(--body);margin-bottom:6px}
 .chart-card .csrc b{color:var(--ink);font-size:12.5px}
 .tip-icon{color:var(--green);cursor:help;font-size:12px;margin-left:4px}
+/* expand-to-fullscreen affordance (top-right of each chart card title) */
+.chart-card .ctitle{padding-right:20px}
+.expand-icon{position:absolute;top:-1px;right:0;color:var(--green);cursor:pointer;
+  font-size:15px;line-height:1;padding:1px 3px;border-radius:5px;opacity:.55}
+.expand-icon:hover{opacity:1;background:#eee}
 .ctitle .tip{display:none;position:absolute;z-index:10;top:100%;left:0;max-width:420px;
   background:var(--ink);color:#fff;font-weight:400;font-size:12px;line-height:1.45;
   padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .ctitle .tip b{color:var(--lav)}
 .ctitle:hover .tip{display:block}
 .chart{width:100%;height:260px}
+/* fullscreen chart overlay: dims the dashboard behind a scrim, lifts one chart
+   into a large centered panel that reuses the same ECharts instance */
+.fs-overlay{position:fixed;inset:0;z-index:1000;background:rgba(20,22,18,.55);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.fs-overlay[hidden]{display:none}
+.fs-panel{background:var(--card);border-radius:12px;padding:16px 18px;
+  width:92%;max-width:1100px;height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.fs-head{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+.fs-title{font-size:14px;font-weight:600;color:var(--ink)}
+.fs-controls{margin-left:auto;display:flex;gap:6px;align-items:center}
+.fs-overlay .fs-range{display:flex;gap:4px;align-items:center}
+.fs-overlay .fs-range button{background:var(--bg);border:1px solid #ccc;color:var(--body);
+  font:inherit;font-size:11px;padding:3px 9px;border-radius:6px;cursor:pointer}
+.fs-overlay .fs-range button:hover{background:#e4e4e4}
+.fs-overlay .fs-range button.active{background:var(--green);border-color:var(--green);
+  color:#fff;font-weight:600}
+.fs-close{background:transparent;border:1px solid #ccc;color:var(--ink);font-size:13px;
+  width:26px;height:26px;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.fs-close:hover{background:var(--bg)}
+.fs-src{font-size:11px;color:var(--body);margin-bottom:10px}
+.fs-src b{color:var(--ink);font-size:12.5px}
+.fs-body{flex:1;min-height:0}
+.fs-body .chart{height:100%}
 /* status badges (§7.2 explicit banner — was hover-only) */
 .badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.4px;
   padding:1px 7px;border-radius:9px;margin-left:6px;vertical-align:1px;text-transform:uppercase}

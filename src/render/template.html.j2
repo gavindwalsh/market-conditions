@@ -25,6 +25,7 @@
         {% if c.badge %}<span class="badge badge-{{ c.badge }}">{{ c.badge_label or c.badge }}</span>{% endif %}
         {% if c.tip %}<span class="tip-icon">ⓘ</span>
         <div class="tip"><b>How to read it:</b> {{ c.tip }}<br/><i>Methodology: APPENDIX.md §{{ c.id }}</i></div>{% endif %}
+        {% if not c.table %}<span class="expand-icon" data-chart="{{ c.id }}" role="button" tabindex="0" aria-label="Expand chart" title="Expand">⤢</span>{% endif %}
       </div>
       <div class="csrc">
         {% if c.value_fmt %}<b>{{ c.value_fmt }}</b>{% endif %}
@@ -55,6 +56,23 @@
   </dl></details>
   <div>Every metric ID links to its DASHBOARD-SPEC.md section. Estimated/nowcast segments are dashed and labeled (§A9.5).</div>
 </footer>
+
+{# fullscreen chart overlay — one shared panel; boot script moves the chosen chart in/out #}
+<div id="fs-overlay" class="fs-overlay" hidden>
+  <div class="fs-panel">
+    <div class="fs-head">
+      <span class="fs-title"></span>
+      <div class="fs-controls">
+        <div class="range-btns fs-range">
+          <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(null,this)">All</button>
+        </div>
+        <button class="fs-close" aria-label="Close chart" title="Close (Esc)">✕</button>
+      </div>
+    </div>
+    <div class="fs-src"></div>
+    <div class="fs-body" id="fs-body"></div>
+  </div>
+</div>
 
 <script>window.__PULSE__ = {{ data_json|safe }};</script>
 {% if echarts_js %}<script>{{ echarts_js|safe }}</script>
