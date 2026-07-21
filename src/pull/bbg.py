@@ -268,6 +268,11 @@ def pull_box_yield() -> pd.DataFrame:
         legs = sorted({s for p in pairs for k in p
                        for s in sub[(sub["k"] == k)]["desc"].tolist()})
         q = blp.bdp(legs, ["PX_BID", "PX_ASK"])
+        # Terminal offline / no chain quotes → bdp returns empty or column-less.
+        # Fail cleanly (caught + logged by run._safe) instead of a bare KeyError.
+        if q.empty or not {"px_bid", "px_ask"} <= set(q.columns):
+            raise RuntimeError("box-spread quotes unavailable "
+                               "(Bloomberg Terminal offline or chain returned no quotes)")
         q = q.rename(columns={"px_bid": "bid", "px_ask": "ask"})  # name-based: xbbg sorts columns
         q["mid"] = (q["bid"] + q["ask"]) / 2.0
         q = q[(q["bid"] > 0) & (q["ask"] > q["bid"])]

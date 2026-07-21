@@ -18,7 +18,7 @@ from . import quiet  # noqa: F401 — import side effect: silence known-benign w
 
 import argparse
 import traceback
-from datetime import date
+from datetime import date, datetime
 
 from . import config, store
 from .render import render
@@ -123,11 +123,16 @@ def main():
     args = ap.parse_args()
 
     run_date = date.today().isoformat()
+    run_start = datetime.now()
     if not args.render:
         pull_all()
         compute_all()
     out = render.build(run_date=run_date, build_version=args.build_version)
     print(f"Rendered {out}")
+    # post-run digest: per-source PASS/FAIL/SKIP + stale-metric check (§2) so the
+    # console tells you whether the run was clean without grepping run_log.jsonl
+    from . import report
+    print(report.render(since=run_start))
     print("Deploy with:  python deploy.py market-conditions")
 
 

@@ -205,7 +205,7 @@ _REGISTRY_ROWS = [
     _m("MH2", "credit", "Corporate credit (IG/HY OAS)", "BBG/FRED", "daily", 1, "2010→"),
     _m("MH3", "credit", "Household credit — market-priced", "BBG", "daily", 1, "2015→"),
     _m("MH4", "credit", "Household credit — borrowing rates", "FRED+", "weekly", 1, "2015→"),
-    _m("MH5", "credit", "Household credit — amounts", "FRED+NYFed", "weekly", 1, "2010→"),
+    _m("MH5", "credit", "Household credit — amounts", "FRED+NYFed", "quarterly", 1, "2010→"),
     _m("MH6", "credit", "Delinquency transitions", "NY Fed HHDC", "quarterly", 1, "2003→"),
     _m("MH7", "internals", "Rates backdrop (MOVE, 10y, 2s10s)", "BBG", "daily", 1, "2010→"),
     _m("MH8", "internals", "Sentiment (AAII/NAAIM)", "scrape", "weekly", 1, "2010→"),
