@@ -194,7 +194,7 @@ Agency MBS current-coupon spread — FNMA current coupon minus a 5y/10y Treasury
 Primary mortgage spread. Optimal Blue daily locks, card APR − FF (G.19), auto 60mo, and the FHFA lock-in gap extend this row later (§4 MH4).
 
 ### MH5 — Household credit — balances by product
-*Source: NY Fed HHDC · cadence: weekly*
+*Source: NY Fed HHDC · cadence: quarterly*
 Quarterly HHDC balances by product, stacked. G.19 monthly and H.8 weekly nowcast legs land later (§4 MH5).
 
 ### MH6 — Delinquency transitions (30+)

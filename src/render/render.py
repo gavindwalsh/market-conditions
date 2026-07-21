@@ -105,30 +105,40 @@ CHART_BOOT = """
              nameTextStyle:{color:'#5A5A5A',align:'left'},
              splitLine:{lineStyle:{color:'#e2e2e2'}}};
     }
+    /* category (not time) x-axis: market data has no weekend/holiday points, so a
+       time axis leaves blank slots for every non-trading day (visible as bar gaps
+       and warped spacing). Category spaces one slot per trading day present. Build
+       the sorted union of dates across all series so multi-series charts share one
+       axis; series data stays [date,value] pairs, which ECharts maps by category. */
+    var catSet={}; m.series.forEach(function(s){(s.points||[]).forEach(function(p){catSet[p.date]=1;});});
+    var cats=Object.keys(catSet).sort();
     ch.setOption({grid:{left:56,right:dual?56:16,top:legend?40:26,bottom:24},
       legend:legend,
-      xAxis:{type:'time',axisLine:{lineStyle:{color:'#1E1E1E'}}},
+      xAxis:{type:'category',data:cats,axisLine:{lineStyle:{color:'#1E1E1E'}}},
       yAxis:yAxes,
       tooltip:{trigger:'axis'},
       dataZoom:[{type:'inside',xAxisIndex:0,filterMode:'filter'}],  /* y re-fits to visible window */
       textStyle:{fontFamily:'Roboto,system-ui,sans-serif'},
       series:series});
-    var maxX=0; m.series.forEach(function(s){(s.points||[]).forEach(function(p){
-      var t=+new Date(p.date); if(t>maxX) maxX=t;});});
-    window.__CHARTS__.push({ch:ch,maxX:maxX,id:id,el:el});
+    window.__CHARTS__.push({ch:ch,cats:cats,id:id,el:el});
     window.addEventListener('resize',function(){ch.resize();});
   });
   var chartById=function(id){var f=null;window.__CHARTS__.forEach(function(c){if(c.id===id)f=c.ch;});return f;};
-  /* header range buttons: months back from each chart's own latest point; null = All */
+  /* header range buttons: months back from each chart's own latest point; null = All.
+     On a category axis dataZoom bounds are indices, so translate "N months back"
+     into the first trading-day slot at/after that calendar cutoff. */
   window.setRange=function(months,btn){
     document.querySelectorAll('.range-btns button').forEach(function(b){b.classList.remove('active');});
     if(btn) btn.classList.add('active');
     window.__CHARTS__.forEach(function(c){
-      if(months===null){
+      var cats=c.cats||[];
+      if(months===null||!cats.length){
         c.ch.dispatchAction({type:'dataZoom',start:0,end:100});
       } else {
-        c.ch.dispatchAction({type:'dataZoom',
-          startValue:c.maxX-months*30.44*86400000,endValue:c.maxX});
+        var cutoff=+new Date(cats[cats.length-1])-months*30.44*86400000;
+        var startIdx=0;
+        for(var i=0;i<cats.length;i++){ if(+new Date(cats[i])>=cutoff){startIdx=i;break;} }
+        c.ch.dispatchAction({type:'dataZoom',startValue:startIdx,endValue:cats.length-1});
       }
     });
   };
