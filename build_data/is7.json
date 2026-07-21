@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-03",
+  "asof": "2026-07-17",
   "cadence": "weekly",
   "id": "IS7",
   "name": "Fund registration filings (485APOS + N-1A)",
@@ -1371,6 +1371,14 @@
         {
           "date": "2026-07-03",
           "value": 41.0
+        },
+        {
+          "date": "2026-07-10",
+          "value": 31.0
+        },
+        {
+          "date": "2026-07-17",
+          "value": 26.0
         }
       ],
       "role": "avos",
@@ -1380,8 +1388,8 @@
   "source": "SEC EDGAR 485APOS + N-1A",
   "tile": {
     "delta": null,
-    "percentile": 99.56,
-    "value": 41.0
+    "percentile": 88.74,
+    "value": 26.0
   },
   "tooltip": "Weekly new fund-registration filings — a launch-pipeline proxy (not launches by category; that needs the BBG fund screen).",
   "unit": " filings/wk"

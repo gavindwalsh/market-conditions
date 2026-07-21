@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-08",
+  "asof": "2026-07-17",
   "cadence": "daily",
   "id": "LV8",
   "name": "L1: ES roll implied financing",
@@ -358,34 +358,6 @@
         {
           "date": "2025-06-30",
           "value": 38.0
-        },
-        {
-          "date": "2025-07-08",
-          "value": 59.947
-        },
-        {
-          "date": "2025-07-09",
-          "value": 58.481
-        },
-        {
-          "date": "2025-07-10",
-          "value": 61.644
-        },
-        {
-          "date": "2025-07-11",
-          "value": 62.068
-        },
-        {
-          "date": "2025-07-14",
-          "value": 58.4
-        },
-        {
-          "date": "2025-07-15",
-          "value": 60.386
-        },
-        {
-          "date": "2025-07-16",
-          "value": 60.405
         },
         {
           "date": "2025-07-17",
@@ -1282,6 +1254,34 @@
         {
           "date": "2026-07-08",
           "value": 139.756
+        },
+        {
+          "date": "2026-07-09",
+          "value": 144.925
+        },
+        {
+          "date": "2026-07-10",
+          "value": 148.809
+        },
+        {
+          "date": "2026-07-13",
+          "value": 143.235
+        },
+        {
+          "date": "2026-07-14",
+          "value": 137.296
+        },
+        {
+          "date": "2026-07-15",
+          "value": 135.085
+        },
+        {
+          "date": "2026-07-16",
+          "value": 136.176
+        },
+        {
+          "date": "2026-07-17",
+          "value": 139.797
         }
       ],
       "role": "avos",
@@ -1291,7 +1291,7 @@
   "source": "BBG ES1/ES2 + FRED SOFR",
   "tile": {
     "delta": null,
-    "percentile": 91.49,
+    "percentile": 91.36,
     "value": 140.0
   },
   "tooltip": "Implied cost of index leverage from the ES futures roll, vs SOFR — rich = leverage demand paying up.",

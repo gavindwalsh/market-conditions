@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-07",
+  "asof": "2026-07-17",
   "cadence": "daily",
   "id": "MH3",
   "name": "Household credit — market-priced (MBS CC spread)",
@@ -514,38 +514,6 @@
         {
           "date": "2025-06-30",
           "value": 146.359
-        },
-        {
-          "date": "2025-07-07",
-          "value": 144.347
-        },
-        {
-          "date": "2025-07-08",
-          "value": 143.483
-        },
-        {
-          "date": "2025-07-09",
-          "value": 143.118
-        },
-        {
-          "date": "2025-07-10",
-          "value": 144.175
-        },
-        {
-          "date": "2025-07-11",
-          "value": 144.335
-        },
-        {
-          "date": "2025-07-14",
-          "value": 147.029
-        },
-        {
-          "date": "2025-07-15",
-          "value": 145.201
-        },
-        {
-          "date": "2025-07-16",
-          "value": 147.485
         },
         {
           "date": "2025-07-17",
@@ -1518,6 +1486,38 @@
         {
           "date": "2026-07-07",
           "value": 108.368
+        },
+        {
+          "date": "2026-07-08",
+          "value": 109.625
+        },
+        {
+          "date": "2026-07-09",
+          "value": 109.845
+        },
+        {
+          "date": "2026-07-10",
+          "value": 109.944
+        },
+        {
+          "date": "2026-07-13",
+          "value": 111.736
+        },
+        {
+          "date": "2026-07-14",
+          "value": 109.223
+        },
+        {
+          "date": "2026-07-15",
+          "value": 109.639
+        },
+        {
+          "date": "2026-07-16",
+          "value": 109.992
+        },
+        {
+          "date": "2026-07-17",
+          "value": 110.353
         }
       ],
       "role": "avos",
@@ -1527,8 +1527,8 @@
   "source": "BBG MTGEFNCL − FRED 5/10y blend",
   "tile": {
     "delta": null,
-    "percentile": 60.58,
-    "value": 108.0
+    "percentile": 62.56,
+    "value": 110.0
   },
   "tooltip": "Market price of mortgage credit/prepay risk.",
   "unit": " bp"

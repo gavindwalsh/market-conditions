@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-08",
+  "asof": "2026-07-20",
   "cadence": "weekly estimate",
   "id": "LV13",
   "name": "L3: Leveraged-ETF financing residual",
@@ -358,38 +358,6 @@
         {
           "date": "2025-06-30",
           "value": 182.072
-        },
-        {
-          "date": "2025-07-08",
-          "value": 195.501
-        },
-        {
-          "date": "2025-07-09",
-          "value": 194.117
-        },
-        {
-          "date": "2025-07-10",
-          "value": 175.815
-        },
-        {
-          "date": "2025-07-11",
-          "value": 194.942
-        },
-        {
-          "date": "2025-07-14",
-          "value": 188.116
-        },
-        {
-          "date": "2025-07-15",
-          "value": 187.702
-        },
-        {
-          "date": "2025-07-16",
-          "value": 170.951
-        },
-        {
-          "date": "2025-07-17",
-          "value": 163.962
         },
         {
           "date": "2025-07-18",
@@ -1366,6 +1334,38 @@
         {
           "date": "2026-07-08",
           "value": 178.715
+        },
+        {
+          "date": "2026-07-09",
+          "value": 182.408
+        },
+        {
+          "date": "2026-07-10",
+          "value": 191.403
+        },
+        {
+          "date": "2026-07-13",
+          "value": 185.263
+        },
+        {
+          "date": "2026-07-14",
+          "value": 181.876
+        },
+        {
+          "date": "2026-07-15",
+          "value": 174.001
+        },
+        {
+          "date": "2026-07-16",
+          "value": 174.899
+        },
+        {
+          "date": "2026-07-17",
+          "value": 189.412
+        },
+        {
+          "date": "2026-07-20",
+          "value": 187.326
         }
       ],
       "role": "avos",
@@ -1379,8 +1379,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 85.19,
-    "value": 179.0
+    "percentile": 88.8,
+    "value": 187.0
   },
   "tooltip": "Financing spread embedded in leveraged-ETF NAV drag, vs SOFR — the cost levered funds actually pay.",
   "unit": " bp vs SOFR"

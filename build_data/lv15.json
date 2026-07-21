@@ -1,5 +1,5 @@
 {
-  "asof": "2026-05-01",
+  "asof": "2026-06-01",
   "cadence": "monthly",
   "id": "LV15",
   "name": "L4: FINRA margin debt",
@@ -1422,6 +1422,10 @@
         {
           "date": "2026-05-01",
           "value": 1415.557
+        },
+        {
+          "date": "2026-06-01",
+          "value": 1502.072
         }
       ],
       "role": "avos",
@@ -2794,6 +2798,10 @@
         {
           "date": "2026-05-01",
           "value": 53.705
+        },
+        {
+          "date": "2026-06-01",
+          "value": 49.021
         }
       ],
       "role": "benchmark",
@@ -2804,7 +2812,7 @@
   "tile": {
     "delta": null,
     "percentile": 99.86,
-    "value": 1416.0
+    "value": 1502.0
   },
   "tooltip": "Debit balances in securities margin accounts — the stock of retail leverage.",
   "unit": " $B"

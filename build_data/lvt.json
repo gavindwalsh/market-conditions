@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-09",
+  "asof": "2026-07-21",
   "cadence": "daily",
   "id": "LVT",
   "name": "Leverage levels — snapshot",
@@ -22,26 +22,26 @@
     "rows": [
       [
         "Dealer GEX, aggregate (LV5)",
-        "+14.7 $B/1%",
-        "2026-07-09",
-        "AAPL +1.6, IWM -1.4, NVDA +1.5, SPCX -0.1"
+        "+3.3 $B/1%",
+        "2026-07-21",
+        "AAPL +0.8, IWM -2.1, NVDA +1.1, QQQ +1.2"
       ],
       [
         "Box − SOFR, 1M (LV7)",
-        "+82 bp",
-        "2026-07-09",
+        "+74 bp",
+        "2026-07-21",
         "near-close quotes preferred"
       ],
       [
         "Box − SOFR, 3M (LV7)",
-        "+57 bp",
-        "2026-07-09",
+        "+70 bp",
+        "2026-07-21",
         "near-close quotes preferred"
       ],
       [
         "Call-wing richness (LV10)",
-        "-0.92 vol pts",
-        "2026-07-09",
+        "+0.64 vol pts",
+        "2026-07-21",
         "+ = upside chased"
       ],
       [

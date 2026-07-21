@@ -122,6 +122,10 @@ Weekly mean of daily bucket shares of contract volume.
 *Source: BBG ES1/ES2 + FRED SOFR · cadence: daily*
 Implied rate = ln(ES2/ES1)/0.25y + trailing SPX dividend yield (SPTR−SPX drift), minus SOFR. Days within ±2bd of quarterly expiry dropped (generic-contract roll artifacts) plus a ±150bp-vs-rolling-median backstop.
 
+### LV9 — L2: Single-name synthetic financing
+*Source: Massive snapshots (parity) · cadence: daily*
+Parity forward from ATM C/P EOD closes (non-synchronous closes add noise — labeled estimate); NO per-name dividend adjustment in v1 (biases financing DOWN for dividend payers; retail favorites are mostly low-div). Compare vs LV7 box for the demand premium (§5.5).
+
 ### LV13 — L3: Leveraged-ETF financing residual
 **Status: new methodology**
 *Source: BBG NAV × total-return index · cadence: weekly*
@@ -212,7 +216,7 @@ Membership = current list applied backward (survivorship caveat). 200dma series 
 
 ### MH1B — Leadership (RSP/SPY, NDX/SPX)
 *Source: Massive grouped bars + BBG · cadence: daily*
-Both ratios rebased to 100 at the common window start (2023-11-22).
+Both ratios rebased to 100 at the common window start (2016-01-04).
 
 ### MH7 — Cross-asset context
 *Source: BBG MOVE/UST · cadence: daily*

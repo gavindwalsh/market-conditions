@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-08",
+  "asof": "2026-07-15",
   "cadence": "weekly",
   "id": "MH8",
   "name": "Sentiment (NAAIM exposure)",
@@ -924,10 +924,6 @@
           "value": 81.41
         },
         {
-          "date": "2025-07-02",
-          "value": 99.3
-        },
-        {
           "date": "2025-07-09",
           "value": 86.28
         },
@@ -1138,6 +1134,10 @@
         {
           "date": "2026-07-08",
           "value": 82.95
+        },
+        {
+          "date": "2026-07-15",
+          "value": 95.64
         }
       ],
       "role": "avos",
@@ -1147,8 +1147,8 @@
   "source": "NAAIM",
   "tile": {
     "delta": null,
-    "percentile": 70.22,
-    "value": 83.0
+    "percentile": 91.45,
+    "value": 95.6
   },
   "tooltip": "Active-manager equity exposure: 0 flat, 100 fully long, ±200 levered.",
   "unit": ""
