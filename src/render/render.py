@@ -193,6 +193,161 @@ CHART_BOOT = """
 """ % json.dumps(SERIES_PALETTE)
 
 
+IPO_TRACKER_BOOT = r"""
+(function(){
+  var P=window.__PULSE__||{}; var D=P.ipo; if(!D) return;
+  if(!document.getElementById('ipo-tracker')) return;
+  var rows=D.rows||[]; var stageOrder=D.stage_order||[];
+  var filt={vehicle:'Operating Co',sector:'all',status:'all',from:'',to:''};
+  var sortP={col:'Raise ($mm)',dir:-1};      /* priced default: largest raise first */
+  var sortL={col:'Tier',dir:1};  /* pipeline default: by confidence tier A→D */
+
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function money(v){ if(v==null) return '—'; var a=Math.abs(v);
+    return a>=1000 ? '$'+(v/1000).toFixed(1)+'B' : '$'+v.toFixed(0)+'mm'; }
+  function pct(v){ if(v==null) return '—'; return (v>=0?'+':'')+(v*100).toFixed(1)+'%'; }
+  function uniq(key){ var s={}; rows.forEach(function(r){ if(r[key]) s[r[key]]=1; });
+    return Object.keys(s).sort(); }
+
+  function passes(r){
+    if(filt.status!=='all' && r.Status!==filt.status) return false;
+    if(filt.vehicle==='__nospac__'){ if(r['Vehicle Type']==='SPAC') return false; }
+    else if(filt.vehicle!=='all' && r['Vehicle Type']!==filt.vehicle) return false;
+    if(filt.sector!=='all' && r.Sector!==filt.sector) return false;
+    var kd=r['Key Date'];  /* lenient: rows without a date pass the date filter */
+    if(filt.from && kd && kd<filt.from) return false;
+    if(filt.to && kd && kd>filt.to) return false;
+    return true;
+  }
+  function currentFiltered(){ return rows.filter(passes); }
+
+  function buildFilters(){
+    var vehicles=uniq('Vehicle Type'), sectors=uniq('Sector');
+    var f=document.getElementById('ipo-filters');
+    var secOpts=['<option value="all">All sectors</option>'].concat(sectors.map(function(v){
+      return '<option'+(filt.sector===v?' selected':'')+'>'+esc(v)+'</option>';})).join('');
+    var vehOpts='<option value="all">All vehicles</option><option value="__nospac__">Exclude SPACs</option>'+
+      vehicles.map(function(v){return '<option'+(filt.vehicle===v?' selected':'')+'>'+esc(v)+'</option>';}).join('');
+    f.innerHTML=
+      '<label>Vehicle<select id="f-veh">'+vehOpts+'</select></label>'+
+      '<label>Sector<select id="f-sec">'+secOpts+'</select></label>'+
+      '<label>Status<select id="f-stat"><option value="all">All</option>'+
+        '<option>Priced</option><option>Pipeline</option><option>Withdrawn</option></select></label>'+
+      '<label>Priced from<input type="date" id="f-from" value="'+filt.from+'"></label>'+
+      '<label>to<input type="date" id="f-to" value="'+filt.to+'"></label>'+
+      '<button id="f-reset" type="button">Reset</button>';
+    f.querySelector('#f-veh').value=filt.vehicle; f.querySelector('#f-stat').value=filt.status;
+    var on=function(id,k){ f.querySelector(id).onchange=function(e){filt[k]=e.target.value;render();}; };
+    on('#f-veh','vehicle'); on('#f-sec','sector'); on('#f-stat','status');
+    on('#f-from','from'); on('#f-to','to');
+    f.querySelector('#f-reset').onclick=function(){
+      filt={vehicle:'Operating Co',sector:'all',status:'all',from:'',to:''}; buildFilters(); render(); };
+  }
+
+  /* ---- KPI strip ---- */
+  function median(a){ if(!a.length) return null; a=a.slice().sort(function(x,y){return x-y;});
+    var m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2; }
+  function wret(list,key){ /* raise-weighted (value-weighted) aggregate return */
+    var num=0,den=0; list.forEach(function(r){ var v=r[key],w=r['Raise ($mm)'];
+      if(v!=null&&w!=null){num+=w*v;den+=w;} }); return den? num/den : null; }
+  function renderKPIs(fr){
+    var priced=fr.filter(function(r){return r.Status==='Priced';});
+    var pipe=fr.filter(function(r){return r.Status==='Pipeline';});
+    var op=priced.filter(function(r){return r['Vehicle Type']==='Operating Co';});
+    var spac=priced.filter(function(r){return r['Vehicle Type']==='SPAC';});
+    var gross=priced.reduce(function(s,r){return s+(r['Raise ($mm)']||0);},0)/1000;
+    var med=median(op.map(function(r){return r['Since Offer (%)'];}).filter(function(v){return v!=null;}));
+    var trOff=wret(op,'Since Offer (%)'), trOpn=wret(op,'Since Open (%)');
+    var cards=[
+      ['YTD priced', priced.length, op.length+' operating · '+spac.length+' SPAC'],
+      ['Gross proceeds', '$'+gross.toFixed(1)+'B', 'sum of raises, priced'],
+      ['Median since-offer', med==null?'—':pct(med), 'priced operating cos'],
+      ['Total return since offer', trOff==null?'—':pct(trOff), 'raise-weighted · priced op cos'],
+      ['Total return since open', trOpn==null?'—':pct(trOpn), 'from first-day open · raise-weighted'],
+      ['Pipeline', pipe.length, 'names tracked forward'],
+    ];
+    document.getElementById('ipo-kpis').innerHTML=cards.map(function(c){
+      return '<div class="ipo-kpi"><div class="k-lab">'+esc(c[0])+'</div>'+
+        '<div class="k-val">'+esc(c[1])+'</div><div class="k-sub">'+esc(c[2])+'</div></div>';}).join('');
+  }
+
+  /* ---- generic sortable, collapsible table ---- */
+  function fmtCell(r,c){ var v=c.get?c.get(r):r[c.key];
+    if(c.badge) return v?'<span class="tier tier-'+esc(v)+'">'+esc(v)+'</span>':'';
+    if(c.money) return money(v);
+    if(c.pct) return pct(v);
+    return esc(v==null?(c.dash||'—'):v); }
+  function sortVal(r,c){ return c.sortVal?c.sortVal(r):(c.get?c.get(r):r[c.key]); }
+  function tdCls(r,c){ var cl=[]; if(c.num)cl.push('num'); if(c.cell)cl.push(c.cell);
+    if(c.color){ var v=r[c.key]; if(v!=null)cl.push(v>=0?'pos':'neg'); } return cl.join(' '); }
+  function makeTable(mount, cols, ss, data, titleFn, openDefault){
+    mount.innerHTML='<details class="ipo-tbl"'+(openDefault===false?'':' open')+
+      '><summary></summary><div class="ipo-twrap"></div></details>';
+    var sum=mount.querySelector('summary'), host=mount.querySelector('.ipo-twrap');
+    function draw(){
+      var sd=cols.filter(function(c){return c.key===ss.col;})[0]||cols[0];
+      var d=data.slice().sort(function(a,b){ var x=sortVal(a,sd),y=sortVal(b,sd);
+        if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1;
+        if(x<y)return -ss.dir; if(x>y)return ss.dir; return 0; });
+      sum.innerHTML=titleFn(data.length);
+      var head='<tr>'+cols.map(function(c){ var ar=ss.col===c.key?(ss.dir>0?' ▲':' ▼'):'';
+        return '<th data-col="'+esc(c.key)+'"'+(c.num?' class="num"':'')+'>'+esc(c.label)+ar+'</th>';}).join('')+'</tr>';
+      var body=d.map(function(r){ return '<tr'+(r._tip?' title="'+esc(r._tip)+'"':'')+'>'+
+        cols.map(function(c){ var cl=tdCls(r,c);
+          return '<td'+(cl?' class="'+cl+'"':'')+'>'+fmtCell(r,c)+'</td>';}).join('')+'</tr>';}).join('');
+      host.innerHTML='<table class="ipo-table"><thead>'+head+'</thead><tbody>'+
+        (body||'<tr><td class="ipo-empty">No rows match the current filters.</td></tr>')+'</tbody></table>';
+      host.querySelectorAll('th[data-col]').forEach(function(th){ th.onclick=function(){
+        var k=th.getAttribute('data-col'); var cd=cols.filter(function(c){return c.key===k;})[0];
+        if(ss.col===k) ss.dir=-ss.dir; else { ss.col=k; ss.dir=cd.num?-1:1; }
+        draw(); }; });
+    }
+    draw();
+  }
+
+  var PCOLS=[
+    {key:'Company',label:'Company',cell:'c-name'},
+    {key:'Ticker',label:'Ticker'},
+    {key:'Key Date',label:'Priced',num:true},
+    {key:'Vehicle Type',label:'Vehicle'},
+    {key:'Sector',label:'Sector',get:function(r){return r.Sector||'Unclassified';}},
+    {key:'Raise ($mm)',label:'Raise',num:true,money:true},
+    {key:'Valuation ($mm)',label:'Mkt cap',num:true,money:true},
+    {key:'Since Offer (%)',label:'Since offer',num:true,pct:true,color:true},
+    {key:'Since Open (%)',label:'Since open',num:true,pct:true,color:true}];
+  var LCOLS=[
+    {key:'Company',label:'Company',cell:'c-name'},
+    {key:'Tier',label:'Tier',badge:true,cell:'tcenter'},
+    {key:'Stage',label:'Stage',sortVal:function(r){var i=stageOrder.indexOf(r.Stage);return i<0?99:i;}},
+    {key:'Sector',label:'Sector',get:function(r){return r.Sector||'Unclassified';}},
+    {key:'Offer/Target Window',label:'Window'},
+    {key:'Valuation ($mm)',label:'Last private val',num:true,money:true},
+    {key:'Raise ($mm)',label:'Target ($, est.)',num:true,money:true}];
+
+  function withTip(r){ r._tip=[r['Valuation Basis']?'Basis: '+r['Valuation Basis']:'',
+    r.Source?'Source: '+r.Source:'', r['As Of']?'As of '+r['As Of']:''].filter(Boolean).join(' · '); return r; }
+
+  function render(){
+    var fr=currentFiltered();
+    renderKPIs(fr);
+    makeTable(document.getElementById('ipo-priced'), PCOLS, sortP,
+      fr.filter(function(r){return r.Status==='Priced';}),
+      function(n){return 'Priced · '+n+' companies';});
+    makeTable(document.getElementById('ipo-pipeline'), LCOLS, sortL,
+      fr.filter(function(r){return r.Status==='Pipeline';}).map(withTip),
+      function(n){return 'Forward pipeline · '+n+' names';});
+    var wd=fr.filter(function(r){return r.Status==='Withdrawn';}).map(withTip);
+    var wdEl=document.getElementById('ipo-withdrawn');
+    if(wd.length){ wdEl.style.display=''; makeTable(wdEl, LCOLS, {col:'Valuation ($mm)',dir:-1}, wd,
+      function(n){return 'Withdrawn · '+n;}, false); }
+    else { wdEl.style.display='none'; wdEl.innerHTML=''; }
+  }
+  buildFilters(); render();
+})();
+"""
+
+
 def _clean_unit(unit: str) -> str:
     """' bp (tile: HY OAS)' → 'bp' — the tile hints died with the tiles."""
     import re
@@ -269,18 +424,23 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
         if charts:
             panels.append({"title": title, "charts": charts})
 
+    # IPO tracker (collapsible tabular section) — not a chart metric; embedded
+    # separately and populated client-side by IPO_TRACKER_BOOT.
+    ipo = display.get("ipo_tracker")
+
     tmpl = Template(open(os.path.join(HERE, "template.html.j2"), encoding="utf-8").read(),
                     autoescape=True)
     html = tmpl.render(
         css=css, run_date=run_date, phase=config.PHASE,
-        lead=lead, panels=panels,
+        lead=lead, panels=panels, ipo=ipo,
         glossary=[{"term": t, "defn": d} for t, d in GLOSSARY],
         build_version=build_version, run_ts=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         size_budget=config.SIZE_BUDGET_MB,
         source_status=_source_status_line(),
         wordmark_data_uri=_wordmark_data_uri(),
-        data_json=json.dumps({"metrics": embed}, ensure_ascii=False),
+        data_json=json.dumps({"metrics": embed, "ipo": ipo}, ensure_ascii=False),
         echarts_js=_vendored_echarts(), chart_boot=CHART_BOOT,
+        ipo_boot=IPO_TRACKER_BOOT,
     )
 
     os.makedirs(OUT_DIR, exist_ok=True)

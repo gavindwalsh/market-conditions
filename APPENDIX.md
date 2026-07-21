@@ -241,3 +241,12 @@ Daily close of Renaissance IPO ETF (IPO) ÷ SPY close, indexed to 100 on 2024-01
 ### IS7 — Fund registration filings (485APOS + N-1A)
 *Source: SEC EDGAR 485APOS + N-1A · cadence: weekly*
 Fri-ended weekly counts of 485APOS (new series of existing trusts) + N-1A (new funds); insurance-product registrants (variable annuity / separate account) excluded by company name. Partial current week dropped; category split lands with the BBG fund screen (OP5-7 work).
+
+### IS9 — IPO issuance pace — cumulative $ (YTD vs prior years)
+**Status: real 2026 $**
+*Source: Bloomberg EQS + Ritter roster · cadence: daily*
+Ritter-comparable operating-company universe (ex SPAC/ADR/REIT/CEF/bank/unit, offer ≥ $5). Each year anchored to the Jay Ritter roster; proceeds = offer price × shares from Bloomberg. Comparison years run the full calendar; the current year stops at today's day-of-year. Prior-year dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so all curves are in real 2026 dollars. Every deal is included — mega-deals (e.g. SpaceX, ~$75B) show as real steps, not smoothed. 2000 is Ritter-anchored ($64.8B nominal across 390 operating-cos), of which $10.1B across 75 tail deals is estimated.
+
+### IS10 — IPO issuance pace — cumulative deal count (YTD vs prior years)
+*Source: Bloomberg EQS + Ritter roster · cadence: daily*
+Companion count view to IS9; same Ritter-comparable universe. Comparison years run the full calendar; the current year stops at today.

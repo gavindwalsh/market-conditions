@@ -48,6 +48,20 @@
 </section>
 {% endfor %}
 
+{% if ipo %}
+<details class="ipo-section" open id="ipo-tracker">
+  <summary><span class="ipo-h">IPO Tracker</span><span class="ipo-asof">data as-of {{ ipo.asof }} · {{ ipo.rows|length }} companies</span></summary>
+  <div class="ipo-body">
+    <div class="ipo-filters" id="ipo-filters"></div>
+    <div class="ipo-kpis" id="ipo-kpis"></div>
+    <div id="ipo-priced" class="ipo-block"></div>
+    <div id="ipo-pipeline" class="ipo-block"></div>
+    <div id="ipo-withdrawn" class="ipo-block"></div>
+    <div class="ipo-foot">Valuation bases differ by row type — priced rows show current market cap, pipeline rows the last private round; the two are never summed. Pipeline raises are midpoint estimates ("target, est."). Sort any priced column by clicking its header.</div>
+  </div>
+</details>
+{% endif %}
+
 <footer>
   <div><b>Build</b> {{ build_version }} · run {{ run_ts }} ET · size target {{ size_budget }} MB</div>
   <div><b>Source status:</b> {{ source_status }}</div>
@@ -80,3 +94,4 @@
 {% else %}
 <!-- ECharts not yet vendored: drop echarts.min.js in src/render/vendor/ to inline it (§6). Tiles render; charts are placeholders. -->
 {% endif %}
+{% if ipo %}<script>{{ ipo_boot|safe }}</script>{% endif %}

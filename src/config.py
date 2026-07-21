@@ -219,6 +219,10 @@ _REGISTRY_ROWS = [
     _m("IS6", "issuance", "Net equity supply", "BBG", "monthly", 1, "2015→"),
     _m("IS7", "issuance", "Fund registration filings (pipeline proxy)", "EDGAR", "weekly", 1, "2020→"),
     _m("IS8", "issuance", "Adoption velocity", "OP7", "weekly", 1, "2022→"),
+    # IS9/IS10 — IPO issuance pace: 2026 YTD vs prior years, cumulative $ and
+    # deal count by day-of-year (Ritter-comparable universe; see compute/ipo.py).
+    _m("IS9", "issuance", "IPO issuance pace — cumulative $ (YTD vs prior years)", "BBG+Ritter", "daily", 1, "build→"),
+    _m("IS10", "issuance", "IPO issuance pace — cumulative count (YTD vs prior years)", "BBG+Ritter", "daily", 1, "build→"),
 ]
 
 REGISTRY: dict[str, Metric] = {m.id: m for m in _REGISTRY_ROWS}

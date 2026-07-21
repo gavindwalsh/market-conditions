@@ -104,11 +104,11 @@ def pull_all():
 def compute_all():
     """Turn lake data into display JSON (build_data/*.json). Each metric's compute
     lands here as it is built; missing computes simply leave last-good in place."""
-    from .compute import (health, issuance, leverage, opra, ownership,
+    from .compute import (health, ipo, issuance, leverage, opra, ownership,
                           retail_series, structure, volatility)
     for name, mod in (("structure", structure), ("ownership", ownership),
                       ("volatility", volatility), ("leverage", leverage),
-                      ("health", health), ("issuance", issuance),
+                      ("health", health), ("issuance", issuance), ("ipo", ipo),
                       ("retail", retail_series), ("opra", opra)):
         result = _safe(f"compute:{name}", mod.build)
         if result:
