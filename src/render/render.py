@@ -382,6 +382,74 @@ def _vendored_echarts():
     return open(p, encoding="utf-8").read() if os.path.exists(p) else None
 
 
+def _md_to_html(md: str) -> str:
+    """Minimal Markdown → HTML for the appendix (the subset APPENDIX.md uses:
+    #/##/### headings, **bold**, *italic*, `code`, blank-line paragraphs, - bullets).
+    No external dependency — the page must stay self-contained (§6)."""
+    import html as _html
+    import re
+
+    def inline(t: str) -> str:
+        t = _html.escape(t)
+        t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
+        t = re.sub(r"`(.+?)`", r"<code>\1</code>", t)
+        t = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"<em>\1</em>", t)
+        return t
+
+    out, para, in_list = [], [], False
+
+    def flush_para():
+        if para:
+            out.append("<p>" + " ".join(para) + "</p>")
+            para.clear()
+
+    def close_list():
+        nonlocal in_list
+        if in_list:
+            out.append("</ul>")
+            in_list = False
+
+    for line in md.splitlines():
+        s = line.rstrip()
+        if not s.strip():
+            flush_para(); close_list(); continue
+        if s.startswith("### "):
+            flush_para(); close_list(); out.append("<h3>" + inline(s[4:]) + "</h3>")
+        elif s.startswith("## "):
+            flush_para(); close_list(); out.append("<h2>" + inline(s[3:]) + "</h2>")
+        elif s.startswith("# "):
+            flush_para(); close_list(); out.append("<h1>" + inline(s[2:]) + "</h1>")
+        elif s.startswith("- "):
+            flush_para()
+            if not in_list:
+                out.append("<ul>"); in_list = True
+            out.append("<li>" + inline(s[2:]) + "</li>")
+        else:
+            close_list(); para.append(inline(s))
+    flush_para(); close_list()
+    return "\n".join(out)
+
+
+def _appendix_page(md_text: str, css: str, wordmark_data_uri, slug: str,
+                   run_date: str) -> str:
+    """Standalone, self-contained appendix page (served at /<slug>/appendix)."""
+    mark = (f'<img class="wordmark" src="{wordmark_data_uri}" alt="avos"/>'
+            if wordmark_data_uri
+            else '<span class="wordmark" style="font-family:Georgia,serif;font-size:22px">avos</span>')
+    return (
+        '<!doctype html><html lang="en"><head><meta charset="utf-8"/>'
+        '<meta name="viewport" content="width=device-width,initial-scale=1"/>'
+        '<title>Market Pulse — Appendix</title>'
+        f'<style>{css}</style></head><body>'
+        '<header class="masthead">'
+        f'{mark}<h1>Market Pulse — Appendix</h1>'
+        f'<a class="appendix-link" href="/{slug}">← Back to dashboard</a>'
+        '</header>'
+        f'<div class="appendix-doc">{_md_to_html(md_text)}</div>'
+        '</body></html>'
+    )
+
+
 def build(run_date: str = None, build_version: str = "dev", lead: str = None) -> str:
     run_date = run_date or date.today().isoformat()
     display = store.load_all_display()
@@ -432,7 +500,7 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
                     autoescape=True)
     html = tmpl.render(
         css=css, run_date=run_date, phase=config.PHASE,
-        lead=lead, panels=panels, ipo=ipo,
+        lead=lead, panels=panels, ipo=ipo, app_slug=config.APP_SLUG,
         glossary=[{"term": t, "defn": d} for t, d in GLOSSARY],
         build_version=build_version, run_ts=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         size_budget=config.SIZE_BUDGET_MB,
@@ -451,7 +519,16 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
         with open(tmp, "w", encoding="utf-8") as f:
             f.write(html)
         os.replace(tmp, path)
-    _write_appendix(display)  # §25: methodology appendix, single-sourced
+    md_path = _write_appendix(display)  # §25: methodology appendix, single-sourced
+    # standalone HTML appendix, served at /<slug>/appendix (linked from the masthead)
+    md_text = open(md_path, encoding="utf-8").read()
+    appendix_html = _appendix_page(md_text, css, _wordmark_data_uri(),
+                                   config.APP_SLUG, run_date)
+    ap = os.path.join(OUT_DIR, "appendix.html")
+    tmp = ap + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(appendix_html)
+    os.replace(tmp, ap)
     return latest
 
 

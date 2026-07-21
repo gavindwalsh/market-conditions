@@ -19,6 +19,20 @@ header .range-btns button{background:rgba(255,255,255,.12);border:1px solid rgba
 header .range-btns button:hover{background:rgba(255,255,255,.25)}
 header .range-btns button.active{background:#fff;color:var(--green);font-weight:600}
 header .asof{font-size:12px;opacity:.9;text-align:right}
+.appendix-link{color:#fff;font-size:12px;text-decoration:none;border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.12);padding:4px 10px;border-radius:6px;white-space:nowrap}
+.appendix-link:hover{background:rgba(255,255,255,.25)}
+/* standalone appendix page */
+.appendix-doc{max-width:820px;margin:22px auto;padding:0 22px;color:var(--ink);
+  font-size:14.5px;line-height:1.6}
+.appendix-doc h1{font-size:22px;color:var(--ink);margin:8px 0 14px}
+.appendix-doc h2{font-size:17px;color:var(--green);border-bottom:2px solid var(--green);
+  padding-bottom:5px;margin:26px 0 10px}
+.appendix-doc h3{font-size:14px;color:var(--ink);margin:18px 0 4px}
+.appendix-doc p{color:var(--body);margin:6px 0}
+.appendix-doc ul{margin:6px 0 6px 4px;padding-left:18px;color:var(--body)}
+.appendix-doc code{background:#e7e7e7;padding:1px 4px;border-radius:3px;font-size:12.5px}
+.appendix-doc strong{color:var(--ink)}
 .lead{background:var(--card);border-left:5px solid var(--green);color:var(--green);
   font-size:18px;padding:16px 22px;margin:18px 22px}
 .panel{background:transparent;margin:18px 22px}

@@ -50,9 +50,22 @@ def deploy_app(slug, cfg):
     run(["aws", "s3", "cp", str(html), f"s3://{bucket}/{slug}/index.html",
          "--content-type", "text/html; charset=utf-8", "--cache-control", "max-age=60",
          "--region", region])
+    paths = [f"/{slug}/index.html"]
+    # methodology appendix, served at /<slug>/appendix (linked from the masthead).
+    # Uploaded to both key shapes so it resolves whichever directory-index rule the
+    # distribution applies to extensionless paths (append /index.html vs .html).
+    appendix = html.parent / "appendix.html"
+    if appendix.exists():
+        for key in (f"{slug}/appendix/index.html", f"{slug}/appendix.html"):
+            run(["aws", "s3", "cp", str(appendix), f"s3://{bucket}/{key}",
+                 "--content-type", "text/html; charset=utf-8", "--cache-control", "max-age=60",
+                 "--region", region])
+        paths += [f"/{slug}/appendix", f"/{slug}/appendix/index.html", f"/{slug}/appendix.html"]
     run(["aws", "cloudfront", "create-invalidation", "--distribution-id", distro,
-         "--paths", f"/{slug}/index.html"])
+         "--paths", *paths])
     print(f"Done. Live in ~30s at https://{cfg.get('DOMAIN','lens.avos.co')}/{slug}")
+    if appendix.exists():
+        print(f"Appendix at https://{cfg.get('DOMAIN','lens.avos.co')}/{slug}/appendix")
 
 
 def main():
