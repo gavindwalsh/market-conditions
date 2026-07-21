@@ -5,7 +5,7 @@
 <style>{{ css|safe }}</style>
 <header class="masthead">
   {% if wordmark_data_uri %}<img class="wordmark" src="{{ wordmark_data_uri }}" alt="avos"/>{% else %}<span class="wordmark" style="font-family:Georgia,serif;font-size:22px">avos</span>{% endif %}
-  <h1>Market Pulse</h1>
+  <h1>US Market Conditions</h1>
   <div class="range-btns">
     <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(null,this)">All</button>
   </div>
@@ -13,7 +13,7 @@
   <div class="asof">Run {{ run_date }} ET · Phase {{ phase }}<br/>Data as-of block below each tile</div>
 </header>
 
-<div class="lead">{{ lead or "Daily aggregate pulse on US equity & options market structure, ownership, leverage, and health — each read in the context of its own history." }}</div>
+{% if lead %}<div class="lead">{{ lead }}</div>{% endif %}
 
 {% for panel in panels %}
 <section class="panel">
