@@ -90,19 +90,19 @@ CHART_BOOT = """
     var yMax = (m.y_max===undefined?null:m.y_max), yMin = (m.y_min===undefined?null:m.y_min);
     var yAxes;
     if(dual){
+      /* axis unit names dropped from the chart (§ user: mostly self-evident);
+         units now live in the title tooltip. axisLabel colors still tie each
+         numeric scale to its series on dual-axis charts. */
       yAxes=[
-        {type:'value',scale:true,position:'left',name:units[0],max:yMax,min:yMin,
-         nameTextStyle:{color:axisColor[0]||'#5A5A5A',align:'left'},
+        {type:'value',scale:true,position:'left',max:yMax,min:yMin,
          axisLabel:{color:axisColor[0]||'#5A5A5A'},
          splitLine:{lineStyle:{color:'#e2e2e2'}}},
-        {type:'value',scale:true,position:'right',name:units[1],
-         nameTextStyle:{color:axisColor[1]||'#5A5A5A',align:'right'},
+        {type:'value',scale:true,position:'right',
          axisLabel:{color:axisColor[1]||'#5A5A5A'},
          splitLine:{show:false}}
       ];
     } else {
-      yAxes={type:'value',scale:true,name:units[0]||fallbackUnit,max:yMax,min:yMin,
-             nameTextStyle:{color:'#5A5A5A',align:'left'},
+      yAxes={type:'value',scale:true,max:yMax,min:yMin,
              splitLine:{lineStyle:{color:'#e2e2e2'}}};
     }
     /* category (not time) x-axis: market data has no weekend/holiday points, so a
@@ -116,7 +116,7 @@ CHART_BOOT = """
       legend:legend,
       xAxis:{type:'category',data:cats,axisLine:{lineStyle:{color:'#1E1E1E'}}},
       yAxis:yAxes,
-      tooltip:{trigger:'axis'},
+      tooltip:{trigger:'axis',confine:true},
       dataZoom:[{type:'inside',xAxisIndex:0,filterMode:'filter'}],  /* y re-fits to visible window */
       textStyle:{fontFamily:'Roboto,system-ui,sans-serif'},
       series:series});
@@ -473,6 +473,17 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
             except Exception:
                 pass
             unit = _clean_unit(d.get("unit", ""))
+            # distinct series units, first-seen order — mirrors the boot script's
+            # axis assignment (units[0]=left, units[1]=right). The axis no longer
+            # prints these; they surface in the title tooltip instead.
+            units = []
+            if d.get("series"):
+                for s in d["series"]:
+                    u = _clean_unit(s.get("unit") or "") or unit
+                    if u and u not in units:
+                        units.append(u)
+                if not units and unit:
+                    units = [unit]
             status = d.get("status") or {}
             charts.append({
                 # display JSON name wins (the compute's honest name) — registry
@@ -489,6 +500,7 @@ def build(run_date: str = None, build_version: str = "dev", lead: str = None) ->
                 # hover balloons. Missing tooltip degrades to nothing.
                 "tip": d.get("tooltip") or "",
                 "badge": status.get("level"), "badge_label": status.get("label"),
+                "units": units,
                 "table": d.get("table"),
             })
         if charts:

@@ -23,11 +23,20 @@
     {% for c in panel.charts %}
     <div class="chart-card">
       <div class="ctitle has-tip">{{ c.id }} · {{ c.name }}
-        {% if c.badge %}<span class="badge badge-{{ c.badge }}">{{ c.badge_label or c.badge }}</span>{% endif %}
-        {% if c.tip %}<span class="tip-icon">ⓘ</span>
-        <div class="tip"><b>How to read it:</b> {{ c.tip }}<br/><i>Methodology: APPENDIX.md §{{ c.id }}</i></div>{% endif %}
         {% if not c.table %}<span class="expand-icon" data-chart="{{ c.id }}" role="button" tabindex="0" aria-label="Expand chart" title="Expand">⤢</span>{% endif %}
+        <div class="tip">
+          <div class="tip-stat">
+            {% if c.value_fmt %}<b>{{ c.value_fmt }}</b>{% endif %}
+            {% if c.percentile is not none %} · {{ c.percentile }}%ile{% endif %}
+            · as-of {{ c.asof }}
+          </div>
+          {% if c.units %}<div class="tip-units">{% if c.units|length > 1 %}Left axis: {{ c.units[0] }} · Right axis: {{ c.units[1] }}{% else %}Y-axis: {{ c.units[0] }}{% endif %}</div>{% endif %}
+          {% if c.badge %}<div class="tip-badge"><span class="badge badge-{{ c.badge }}">{{ c.badge_label or c.badge }}</span></div>{% endif %}
+          {% if c.tip %}<div><b>How to read it:</b> {{ c.tip }}</div>{% endif %}
+          <div class="tip-src">{{ c.source }} · Methodology: APPENDIX.md §{{ c.id }}</div>
+        </div>
       </div>
+      {# kept for the fullscreen overlay (lifted into .fs-src); hidden in the card grid #}
       <div class="csrc">
         {% if c.value_fmt %}<b>{{ c.value_fmt }}</b>{% endif %}
         {% if c.percentile is not none %} · {{ c.percentile }}%ile{% endif %}

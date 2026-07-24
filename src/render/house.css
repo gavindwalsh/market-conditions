@@ -42,10 +42,11 @@ header .asof{font-size:12px;opacity:.9;text-align:right}
 .asof-stamp.stale{color:var(--stale);font-weight:600}
 .charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
 .chart-card{background:var(--card);border-radius:10px;padding:12px}
-.chart-card .ctitle{color:var(--ink);font-size:13px;font-weight:600;margin-bottom:2px;position:relative}
-.chart-card .csrc{font-size:11px;color:var(--body);margin-bottom:6px}
+.chart-card .ctitle{color:var(--ink);font-size:13px;font-weight:600;margin-bottom:8px;position:relative;cursor:help}
+/* .csrc is hidden in the card (its value/percentile/as-of/source now live in the
+   title tooltip); the fullscreen overlay still lifts it into .fs-src */
+.chart-card .csrc{display:none}
 .chart-card .csrc b{color:var(--ink);font-size:12.5px}
-.tip-icon{color:var(--green);cursor:help;font-size:12px;margin-left:4px}
 /* expand-to-fullscreen affordance (top-right of each chart card title) */
 .chart-card .ctitle{padding-right:20px}
 .expand-icon{position:absolute;top:-1px;right:0;color:var(--green);cursor:pointer;
@@ -55,6 +56,13 @@ header .asof{font-size:12px;opacity:.9;text-align:right}
   background:var(--ink);color:#fff;font-weight:400;font-size:12px;line-height:1.45;
   padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .ctitle .tip b{color:var(--lav)}
+.ctitle .tip>div{margin-bottom:5px}
+.ctitle .tip>div:last-child{margin-bottom:0}
+.ctitle .tip .tip-stat{color:#fff}
+.ctitle .tip .tip-stat b{font-size:13px}
+.ctitle .tip .tip-badge .badge{margin-left:0}
+.ctitle .tip .tip-units{opacity:.85;font-size:11.5px}
+.ctitle .tip .tip-src{opacity:.72;font-size:11px}
 .ctitle:hover .tip{display:block}
 .chart{width:100%;height:260px}
 /* fullscreen chart overlay: dims the dashboard behind a scrim, lifts one chart
