@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "MH1",
   "name": "Breadth (% above moving averages)",
-  "notes": "Membership = current list applied backward (survivorship caveat). 200dma series appears once the grouped-bars backfill provides the lookback. Leadership ratios: MH1B.",
+  "notes": "**What it shows.** Market breadth — the share of S&P 500 members trading above their 50-day and 200-day moving averages. High readings mean broad participation; a falling line while the index itself holds up is the signature of narrowing, mega-cap-driven leadership.\n\n**How it's computed.** From daily member closes on the grouped tape, the percent of members above each moving average, computed only on days when at least 400 members have data (and enough history for the lookback).\n\n**Caveats.** Membership is the current S&P 500 list applied backward, so older readings carry a survivorship bias. The 200-day series appears once the tape backfill provides a deep enough lookback. Leadership ratios live in MH1B.",
   "panel": "internals",
   "provenance": "derived",
   "series": [
@@ -458,18 +458,6 @@
         {
           "date": "2025-06-30",
           "value": 73.79
-        },
-        {
-          "date": "2025-07-18",
-          "value": 68.145
-        },
-        {
-          "date": "2025-07-21",
-          "value": 63.911
-        },
-        {
-          "date": "2025-07-22",
-          "value": 74.395
         },
         {
           "date": "2025-07-23",
@@ -1466,6 +1454,18 @@
         {
           "date": "2026-07-20",
           "value": 60.239
+        },
+        {
+          "date": "2026-07-21",
+          "value": 58.847
+        },
+        {
+          "date": "2026-07-22",
+          "value": 61.431
+        },
+        {
+          "date": "2026-07-23",
+          "value": 57.058
         }
       ],
       "role": "avos",
@@ -1894,18 +1894,6 @@
         {
           "date": "2025-06-30",
           "value": 55.242
-        },
-        {
-          "date": "2025-07-18",
-          "value": 60.484
-        },
-        {
-          "date": "2025-07-21",
-          "value": 59.274
-        },
-        {
-          "date": "2025-07-22",
-          "value": 64.516
         },
         {
           "date": "2025-07-23",
@@ -2902,6 +2890,18 @@
         {
           "date": "2026-07-20",
           "value": 63.022
+        },
+        {
+          "date": "2026-07-21",
+          "value": 62.227
+        },
+        {
+          "date": "2026-07-22",
+          "value": 63.419
+        },
+        {
+          "date": "2026-07-23",
+          "value": 63.419
         }
       ],
       "role": "context",
@@ -2911,8 +2911,8 @@
   "source": "Massive grouped bars × membership",
   "tile": {
     "delta": null,
-    "percentile": 45.54,
-    "value": 60.2
+    "percentile": 39.84,
+    "value": 57.1
   },
   "tooltip": "Share of S&P 500 members above their 50- and 200-day averages.",
   "unit": "% (tile: >50dma)"

@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "SC5",
   "name": "Realized cross-sectional dispersion",
-  "notes": "Per-day std-dev of member daily returns; days with <400 member returns dropped. Uses TODAY'S membership applied backward until historical membership lands; backfill extends via massive.pull_grouped_range.",
+  "notes": "**What it shows.** Realized cross-sectional dispersion — how widely S&P 500 members' same-day returns spread out. It is the realized counterpart to DSPX (SC4): high readings mean big winners and losers on the same day, a stock-picker's tape; low readings mean the index moves as one.\n\n**How it's computed.** Each day, the standard deviation of member daily returns (×100), computed only on days with at least 400 members reporting a return, so a thin cross-section can't distort it.\n\n**Caveats.** Survivorship badge: the calculation uses today's membership applied backward until historical membership lands, so older readings carry that bias while recent ones are exact.",
   "panel": "other",
   "provenance": "massive_cache",
   "series": [
@@ -466,18 +466,6 @@
         {
           "date": "2025-06-30",
           "value": 1.399
-        },
-        {
-          "date": "2025-07-18",
-          "value": 1.561
-        },
-        {
-          "date": "2025-07-21",
-          "value": 1.351
-        },
-        {
-          "date": "2025-07-22",
-          "value": 2.466
         },
         {
           "date": "2025-07-23",
@@ -1474,6 +1462,18 @@
         {
           "date": "2026-07-20",
           "value": 1.401
+        },
+        {
+          "date": "2026-07-21",
+          "value": 2.696
+        },
+        {
+          "date": "2026-07-22",
+          "value": 2.196
+        },
+        {
+          "date": "2026-07-23",
+          "value": 2.43
         }
       ],
       "role": "avos",
@@ -1487,8 +1487,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 34.86,
-    "value": 1.4
+    "percentile": 90.63,
+    "value": 2.43
   },
   "tooltip": "Spread of same-day returns across S&P 500 members — realized dispersion.",
   "unit": "%"

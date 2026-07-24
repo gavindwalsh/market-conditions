@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "LV3",
   "name": "Volume by DTE bucket",
-  "notes": "Weekly mean of daily bucket shares of contract volume.",
+  "notes": "**What it shows.** How option volume splits by time to expiry — same-day (0 DTE), 1–5, 6–30, and more than 30 days — as weekly stacked bars that sum to 100%. A growing 0 DTE stack is the signature of short-dated, retail-heavy speculation.\n\n**How it's computed.** Each day, contract volume is sorted into the four days-to-expiry buckets; each bucket's daily share of total volume is then averaged over the Friday-ended week. The tile shows the latest 0 DTE share.\n\n**Caveats.** This is whole-market OPRA volume, not retail-only, and the shares are of contract count, not premium dollars.",
   "panel": "retail",
   "provenance": "massive_opra",
   "series": [
@@ -546,7 +546,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 40.208
+          "value": 33.06
         }
       ],
       "role": "context",
@@ -1092,7 +1092,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 24.065
+          "value": 27.252
         }
       ],
       "role": "context",
@@ -1638,7 +1638,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 10.828
+          "value": 18.491
         }
       ],
       "role": "context",
@@ -2184,7 +2184,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 24.898
+          "value": 21.197
         }
       ],
       "role": "context",
@@ -2196,7 +2196,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 40.2
+    "value": 26.4
   },
   "tooltip": "Composition of option volume by days-to-expiry — weekly average, stacks to 100%.",
   "unit": "% (tile: 0DTE)"

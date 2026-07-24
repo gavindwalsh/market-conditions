@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "SC4",
   "name": "Implied dispersion (DSPX)",
-  "notes": "Cboe implied-dispersion index, full history from inception. Cboe EOD CSV is the fallback if the BBG pull fails.",
+  "notes": "**What it shows.** Cboe's implied dispersion index (DSPX) — how much single stocks are expected to move independently of the index over the coming month. High dispersion is a stock-picker's environment; low dispersion means names are expected to move together. It is the implied, forward-looking counterpart to the realized dispersion in SC5.\n\n**How it's computed.** The published Cboe S&P 500 Dispersion Index (DSPX), with full history from its inception; the tile ranks the latest level against that history.\n\n**Caveats.** Sourced from Bloomberg, with Cboe's end-of-day CSV as a fallback if the Terminal pull fails.",
   "panel": "other",
   "provenance": "bloomberg_cache",
   "series": [
@@ -542,22 +542,6 @@
         {
           "date": "2025-06-30",
           "value": 30.23
-        },
-        {
-          "date": "2025-07-18",
-          "value": 31.46
-        },
-        {
-          "date": "2025-07-21",
-          "value": 31.36
-        },
-        {
-          "date": "2025-07-22",
-          "value": 32.13
-        },
-        {
-          "date": "2025-07-23",
-          "value": 32.41
         },
         {
           "date": "2025-07-24",
@@ -1550,6 +1534,22 @@
         {
           "date": "2026-07-20",
           "value": 47.15
+        },
+        {
+          "date": "2026-07-21",
+          "value": 47.51
+        },
+        {
+          "date": "2026-07-22",
+          "value": 47.26
+        },
+        {
+          "date": "2026-07-23",
+          "value": 45.78
+        },
+        {
+          "date": "2026-07-24",
+          "value": 44.16
         }
       ],
       "role": "avos",
@@ -1559,8 +1559,8 @@
   "source": "BBG DSPX Index",
   "tile": {
     "delta": null,
-    "percentile": 99.8,
-    "value": 47.15
+    "percentile": 99.19,
+    "value": 44.16
   },
   "tooltip": "Cboe implied dispersion — how much single names are expected to move independently of the index.",
   "unit": ""

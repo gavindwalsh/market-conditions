@@ -3,7 +3,7 @@
   "cadence": "monthly",
   "id": "OP10",
   "name": "Personal saving (level)",
-  "notes": "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA). Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
+  "notes": "**What it shows.** The dollar level of personal saving — the same household behavior as the saving rate (OP9), but in dollars rather than as a share of income.\n\n**How it's computed.** The BEA's PMSAVE series — the personal saving level in billions of dollars, quoted at a seasonally-adjusted annual rate, monthly.\n\n**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they run off-chart rather than flattening the rest of the history.",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [

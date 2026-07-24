@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "MH9",
   "name": "Off-exchange + odd-lot share",
-  "notes": "Off-exchange = FINRA TRF prints / total volume; odd-lot = trades <100sh.",
+  "notes": "**What it shows.** Two market-structure gauges that have climbed alongside retail and internalization: the share of volume printing away from the lit exchanges (bars, left axis) and the share of trades that are odd lots — fewer than 100 shares (line, right axis).\n\n**How it's computed.** Off-exchange share is FINRA TRF print volume ÷ total tape volume; odd-lot share is the count of sub-100-share trades ÷ total trade count. Both are daily.\n\n**Caveats.** Off-exchange share captures all internalized and dark volume, not retail alone, so read it as a structure indicator rather than a pure retail gauge.",
   "panel": "health",
   "provenance": "massive_tape",
   "series": [
@@ -551,6 +551,18 @@
         {
           "date": "2026-07-20",
           "value": 43.843
+        },
+        {
+          "date": "2026-07-21",
+          "value": 43.93
+        },
+        {
+          "date": "2026-07-22",
+          "value": 43.652
+        },
+        {
+          "date": "2026-07-23",
+          "value": 42.055
         }
       ],
       "role": "avos",
@@ -1099,6 +1111,18 @@
         {
           "date": "2026-07-20",
           "value": 72.059
+        },
+        {
+          "date": "2026-07-21",
+          "value": 71.263
+        },
+        {
+          "date": "2026-07-22",
+          "value": 71.537
+        },
+        {
+          "date": "2026-07-23",
+          "value": 71.619
         }
       ],
       "role": "context",
@@ -1109,7 +1133,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 43.84
+    "value": 42.05
   },
   "tooltip": "Share of volume printed off-exchange (bars, left) and share of trades under 100 shares (line, right).",
   "unit": "%"

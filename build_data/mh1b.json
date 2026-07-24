@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "MH1B",
   "name": "Leadership (RSP/SPY, NDX/SPX)",
-  "notes": "Both ratios rebased to 100 at the common window start (2016-01-04).",
+  "notes": "**What it shows.** Two leadership ratios — equal-weight versus cap-weight (RSP/SPY) and mega-cap growth versus the broad market (NDX/SPX) — each rebased to 100. A falling RSP/SPY means a handful of the largest names are carrying the index; a rising NDX/SPX means growth is leading.\n\n**How it's computed.** The RSP÷SPY and NDX÷SPX daily-close ratios, both rebased to 100 at their common start date (2016-01-04) so they share the axis fairly.\n\n**Caveats.** These are rebased indices, not levels — read the moves relative to that common starting point, not the absolute numbers.",
   "panel": "internals",
   "provenance": "derived",
   "series": [
@@ -466,18 +466,6 @@
         {
           "date": "2025-06-30",
           "value": 78.018
-        },
-        {
-          "date": "2025-07-18",
-          "value": 77.839
-        },
-        {
-          "date": "2025-07-21",
-          "value": 77.426
-        },
-        {
-          "date": "2025-07-22",
-          "value": 78.402
         },
         {
           "date": "2025-07-23",
@@ -1474,6 +1462,18 @@
         {
           "date": "2026-07-20",
           "value": 75.921
+        },
+        {
+          "date": "2026-07-21",
+          "value": 75.414
+        },
+        {
+          "date": "2026-07-22",
+          "value": 75.48
+        },
+        {
+          "date": "2026-07-23",
+          "value": 76.144
         }
       ],
       "role": "context",
@@ -1938,22 +1938,6 @@
         {
           "date": "2025-06-30",
           "value": 163.55
-        },
-        {
-          "date": "2025-07-18",
-          "value": 163.911
-        },
-        {
-          "date": "2025-07-21",
-          "value": 164.495
-        },
-        {
-          "date": "2025-07-22",
-          "value": 163.564
-        },
-        {
-          "date": "2025-07-23",
-          "value": 162.992
         },
         {
           "date": "2025-07-24",
@@ -2946,6 +2930,22 @@
         {
           "date": "2026-07-20",
           "value": 171.961
+        },
+        {
+          "date": "2026-07-21",
+          "value": 173.735
+        },
+        {
+          "date": "2026-07-22",
+          "value": 173.035
+        },
+        {
+          "date": "2026-07-23",
+          "value": 171.871
+        },
+        {
+          "date": "2026-07-24",
+          "value": 170.818
         }
       ],
       "role": "context",
@@ -2955,8 +2955,8 @@
   "source": "Massive grouped bars + BBG",
   "tile": {
     "delta": null,
-    "percentile": 5.38,
-    "value": 75.9
+    "percentile": 5.67,
+    "value": 76.1
   },
   "tooltip": "Equal-weight vs cap-weight and NDX vs SPX, rebased to 100 — falling RSP/SPY = mega-cap leadership.",
   "unit": "rebased (tile: RSP/SPY)"

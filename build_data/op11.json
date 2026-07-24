@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "OP11",
   "name": "Debt service ratio",
-  "notes": "TDSP — required mortgage + consumer debt payments / disposable income (Fed, quarterly).",
+  "notes": "**What it shows.** Required household debt payments — mortgage plus consumer — as a share of disposable income. It measures how burdened household balance sheets are by debt service; rising readings squeeze spending power.\n\n**How it's computed.** The Federal Reserve's TDSP series (total debt-service payments ÷ disposable personal income), quarterly.\n\n**Caveats.** Quarterly and released with a lag.",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [

@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "RF4",
   "name": "Buy-the-dip sensitivity",
-  "notes": "Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Rolling OLS slope of daily identified retail net flow ($B, unscaled floor) regressed on the SPX daily % return, sign-flipped so a positive value = buying into declines. Solid line is the 63d (3-month) trend; faint line the 21d (1-month) window — faster but ~4× noisier. Contemporaneous; identified floor, not ×3-scaled.",
+  "notes": "**What it shows.** How hard retail leans into weakness — the dollars of net retail buying that arrive per 1% S&P 500 decline. A positive, rising reading means retail buys harder as the market falls (dip-buying); a negative reading means retail sells into declines.\n\n**How it's computed.** A rolling ordinary-least-squares slope of daily identified retail net flow (in $B) regressed on the S&P 500 daily percent return, sign-flipped so that a positive value means buying into declines: `RF4 = −slope(net flow $B on SPX % return)`. Two contemporaneous windows are shown — a 63-day (3-month) primary trend and a 21-day (1-month) context line that reacts faster but is roughly 4× noisier. See Retail identification and scaling above for the underlying classifier.\n\n**Caveats.** Built on the identified floor of retail flow, not the ×3-scaled total — but as a regression slope its shape is scale-invariant. It unlocks only once at least 63 signed days carrying an S&P 500 return have accumulated, and carries the *classifier floor* badge marking it provisional until calibration.",
   "panel": "retail",
   "provenance": "massive_tape",
   "series": [

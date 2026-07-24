@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-15",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "LV9",
   "name": "L2: Single-name synthetic financing",
@@ -13,19 +13,43 @@
       "points": [
         {
           "date": "2026-07-09",
-          "value": -919.774
+          "value": -920.78
         },
         {
           "date": "2026-07-13",
-          "value": 261.313
+          "value": 260.319
         },
         {
           "date": "2026-07-14",
-          "value": -1099.509
+          "value": -1100.515
         },
         {
           "date": "2026-07-15",
-          "value": 379.051
+          "value": 378.06
+        },
+        {
+          "date": "2026-07-17",
+          "value": 4359.998
+        },
+        {
+          "date": "2026-07-20",
+          "value": -1730.624
+        },
+        {
+          "date": "2026-07-21",
+          "value": -1530.263
+        },
+        {
+          "date": "2026-07-22",
+          "value": 609.287
+        },
+        {
+          "date": "2026-07-23",
+          "value": 2345.642
+        },
+        {
+          "date": "2026-07-24",
+          "value": -153.583
         }
       ],
       "role": "avos",
@@ -36,7 +60,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 379.0
+    "value": -154.0
   },
   "unit": " bp vs SOFR"
 }

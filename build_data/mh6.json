@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "MH6",
   "name": "Delinquency transitions (30+)",
-  "notes": "Quarterly HHDC 'New Delinquent Balances by Loan Type' (flow into 30+ delinquency, % of balances).",
+  "notes": "**What it shows.** The flow of household balances newly falling 30 or more days past due, by product — the earliest read on household credit stress, visible well before loans are charged off.\n\n**How it's computed.** The New York Fed HHDC 'new delinquent balances by loan type' — the share of balances transitioning into 30+ day delinquency each quarter. The tile tracks credit cards.\n\n**Caveats.** Quarterly, and reported with the usual HHDC lag.",
   "panel": "credit",
   "provenance": "nyfed_cache",
   "series": [

@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "VC1",
   "name": "Implied correlation",
-  "notes": "Cboe implied correlation indices; tile ranks COR1M. The spread vs realized correlation is VC2.",
+  "notes": "**What it shows.** The average correlation between S&P 500 members that index-options prices imply for the coming month. Low readings mean index options are cheap relative to single-name options — the market expects stocks to move on their own news (a dispersion, stock-picker's regime). High readings mean stocks are priced to move together, an index-like, macro-driven tape.\n\n**How it's computed.** We plot Cboe's published COR1M (1-month) with COR3M (3-month) alongside; the tile ranks COR1M against its own trailing history. Cboe derives implied correlation from the identity that links index variance to member variances: index options price the index variance `σ_index²`, single-name options price each member's variance `σᵢ²`, and the implied average correlation `ρ` is the value that reconciles the two — `σ_index² = Σ wᵢ² σᵢ² + ρ · ΣΣ wᵢ wⱼ σᵢ σⱼ` (the double sum runs over distinct member pairs, `wᵢ` are index weights). Solving for `ρ` gives the index.\n\n**Caveats.** This is an implied, forward-looking measure read from options prices, not correlation that has actually occurred. The gap between implied and realized correlation — the correlation risk premium — is charted separately as VC2.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -754,22 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 14.48
-        },
-        {
-          "date": "2025-07-18",
-          "value": 12.92
-        },
-        {
-          "date": "2025-07-21",
-          "value": 13.53
-        },
-        {
-          "date": "2025-07-22",
-          "value": 12.94
-        },
-        {
-          "date": "2025-07-23",
-          "value": 10.98
         },
         {
           "date": "2025-07-24",
@@ -1762,6 +1746,22 @@
         {
           "date": "2026-07-20",
           "value": 6.81
+        },
+        {
+          "date": "2026-07-21",
+          "value": 4.98
+        },
+        {
+          "date": "2026-07-22",
+          "value": 4.3
+        },
+        {
+          "date": "2026-07-23",
+          "value": 7.36
+        },
+        {
+          "date": "2026-07-24",
+          "value": 7.21
         }
       ],
       "role": "avos",
@@ -2514,22 +2514,6 @@
         {
           "date": "2025-06-30",
           "value": 17.08
-        },
-        {
-          "date": "2025-07-18",
-          "value": 18.74
-        },
-        {
-          "date": "2025-07-21",
-          "value": 18.89
-        },
-        {
-          "date": "2025-07-22",
-          "value": 18.56
-        },
-        {
-          "date": "2025-07-23",
-          "value": 16.44
         },
         {
           "date": "2025-07-24",
@@ -3522,6 +3506,22 @@
         {
           "date": "2026-07-20",
           "value": 9.06
+        },
+        {
+          "date": "2026-07-21",
+          "value": 7.99
+        },
+        {
+          "date": "2026-07-22",
+          "value": 7.54
+        },
+        {
+          "date": "2026-07-23",
+          "value": 9.26
+        },
+        {
+          "date": "2026-07-24",
+          "value": 9.71
         }
       ],
       "role": "context",
@@ -3531,8 +3531,8 @@
   "source": "BBG COR1M/COR3M Index",
   "tile": {
     "delta": null,
-    "percentile": 0.87,
-    "value": 6.81
+    "percentile": 1.07,
+    "value": 7.21
   },
   "tooltip": "Implied correlation — low means single-name moves dominate the index (dispersion regime).",
   "unit": ""

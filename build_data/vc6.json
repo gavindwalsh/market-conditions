@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "VC6",
   "name": "3M IV by sector basket",
-  "notes": "Per-name 3M ATM IV averaged equally within each basket; a basket only renders with at least half its names (min 3). Tile: semis.",
+  "notes": "**What it shows.** Three-month at-the-money implied volatility, averaged across the names in each sector basket (semiconductors, hyperscalers, healthcare, staples). Because every basket is built the same way, the levels are directly comparable — you can read straight off the chart which part of the market options traders expect to be most volatile.\n\n**How it's computed.** For each name we take Bloomberg's 3-month ATM implied vol, then equal-weight average across the basket: `IV_basket = mean(IVᵢ)`. A basket renders on a given day only if at least half its names — and no fewer than three — have data, so a thin feed can't distort the average. The tile ranks the semis basket.\n\n**Caveats.** This is equal-weight single-name implied vol, deliberately not sector-ETF implied vol: an ETF's option vol embeds the correlation across its holdings and prints materially lower, which would not be comparable to a basket of individual names.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -466,18 +466,6 @@
         {
           "date": "2025-06-30",
           "value": 36.77
-        },
-        {
-          "date": "2025-07-18",
-          "value": 36.141
-        },
-        {
-          "date": "2025-07-21",
-          "value": 35.567
-        },
-        {
-          "date": "2025-07-22",
-          "value": 35.733
         },
         {
           "date": "2025-07-23",
@@ -1474,6 +1462,18 @@
         {
           "date": "2026-07-20",
           "value": 66.822
+        },
+        {
+          "date": "2026-07-21",
+          "value": 66.949
+        },
+        {
+          "date": "2026-07-22",
+          "value": 66.901
+        },
+        {
+          "date": "2026-07-23",
+          "value": 65.928
         }
       ],
       "role": "context",
@@ -1938,18 +1938,6 @@
         {
           "date": "2025-06-30",
           "value": 31.034
-        },
-        {
-          "date": "2025-07-18",
-          "value": 30.198
-        },
-        {
-          "date": "2025-07-21",
-          "value": 29.793
-        },
-        {
-          "date": "2025-07-22",
-          "value": 30.474
         },
         {
           "date": "2025-07-23",
@@ -2946,6 +2934,18 @@
         {
           "date": "2026-07-20",
           "value": 44.968
+        },
+        {
+          "date": "2026-07-21",
+          "value": 44.618
+        },
+        {
+          "date": "2026-07-22",
+          "value": 45.296
+        },
+        {
+          "date": "2026-07-23",
+          "value": 45.251
         }
       ],
       "role": "context",
@@ -3410,18 +3410,6 @@
         {
           "date": "2025-06-30",
           "value": 30.441
-        },
-        {
-          "date": "2025-07-18",
-          "value": 31.031
-        },
-        {
-          "date": "2025-07-21",
-          "value": 30.645
-        },
-        {
-          "date": "2025-07-22",
-          "value": 30.944
         },
         {
           "date": "2025-07-23",
@@ -4418,6 +4406,18 @@
         {
           "date": "2026-07-20",
           "value": 30.9
+        },
+        {
+          "date": "2026-07-21",
+          "value": 30.762
+        },
+        {
+          "date": "2026-07-22",
+          "value": 31.089
+        },
+        {
+          "date": "2026-07-23",
+          "value": 31.409
         }
       ],
       "role": "context",
@@ -4882,18 +4882,6 @@
         {
           "date": "2025-06-30",
           "value": 21.587
-        },
-        {
-          "date": "2025-07-18",
-          "value": 20.651
-        },
-        {
-          "date": "2025-07-21",
-          "value": 20.646
-        },
-        {
-          "date": "2025-07-22",
-          "value": 20.407
         },
         {
           "date": "2025-07-23",
@@ -5890,6 +5878,18 @@
         {
           "date": "2026-07-20",
           "value": 24.445
+        },
+        {
+          "date": "2026-07-21",
+          "value": 24.541
+        },
+        {
+          "date": "2026-07-22",
+          "value": 24.359
+        },
+        {
+          "date": "2026-07-23",
+          "value": 24.776
         }
       ],
       "role": "context",
@@ -5899,8 +5899,8 @@
   "source": "BBG per-name 3M ATM IV",
   "tile": {
     "delta": null,
-    "percentile": 99.68,
-    "value": 66.8
+    "percentile": 99.42,
+    "value": 65.9
   },
   "tooltip": "Equal-weight single-name 3M implied vol by sector basket — same construction, comparable levels.",
   "unit": " vol pts"

@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "LV10",
   "name": "L2: Call-wing richness",
-  "notes": "25Δ call IV − ATM IV per name (20-45d expiry), volume-weighted across the ~32-name snapshot universe; % SPX members inverted lands with the member-breadth extension.",
+  "notes": "**What it shows.** How expensive upside calls are relative to at-the-money options. Positive means the call wing is bid up versus ATM — a call-demand, upside-chasing regime; near zero or negative means that demand has faded.\n\n**How it's computed.** For each name we take `25Δ call IV − ATM IV` at 20–45 day expiry — the implied vol of the roughly 0.25-delta call minus the roughly 0.50-delta (ATM) call — then volume-weight across the ~32-name snapshot universe. Names where those deltas can't be matched closely are dropped so a bad strike can't skew the composite.\n\n**Caveats.** Computed on the snapshot universe (hence the badge). The breadth companion — the share of S&P 500 members with an inverted call skew — arrives with a later member-breadth extension.",
   "panel": "leverage",
   "provenance": "massive_snapshot",
   "series": [
@@ -38,6 +38,18 @@
         {
           "date": "2026-07-21",
           "value": 0.64
+        },
+        {
+          "date": "2026-07-22",
+          "value": -1.263
+        },
+        {
+          "date": "2026-07-23",
+          "value": -4.177
+        },
+        {
+          "date": "2026-07-24",
+          "value": -1.868
         }
       ],
       "role": "avos",
@@ -52,7 +64,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 0.64
+    "value": -1.87
   },
   "tooltip": "Positive = upside call wings bid vs ATM (call-demand regime).",
   "unit": " vol pts"

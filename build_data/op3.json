@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "OP3",
   "name": "Household cash % of financial assets",
-  "notes": "(checkable+currency + time/savings + MMF) / total financial assets, households (Z.1 B.101). OP4 weekly nowcast (dashed) pending ICI+H.8.",
+  "notes": "**What it shows.** How much of household financial assets sit in cash-like holdings — a dry-powder and risk-appetite gauge. A rising line means households are holding back; a falling one means cash is being put to work.\n\n**How it's computed.** `(checkable deposits + currency + time & savings deposits + money-market funds) ÷ total household financial assets`, from the Fed's Z.1 Financial Accounts (table B.101), quarterly.\n\n**Caveats.** Quarterly; the weekly nowcast (OP4) that would bridge the reporting lag is pending ICI and Fed H.8 data.",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [

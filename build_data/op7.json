@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "OP7",
   "name": "Leveraged ETF AUM",
-  "notes": "AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — not all US leveraged ETFs; single-stock slice broken out.",
+  "notes": "**What it shows.** Total assets in the leveraged-ETF complex, with the single-stock-leveraged slice broken out — a gauge of how much levered exposure investors are holding, and how fast the single-stock corner is growing.\n\n**How it's computed.** Bloomberg FUND_TOTAL_ASSETS summed across the curated leveraged universe (see ETF flow universe in Shared methodology); the single-stock line is the funds that track individual names rather than QQQ, SPY, or SMH.\n\n**Caveats.** Covers the curated leveraged universe, not every US leveraged ETF.",
   "panel": "flows",
   "provenance": "bloomberg_cache",
   "series": [
@@ -514,18 +514,6 @@
         {
           "date": "2025-06-30",
           "value": 83.645
-        },
-        {
-          "date": "2025-07-18",
-          "value": 86.698
-        },
-        {
-          "date": "2025-07-21",
-          "value": 86.563
-        },
-        {
-          "date": "2025-07-22",
-          "value": 85.29
         },
         {
           "date": "2025-07-23",
@@ -1522,6 +1510,18 @@
         {
           "date": "2026-07-20",
           "value": 94.598
+        },
+        {
+          "date": "2026-07-21",
+          "value": 100.952
+        },
+        {
+          "date": "2026-07-22",
+          "value": 100.435
+        },
+        {
+          "date": "2026-07-23",
+          "value": 95.583
         }
       ],
       "role": "avos",
@@ -1670,18 +1670,6 @@
         {
           "date": "2025-06-30",
           "value": 17.829
-        },
-        {
-          "date": "2025-07-18",
-          "value": 19.325
-        },
-        {
-          "date": "2025-07-21",
-          "value": 19.205
-        },
-        {
-          "date": "2025-07-22",
-          "value": 19.061
         },
         {
           "date": "2025-07-23",
@@ -2678,6 +2666,18 @@
         {
           "date": "2026-07-20",
           "value": 10.676
+        },
+        {
+          "date": "2026-07-21",
+          "value": 11.337
+        },
+        {
+          "date": "2026-07-22",
+          "value": 11.253
+        },
+        {
+          "date": "2026-07-23",
+          "value": 9.832
         }
       ],
       "role": "context",
@@ -2688,7 +2688,7 @@
   "tile": {
     "delta": null,
     "percentile": 98.23,
-    "value": 94.6
+    "value": 95.6
   },
   "tooltip": "Assets in the leveraged-ETF complex; second line = the single-stock slice.",
   "unit": " $B"

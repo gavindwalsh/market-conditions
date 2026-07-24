@@ -3,7 +3,7 @@
   "cadence": "weekly",
   "id": "IS7",
   "name": "Fund registration filings (485APOS + N-1A)",
-  "notes": "Fri-ended weekly counts of 485APOS (new series of existing trusts) + N-1A (new funds); insurance-product registrants (variable annuity / separate account) excluded by company name. Partial current week dropped; category split lands with the BBG fund screen (OP5-7 work).",
+  "notes": "**What it shows.** The fund-launch pipeline — weekly counts of new fund registrations. It is a proxy for how fast asset managers are bringing new products to market, a gauge of product-side risk appetite.\n\n**How it's computed.** Friday-ended weekly counts of 485APOS filings (new series of existing trusts) plus N-1A filings (brand-new funds) from SEC EDGAR, with insurance-product registrants — variable annuity and separate-account filers — excluded by company name. The partial current week is dropped.\n\n**Caveats.** A filing-pipeline proxy, not a count of actual launches by category; that breakdown, along with fund closures, arrives with the Bloomberg fund screen (the OP5–OP7 work).",
   "panel": "issuance",
   "provenance": "edgar_lake",
   "series": [

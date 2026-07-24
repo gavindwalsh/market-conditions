@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "LV14",
   "name": "L4: Broker margin rates",
-  "notes": "Manual-quarterly posted rates, as-of 2026-07-09. Discount tiered vs full-service base rates. SEED VALUES pending verification against broker pages (pull/free.py).",
+  "notes": "**What it shows.** The posted margin interest rates at major retail brokers — the headline price of retail leverage. The tile shows the spread between the cheapest and most expensive broker.\n\n**How it's computed.** Posted rates entered by hand each quarter (no API exists), as of 2026-07-09, each with its own source and date; discount-broker tiered rates are shown against full-service base rates.\n\n**Caveats.** Manual quarterly values, not a live feed. The current figures are seed values pending verification against the brokers' posted pages.",
   "panel": "leverage",
   "provenance": "manual_quarterly",
   "series": [

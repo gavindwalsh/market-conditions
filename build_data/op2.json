@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "OP2",
   "name": "Household equity — nowcast",
-  "notes": "Last DFA print rolled forward with SPX total return; cohort shares frozen until the next DFA print (Q2 2026 lands 2026-09-11). Official series trimmed to ~12 quarters; percentile suppressed on the nowcast.",
+  "notes": "**What it shows.** The OP1 household-equity level brought up to date daily. The official quarterly print is rolled forward with the S&P 500's total return, so you can see roughly where household equity stands today rather than a quarter ago.\n\n**How it's computed.** The last DFA cohort levels are grown by the S&P 500 total return since quarter-end, holding each cohort's share fixed until the next DFA release. The official prints are drawn solid; the rolled-forward segment is dashed.\n\n**Caveats.** A nowcast, not data — cohort shares are frozen between DFA prints (the next, Q2 2026, is expected 2026-09-11). The official line is trimmed to about 12 quarters (OP1 carries the full history), and no percentile is shown on the nowcast segment.",
   "panel": "ownership",
   "provenance": "derived",
   "series": [
@@ -370,17 +370,29 @@
         {
           "date": "2026-07-20",
           "value": 63.081
+        },
+        {
+          "date": "2026-07-21",
+          "value": 63.64
+        },
+        {
+          "date": "2026-07-22",
+          "value": 63.554
+        },
+        {
+          "date": "2026-07-23",
+          "value": 62.787
         }
       ],
       "role": "nowcast",
       "unit": null
     }
   ],
-  "source": "FRED DFA × BBG SPTR (§5.6)",
+  "source": "FRED DFA × BBG SPTR",
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 63.1
+    "value": 62.8
   },
   "tooltip": "Official quarterly household equity rolled forward daily with SPX total return (dashed = nowcast).",
   "unit": " $T"

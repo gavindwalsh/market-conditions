@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "LV7",
   "name": "L1: Box-spread implied yield vs SOFR",
-  "notes": "Median across 5 wide strike pairs, NBBO midpoints. History accumulates from 2026-07-09 (§6 gate applies). Cross-check vs boxtrades.com ±25bp (§7.3). Quotes pulled off-close are wider — prefer near-close runs.",
+  "notes": "**What it shows.** The risk-free borrowing rate implied by S&P 500 options box spreads, versus SOFR — an equity-market read on funding costs, and a clean benchmark for the other financing measures.\n\n**How it's computed.** A box spread (offsetting call and put pairs at two strikes) locks in a fixed payoff, so its price implies a fixed financing rate. We take the median implied rate across five wide strike pairs at NBBO midpoints, minus SOFR, for the 1-month and 3-month tenors (basis points).\n\n**Caveats.** History accumulates one point per tenor per run day. Quotes pulled away from the close are wider, so near-close runs are preferred; the series is cross-checked against boxtrades.com within ±25bp.",
   "panel": "leverage",
   "provenance": "bloomberg_cache",
   "series": [
@@ -33,11 +33,23 @@
         },
         {
           "date": "2026-07-20",
-          "value": 231.851
+          "value": 233.851
         },
         {
           "date": "2026-07-21",
-          "value": 73.514
+          "value": 71.514
+        },
+        {
+          "date": "2026-07-22",
+          "value": 125.643
+        },
+        {
+          "date": "2026-07-23",
+          "value": 298.516
+        },
+        {
+          "date": "2026-07-24",
+          "value": -266.195
         }
       ],
       "role": "context",
@@ -69,22 +81,34 @@
         },
         {
           "date": "2026-07-20",
-          "value": 3.431
+          "value": 5.431
         },
         {
           "date": "2026-07-21",
-          "value": 69.716
+          "value": 67.716
+        },
+        {
+          "date": "2026-07-22",
+          "value": 93.145
+        },
+        {
+          "date": "2026-07-23",
+          "value": 20.609
+        },
+        {
+          "date": "2026-07-24",
+          "value": 6.924
         }
       ],
       "role": "avos",
       "unit": null
     }
   ],
-  "source": "BBG SPX chain (§5.4)",
+  "source": "BBG SPX chain",
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 70.0
+    "value": 7.0
   },
   "tooltip": "Equity-implied borrow rate from SPX box spreads, vs SOFR.",
   "unit": " bp (tile: 3M)"

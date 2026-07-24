@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "OP1",
   "name": "Household equity by wealth cohort",
-  "notes": "Levels in $T per cohort; tile = bottom-50% share of aggregate. DFA lands ~11 weeks after quarter-end; OP2 nowcast (dashed) pending BBG.",
+  "notes": "**What it shows.** How much corporate equity US households own, split into four wealth cohorts — bottom 50%, 50th–90th, 90th–99th, and top 1%. The tile is the bottom-50%'s share of the total, a direct read on how concentrated equity ownership is.\n\n**How it's computed.** Federal Reserve Distributional Financial Accounts (DFA) equity levels, shown in trillions of dollars per cohort; the tile ranks the bottom-50% share of aggregate household equity against its own history.\n\n**Caveats.** The DFA is released about 11 weeks after quarter-end; OP2 is the daily nowcast that bridges that lag.",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [

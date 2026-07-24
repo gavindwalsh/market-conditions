@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "RF1",
   "name": "Retail net flow — daily (est. total)",
-  "notes": "Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Dollar values scaled ×3 from the identified floor to estimated total retail; factor provisional until RF9 fits it empirically.",
+  "notes": "**What it shows.** Estimated net dollar flow from retail traders each day — buys minus sells — scaled to a whole-market figure. Positive bars are net buying, negative bars net selling; together they track the daily push and pull of the retail crowd.\n\n**How it's computed.** Every retail trade is identified and signed by the quote-midpoint classifier described in \"Retail identification and scaling\" above — off-exchange sub-penny prints, signed buy or sell against the NBBO midpoint. Each day's net identified dollars are summed and multiplied by the ×3 scale factor to estimate the market-wide total: `RF1 = 3.0 × Σ(signed identified retail $)`, plotted in billions of dollars per day.\n\n**Caveats.** The ×3 factor is provisional, so the series carries an *uncalibrated* badge until it is fit against Nasdaq's Retail Activity Tracker and clears the calibration gate (see the shared section). Trades executing exactly at the midpoint are excluded because their direction is ambiguous, so this is a net-direction estimate, not a gross-volume one — for gross retail dollar volume see RF10.",
   "panel": "retail",
   "provenance": "massive_tape",
   "series": [
@@ -551,6 +551,18 @@
         {
           "date": "2026-07-20",
           "value": 22.985
+        },
+        {
+          "date": "2026-07-21",
+          "value": 2.021
+        },
+        {
+          "date": "2026-07-22",
+          "value": -0.209
+        },
+        {
+          "date": "2026-07-23",
+          "value": 18.867
         }
       ],
       "role": "avos",
@@ -565,7 +577,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 22.98
+    "value": 18.87
   },
   "tooltip": "Estimated total retail net buying per day — classifier floor ×3 until the RF9 calibration lands.",
   "unit": " $B/day"

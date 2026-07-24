@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "weekly",
   "id": "RF2",
   "name": "Retail participation — weekly (est. total)",
-  "notes": "Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Splice: FINRA T1+T2 non-ATS weekly volume (OTCE excluded) rescaled onto our definition by k = mean(ours/FINRA) over overlap weeks — FINRA per-firm rows count both sides of trades, ~2x retail. T1-only weeks in FINRA's publication lag are rescaled separately; our ×3 classifier estimate covers weeks FINRA has not published.",
+  "notes": "**What it shows.** Retail's share of total tape volume each week, scaled to a market-wide estimate. A rising line means retail is accounting for a larger slice of everything that trades.\n\n**How it's computed.** Our weekly reading is identified retail dollars ÷ total tape dollars, ×3-scaled to an estimated total, averaged over the week (weeks with fewer than three trading days are dropped). The official trend anchor, though, is FINRA's own data: weekly non-ATS (T1+T2) share volume divided by our tape volume, rescaled onto our definition per the FINRA participation anchor described in Shared methodology. Because FINRA T1 tiers publish about two weeks ahead of T2, a T1-only segment is rescaled separately to bridge that gap, and our own ×3 classifier estimate fills the most recent weeks FINRA has not yet published. The chart shows the three segments in sequence: FINRA-anchored (solid), the T1-only bridge, then our estimate.\n\n**Caveats.** The classifier captures only about a third of retail, so the level depends on the provisional ×3 factor and the series carries an *uncalibrated* badge until that factor clears the RTAT calibration gate (see Shared methodology). The tile reads the last complete week, excluding the in-progress one.",
   "panel": "retail",
   "provenance": "finra+massive",
   "series": [
@@ -589,6 +589,10 @@
         {
           "date": "2026-07-17",
           "value": 20.112
+        },
+        {
+          "date": "2026-07-24",
+          "value": 21.542
         }
       ],
       "role": "nowcast",

@@ -1,17 +1,17 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "extremes": {
-    "AAPL": 0.8,
-    "IWM": -2.1,
-    "NVDA": 1.1,
-    "QQQ": 1.2,
-    "SPCX": -0.1,
-    "SPY": -0.4
+    "AAPL": 1.6,
+    "IWM": -3.6,
+    "META": 0.7,
+    "NVDA": 1.7,
+    "QQQ": -8.5,
+    "SPY": -9.5
   },
   "id": "LV5",
   "name": "Dealer GEX (OI-convention)",
-  "notes": "OI-convention estimator (dealers +γ calls / −γ puts, §5.3 revised). Universe = retail top-25 + majors + semis (~32 names).",
+  "notes": "**What it shows.** An estimate of dealer gamma exposure — how much dealers must buy or sell to stay delta-hedged as the market moves. Large negative readings imply dealers amplify moves (selling into falls); positive readings imply they dampen them. The direction of change matters more than the absolute level.\n\n**How it's computed.** For each option, `GEX = sign · γ · OI · 100 · S² · 0.01`, where `γ` is gamma, `OI` open interest, `S` the underlying price, `100` the contract multiplier, and `sign` is +1 for calls and −1 for puts (the open-interest convention, taking dealers long calls and short puts). These are summed across the universe and expressed in billions of dollars per 1% move. The universe is roughly 32 names — the retail top-25 plus index majors and semiconductors.\n\n**Caveats.** This is the open-interest estimator, inferring dealer positioning from OI rather than signed order flow — hence the *OI-convention* badge. Read the trend, not the level.",
   "panel": "leverage",
   "provenance": "massive_snapshot",
   "series": [
@@ -46,6 +46,18 @@
         {
           "date": "2026-07-21",
           "value": 3.298
+        },
+        {
+          "date": "2026-07-22",
+          "value": -9.642
+        },
+        {
+          "date": "2026-07-23",
+          "value": -31.516
+        },
+        {
+          "date": "2026-07-24",
+          "value": -18.978
         }
       ],
       "role": "avos",
@@ -60,7 +72,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 3.3
+    "value": -19.0
   },
   "tooltip": "Dealer gamma exposure estimate — changes are the signal, not levels.",
   "unit": " $B/1%"

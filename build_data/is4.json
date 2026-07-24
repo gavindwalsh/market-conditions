@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "IS4",
   "name": "Aftermarket appetite (IPO ETF vs SPY)",
-  "notes": "Daily close of Renaissance IPO ETF (IPO) ÷ SPY close, indexed to 100 on 2024-01-02.",
+  "notes": "**What it shows.** Whether investors are rewarding recent IPOs — the Renaissance IPO ETF measured against SPY. A rising line means the recent-issue basket is outperforming the broad market, a sign of healthy aftermarket appetite for new deals; a falling one means new issues are out of favor.\n\n**How it's computed.** The daily close of the Renaissance IPO ETF (ticker IPO) ÷ the SPY close, indexed to 100 on 2024-01-02. The anchor date is fixed so the level's meaning doesn't drift as the data window moves.\n\n**Caveats.** A rebased relative-strength ratio — read moves against the anchor date, not the absolute number.",
   "panel": "issuance",
   "provenance": "massive_cache",
   "series": [
@@ -466,18 +466,6 @@
         {
           "date": "2025-06-30",
           "value": 94.969
-        },
-        {
-          "date": "2025-07-18",
-          "value": 94.131
-        },
-        {
-          "date": "2025-07-21",
-          "value": 95.562
-        },
-        {
-          "date": "2025-07-22",
-          "value": 95.32
         },
         {
           "date": "2025-07-23",
@@ -1474,6 +1462,18 @@
         {
           "date": "2026-07-20",
           "value": 93.068
+        },
+        {
+          "date": "2026-07-21",
+          "value": 94.852
+        },
+        {
+          "date": "2026-07-22",
+          "value": 93.687
+        },
+        {
+          "date": "2026-07-23",
+          "value": 93.833
         }
       ],
       "role": "avos",
@@ -1483,8 +1483,8 @@
   "source": "Massive grouped bars",
   "tile": {
     "delta": null,
-    "percentile": 13.12,
-    "value": 93.1
+    "percentile": 14.84,
+    "value": 93.8
   },
   "tooltip": "Recent-IPO basket vs SPY — rising = aftermarket appetite for new issues.",
   "unit": " (rebased)"

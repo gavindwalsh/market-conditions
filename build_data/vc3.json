@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "VC3",
   "name": "Vol term structure (VIX/VIX3M)",
-  "notes": "Daily close ratio of VIX to VIX3M. Per-name term-structure slopes for top names are a noted extension.",
+  "notes": "**What it shows.** The slope of the S&P 500's implied-volatility term structure — near-term expected vol (VIX, 30-day) divided by 3-month expected vol (VIX3M). Above 1 the curve is inverted: near-term fear exceeds the medium term, the classic stress signature. Below 1 the curve is in contango (upward-sloping), the calm-market norm that makes selling short-dated vol profitable to carry.\n\n**How it's computed.** The daily ratio `VIX ÷ VIX3M` of closing index levels. The tile ranks the ratio against its trailing history.\n\n**Caveats.** A ratio of two Cboe indices measuring 30-day and 3-month expected S&P 500 volatility. Per-name term-structure slopes for the largest single names are a possible future extension.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -754,22 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 0.861
-        },
-        {
-          "date": "2025-07-18",
-          "value": 0.838
-        },
-        {
-          "date": "2025-07-21",
-          "value": 0.853
-        },
-        {
-          "date": "2025-07-22",
-          "value": 0.845
-        },
-        {
-          "date": "2025-07-23",
-          "value": 0.828
         },
         {
           "date": "2025-07-24",
@@ -1762,6 +1746,22 @@
         {
           "date": "2026-07-20",
           "value": 0.914
+        },
+        {
+          "date": "2026-07-21",
+          "value": 0.87
+        },
+        {
+          "date": "2026-07-22",
+          "value": 0.852
+        },
+        {
+          "date": "2026-07-23",
+          "value": 0.908
+        },
+        {
+          "date": "2026-07-24",
+          "value": 0.893
         }
       ],
       "role": "avos",
@@ -1771,8 +1771,8 @@
   "source": "BBG VIX/VIX3M Index",
   "tile": {
     "delta": null,
-    "percentile": 66.33,
-    "value": 0.914
+    "percentile": 55.01,
+    "value": 0.893
   },
   "tooltip": "VIX/VIX3M above 1 = stress inversion; low = carry-friendly contango.",
   "unit": "×"

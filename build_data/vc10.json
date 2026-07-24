@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "VC10",
   "name": "NDX 10% OTM call/put IV",
-  "notes": "90%/110% moneyness 30d IV; realized leg uses log returns over 360 trading days, sqrt(260) annualized. Tile: put wing.",
+  "notes": "**What it shows.** The implied volatility of 10%-out-of-the-money puts (90% moneyness) and calls (110% moneyness) on NDX, with realized vol for reference. The put wing sits above the call wing in normal markets — the standing cost of downside protection. The distance between the two wings is the skew, and it widens as hedging demand rises.\n\n**How it's computed.** Both wings are 30-day implied vols read at fixed moneyness — strikes set at 90% and 110% of spot. The realized leg is 360-day realized volatility built per the realized-volatility conventions above (daily log returns of index closes, rolling 360-trading-day window, annualized by √260 to tie to Bloomberg's VOLATILITY_360D field). The tile ranks the put wing.\n\n**Caveats.** These are moneyness-based wings, not delta-based: the strikes are fixed percentages of spot rather than a fixed option delta, so they do not re-strike as volatility changes. As with the VIX/VXN charts, the 30-day wings are compared against a 360-day realized window, so part of any level gap is the tenor difference.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -754,18 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 25.6
-        },
-        {
-          "date": "2025-07-18",
-          "value": 25.057
-        },
-        {
-          "date": "2025-07-21",
-          "value": 24.399
-        },
-        {
-          "date": "2025-07-22",
-          "value": 24.798
         },
         {
           "date": "2025-07-23",
@@ -1762,6 +1750,18 @@
         {
           "date": "2026-07-20",
           "value": 32.382
+        },
+        {
+          "date": "2026-07-21",
+          "value": 30.765
+        },
+        {
+          "date": "2026-07-22",
+          "value": 31.447
+        },
+        {
+          "date": "2026-07-23",
+          "value": 32.677
         }
       ],
       "role": "avos",
@@ -2514,18 +2514,6 @@
         {
           "date": "2025-06-30",
           "value": 15.49
-        },
-        {
-          "date": "2025-07-18",
-          "value": 14.807
-        },
-        {
-          "date": "2025-07-21",
-          "value": 14.45
-        },
-        {
-          "date": "2025-07-22",
-          "value": 14.608
         },
         {
           "date": "2025-07-23",
@@ -3522,6 +3510,18 @@
         {
           "date": "2026-07-20",
           "value": 18.878
+        },
+        {
+          "date": "2026-07-21",
+          "value": 17.849
+        },
+        {
+          "date": "2026-07-22",
+          "value": 17.985
+        },
+        {
+          "date": "2026-07-23",
+          "value": 18.656
         }
       ],
       "role": "context",
@@ -4206,22 +4206,6 @@
         {
           "date": "2025-06-30",
           "value": 23.262
-        },
-        {
-          "date": "2025-07-18",
-          "value": 23.148
-        },
-        {
-          "date": "2025-07-21",
-          "value": 23.138
-        },
-        {
-          "date": "2025-07-22",
-          "value": 23.139
-        },
-        {
-          "date": "2025-07-23",
-          "value": 23.097
         },
         {
           "date": "2025-07-24",
@@ -5214,6 +5198,22 @@
         {
           "date": "2026-07-20",
           "value": 23.241
+        },
+        {
+          "date": "2026-07-21",
+          "value": 23.291
+        },
+        {
+          "date": "2026-07-22",
+          "value": 23.297
+        },
+        {
+          "date": "2026-07-23",
+          "value": 23.329
+        },
+        {
+          "date": "2026-07-24",
+          "value": 23.331
         }
       ],
       "role": "benchmark",
@@ -5223,8 +5223,8 @@
   "source": "BBG moneyness IV + index closes",
   "tile": {
     "delta": null,
-    "percentile": 83.14,
-    "value": 32.38
+    "percentile": 84.23,
+    "value": 32.68
   },
   "tooltip": "Downside and upside 10% OTM wing vol vs realized — the gap between wings is the skew.",
   "unit": "vol pts"

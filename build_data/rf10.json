@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "weekly",
   "id": "RF10",
   "name": "Retail dollar volume — weekly (est. total)",
-  "notes": "Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Gross dollar volume, not net direction — FINRA weekly OTC has no buy/sell split, so RF1 remains the net view. History = FINRA T1+T2 non-ATS share volume × weekly tape $/share, rescaled onto our estimated-total definition by k = mean(ours/FINRA) over overlap weeks (FINRA per-firm rows count both sides, ~2×); recent weeks in FINRA's publication lag are the ×3 classifier estimate.",
+  "notes": "**What it shows.** Estimated total dollars retail traded each week — gross activity, buys and sells added together, not a net direction. For the net buy-minus-sell view see RF1.\n\n**How it's computed.** Our recent weeks are the identified retail dollars ×3-scaled to an estimated total and summed by week (weeks with fewer than three trading days dropped). The history is anchored to FINRA: FINRA T1+T2 non-ATS share volume is turned into dollars using that week's volume-weighted tape price (`$/share`), then rescaled onto our estimated-total definition per the FINRA participation anchor in Shared methodology. The most recent weeks — inside FINRA's roughly four-week publication lag — use the ×3 classifier estimate. The two segments are spliced into one series.\n\n**Caveats.** This is gross volume, not net flow — FINRA's weekly OTC data carries no buy/sell split, which is why RF1 remains the only net view. The ×3 factor is provisional, so the series carries an *uncalibrated* badge until it clears the RTAT calibration gate (see Shared methodology).",
   "panel": "retail",
   "provenance": "finra+massive",
   "series": [
@@ -580,6 +580,10 @@
         {
           "date": "2026-07-17",
           "value": 1041.437
+        },
+        {
+          "date": "2026-07-24",
+          "value": 1007.991
         }
       ],
       "role": "nowcast",
@@ -593,7 +597,7 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 44.64,
+    "percentile": 45.04,
     "value": 1041.4
   },
   "tooltip": "Estimated total retail dollars traded per week — gross activity, not net (see RF1 for net). FINRA-anchored history spliced with the recent Massive tape.",

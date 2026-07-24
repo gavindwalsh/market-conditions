@@ -3,7 +3,7 @@
   "cadence": "weekly",
   "id": "OP6",
   "name": "ETF flows by category",
-  "notes": "Curated 53-fund universe (top of complex, §A3 coverage label) — not all US ETFs. Flows = Δshares × NAV. Weekly sums per category; in-progress week dropped.",
+  "notes": "**What it shows.** Weekly net ETF flows stacked by category (equity, leveraged, and so on) — creations up, redemptions down. It shows where money is rotating across the fund complex.\n\n**How it's computed.** The same shares-outstanding flows (see ETF flow universe in Shared methodology) summed per category per Friday-ended week, with about three years shown. The tile is the latest complete leveraged-category week.\n\n**Caveats.** Covers the curated 53-fund universe, not every US ETF; the in-progress week is dropped.",
   "panel": "flows",
   "provenance": "bloomberg_cache",
   "series": [

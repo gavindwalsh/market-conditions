@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "IS10",
   "name": "IPO issuance pace — cumulative deal count (YTD vs prior years)",
-  "notes": "Companion count view to IS9; same Ritter-comparable universe. Comparison years run the full calendar; the current year stops at today.",
+  "notes": "**What it shows.** The same issuance-pace comparison as IS9, but counting deals rather than dollars — cumulative operating-company IPO count by day of the year, this year against prior years. Reading it next to IS9 separates a few mega-deals from a genuinely broad issuance wave.\n\n**How it's computed.** The companion count view to IS9, built on the same Ritter-comparable universe; comparison years run the full calendar and the current year stops at today.\n\n**Caveats.** Same universe and the same Ritter-anchoring caveats as IS9.",
   "panel": "issuance",
   "provenance": "ipo_pace",
   "series": [

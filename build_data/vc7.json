@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "VC7",
   "name": "SPX implied (VIX) vs realized vol",
-  "notes": "VIX implied-vol index vs realized vol from log returns over 360 trading days, sqrt(260) annualized. Tile: VIX.",
+  "notes": "**What it shows.** SPX's 30-day implied volatility (VIX) against the volatility SPX has actually realized. Implied sitting above realized is the normal state — the variance risk premium that sellers of options earn; the gap narrowing, or the two lines crossing, marks stress.\n\n**How it's computed.** The implied leg is the VIX index — 30-day, skew-inclusive expected volatility. The realized leg is 360-day realized volatility built per the realized-volatility conventions above: daily log returns of index closes, a rolling 360-trading-day window, annualized by √260 to tie to Bloomberg's VOLATILITY_360D field. The tile ranks VIX against its trailing history.\n\n**Caveats.** The implied tenor (30 days) is far shorter than the realized window (360 days), so part of the level gap reflects that tenor mismatch rather than the risk premium alone — read the direction and size of changes in the gap, not the raw level.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -754,18 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 16.73
-        },
-        {
-          "date": "2025-07-21",
-          "value": 16.65
-        },
-        {
-          "date": "2025-07-22",
-          "value": 16.5
-        },
-        {
-          "date": "2025-07-23",
-          "value": 15.37
         },
         {
           "date": "2025-07-24",
@@ -1789,7 +1777,19 @@
         },
         {
           "date": "2026-07-21",
-          "value": 17.78
+          "value": 17.05
+        },
+        {
+          "date": "2026-07-22",
+          "value": 16.64
+        },
+        {
+          "date": "2026-07-23",
+          "value": 18.7
+        },
+        {
+          "date": "2026-07-24",
+          "value": 18.11
         }
       ],
       "role": "avos",
@@ -2474,22 +2474,6 @@
         {
           "date": "2025-06-30",
           "value": 17.817
-        },
-        {
-          "date": "2025-07-18",
-          "value": 17.731
-        },
-        {
-          "date": "2025-07-21",
-          "value": 17.726
-        },
-        {
-          "date": "2025-07-22",
-          "value": 17.726
-        },
-        {
-          "date": "2025-07-23",
-          "value": 17.694
         },
         {
           "date": "2025-07-24",
@@ -3482,6 +3466,22 @@
         {
           "date": "2026-07-20",
           "value": 17.596
+        },
+        {
+          "date": "2026-07-21",
+          "value": 17.61
+        },
+        {
+          "date": "2026-07-22",
+          "value": 17.609
+        },
+        {
+          "date": "2026-07-23",
+          "value": 17.622
+        },
+        {
+          "date": "2026-07-24",
+          "value": 17.623
         }
       ],
       "role": "benchmark",
@@ -3491,8 +3491,8 @@
   "source": "BBG VIX + index closes",
   "tile": {
     "delta": null,
-    "percentile": 57.86,
-    "value": 17.78
+    "percentile": 60.28,
+    "value": 18.11
   },
   "tooltip": "VIX (30-day implied vol, skew-inclusive) vs 360-day realized (Bloomberg convention).",
   "unit": "vol pts"

@@ -3,7 +3,7 @@
   "cadence": "quarterly",
   "id": "MH5",
   "name": "Household credit — balances by product",
-  "notes": "Quarterly HHDC balances by product, stacked. G.19 monthly and H.8 weekly nowcast legs land later (§4 MH5).",
+  "notes": "**What it shows.** Total household debt broken into products — mortgage, auto, credit card, student, HELOC, other — as a stacked bar, so the height is aggregate household debt and the segments show its composition over time.\n\n**How it's computed.** New York Fed Household Debt & Credit balances, quarterly, stacked largest-first (mortgage at the base) in trillions of dollars. The tile is the total across products.\n\n**Caveats.** Quarterly; monthly (Fed G.19) and weekly (Fed H.8) nowcast legs are slated to extend this row later.",
   "panel": "credit",
   "provenance": "nyfed_cache",
   "series": [

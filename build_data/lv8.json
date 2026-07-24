@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-17",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "LV8",
   "name": "L1: ES roll implied financing",
-  "notes": "Implied rate = ln(ES2/ES1)/0.25y + trailing SPX dividend yield (SPTR−SPX drift), minus SOFR. Days within ±2bd of quarterly expiry dropped (generic-contract roll artifacts) plus a ±150bp-vs-rolling-median backstop.",
+  "notes": "**What it shows.** The implied cost of index leverage read from the S&P 500 (ES) futures roll, quoted as a spread over SOFR. A rich (positive) spread means leverage demand is paying up to be long the index via futures.\n\n**How it's computed.** The calendar between the front and second ES contracts implies a financing rate, `ln(ES2/ES1)/Δt` with `Δt ≈ 0.25y` (91/365). Because holding futures forgoes dividends, we add back the trailing S&P 500 dividend yield — estimated from the one-year SPTR-minus-SPX return drift — and subtract SOFR, leaving a spread in basis points.\n\n**Caveats.** On generic-contract roll days the front/second ratio explodes (verified swings of several hundred bp around quarterly expiry), so days within ±2 business days of the March/June/September/December third Friday are dropped, backed by a ±150bp-versus-60-day-median filter.",
   "panel": "leverage",
   "provenance": "derived",
   "series": [
@@ -358,22 +358,6 @@
         {
           "date": "2025-06-30",
           "value": 38.0
-        },
-        {
-          "date": "2025-07-17",
-          "value": 60.893
-        },
-        {
-          "date": "2025-07-18",
-          "value": 63.362
-        },
-        {
-          "date": "2025-07-21",
-          "value": 68.855
-        },
-        {
-          "date": "2025-07-22",
-          "value": 70.241
         },
         {
           "date": "2025-07-23",
@@ -1282,6 +1266,22 @@
         {
           "date": "2026-07-17",
           "value": 139.797
+        },
+        {
+          "date": "2026-07-20",
+          "value": 143.016
+        },
+        {
+          "date": "2026-07-21",
+          "value": 140.667
+        },
+        {
+          "date": "2026-07-22",
+          "value": 140.713
+        },
+        {
+          "date": "2026-07-23",
+          "value": 134.799
         }
       ],
       "role": "avos",
@@ -1291,8 +1291,8 @@
   "source": "BBG ES1/ES2 + FRED SOFR",
   "tile": {
     "delta": null,
-    "percentile": 91.36,
-    "value": 140.0
+    "percentile": 89.12,
+    "value": 135.0
   },
   "tooltip": "Implied cost of index leverage from the ES futures roll, vs SOFR — rich = leverage demand paying up.",
   "unit": " bp vs SOFR"

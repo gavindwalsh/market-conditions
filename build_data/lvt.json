@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "LVT",
   "name": "Leverage levels — snapshot",
-  "notes": "Aggregates the latest LV5/LV7/LV10/LV14 values; those metrics keep accumulating their own series behind the scenes.",
+  "notes": "**What it shows.** A point-in-time table of the leverage measures that don't yet have enough history to chart — dealer GEX (LV5), box-spread yields (LV7), call-wing richness (LV10), and broker margin rates (LV14). Each returns as its own chart once its history accrues.\n\n**How it's computed.** Reads the latest value of each of those metrics from the current run and lays them out with their as-of dates and flags.\n\n**Caveats.** History-accruing badge: this is a snapshot, not a time series — see the individual metrics above for their construction.",
   "panel": "leverage",
   "provenance": "derived",
   "series": [],
@@ -22,26 +22,26 @@
     "rows": [
       [
         "Dealer GEX, aggregate (LV5)",
-        "+3.3 $B/1%",
-        "2026-07-21",
-        "AAPL +0.8, IWM -2.1, NVDA +1.1, QQQ +1.2"
+        "-19.0 $B/1%",
+        "2026-07-24",
+        "AAPL +1.6, IWM -3.6, META +0.7, NVDA +1.7"
       ],
       [
         "Box − SOFR, 1M (LV7)",
-        "+74 bp",
-        "2026-07-21",
+        "-266 bp",
+        "2026-07-24",
         "near-close quotes preferred"
       ],
       [
         "Box − SOFR, 3M (LV7)",
-        "+70 bp",
-        "2026-07-21",
+        "+7 bp",
+        "2026-07-24",
         "near-close quotes preferred"
       ],
       [
         "Call-wing richness (LV10)",
-        "+0.64 vol pts",
-        "2026-07-21",
+        "-1.87 vol pts",
+        "2026-07-24",
         "+ = upside chased"
       ],
       [

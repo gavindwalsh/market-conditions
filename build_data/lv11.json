@@ -1,9 +1,9 @@
 {
-  "asof": "2026-06-17",
+  "asof": "2026-06-24",
   "cadence": "daily",
   "id": "LV11",
   "name": "Variance risk premium",
-  "notes": "Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 sessions.",
+  "notes": "**What it shows.** What a month of implied volatility turned out to cost versus what actually came to pass — one-month implied vol (VIX for the S&P 500, VXN for the Nasdaq-100) minus the volatility realized over the month that followed. Positive means option buyers overpaid and sellers earned the premium; negative means realized vol overshot what was priced. Because it looks forward to realized outcomes, the series necessarily ends about a month ago.\n\n**How it's computed.** For each index, `VRP = IV_1M − RV_next21`, where `IV_1M` is the implied-vol index and `RV_next21` is realized volatility over the subsequent 21 trading sessions — daily returns, a rolling 21-day standard deviation, annualized by √252, then shifted back so each day is paired with the volatility that came after it. The tile ranks the S&P 500 series.\n\n**Caveats.** The forward-looking realized leg cannot be computed for the most recent ~21 sessions, so by construction the line stops about one month short of today.",
   "panel": "volatility",
   "provenance": "derived",
   "series": [
@@ -750,22 +750,6 @@
         {
           "date": "2025-05-30",
           "value": 8.82
-        },
-        {
-          "date": "2025-06-17",
-          "value": 13.82
-        },
-        {
-          "date": "2025-06-18",
-          "value": 12.414
-        },
-        {
-          "date": "2025-06-20",
-          "value": 13.05
-        },
-        {
-          "date": "2025-06-23",
-          "value": 12.444
         },
         {
           "date": "2025-06-24",
@@ -1758,6 +1742,22 @@
         {
           "date": "2026-06-17",
           "value": 7.608
+        },
+        {
+          "date": "2026-06-18",
+          "value": 5.796
+        },
+        {
+          "date": "2026-06-22",
+          "value": 6.75
+        },
+        {
+          "date": "2026-06-23",
+          "value": 9.333
+        },
+        {
+          "date": "2026-06-24",
+          "value": 8.461
         }
       ],
       "role": "avos",
@@ -2506,22 +2506,6 @@
         {
           "date": "2025-05-30",
           "value": 8.183
-        },
-        {
-          "date": "2025-06-17",
-          "value": 13.504
-        },
-        {
-          "date": "2025-06-18",
-          "value": 12.366
-        },
-        {
-          "date": "2025-06-20",
-          "value": 12.384
-        },
-        {
-          "date": "2025-06-23",
-          "value": 11.678
         },
         {
           "date": "2025-06-24",
@@ -3305,7 +3289,7 @@
         },
         {
           "date": "2026-04-02",
-          "value": 11.693
+          "value": 11.694
         },
         {
           "date": "2026-04-06",
@@ -3341,7 +3325,7 @@
         },
         {
           "date": "2026-04-16",
-          "value": 4.885
+          "value": 4.886
         },
         {
           "date": "2026-04-17",
@@ -3514,6 +3498,22 @@
         {
           "date": "2026-06-17",
           "value": 3.836
+        },
+        {
+          "date": "2026-06-18",
+          "value": 2.264
+        },
+        {
+          "date": "2026-06-22",
+          "value": 3.594
+        },
+        {
+          "date": "2026-06-23",
+          "value": 10.16
+        },
+        {
+          "date": "2026-06-24",
+          "value": 7.978
         }
       ],
       "role": "context",
@@ -3523,8 +3523,8 @@
   "source": "BBG VIX/VXN vs realized",
   "tile": {
     "delta": null,
-    "percentile": 78.51,
-    "value": 7.61
+    "percentile": 83.77,
+    "value": 8.46
   },
   "tooltip": "Implied vol minus what was subsequently realized — the toll option buyers paid; ends ~1 month ago by construction.",
   "unit": " vol pts"

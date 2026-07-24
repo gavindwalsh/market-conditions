@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-15",
+  "asof": "2026-07-22",
   "cadence": "weekly",
   "id": "MH8",
   "name": "Sentiment (NAAIM exposure)",
-  "notes": "NAAIM weekly manager-exposure survey. AAII bull−bear leg blocked (survey file now members-only) — see blockers list.",
+  "notes": "**What it shows.** How much equity exposure active managers are actually running — the NAAIM survey. A reading of 0 is flat, 100 is fully invested, and values above 100 (up to ±200) mean leverage or net-short. A crowded-long reading can flag complacency; a washed-out one, capitulation.\n\n**How it's computed.** The weekly NAAIM Exposure Index — the mean equity exposure reported by member managers.\n\n**Caveats.** NAAIM only for now — the AAII bull-minus-bear sentiment leg is blocked because that survey file is now members-only.",
   "panel": "internals",
   "provenance": "scrape_cache",
   "series": [
@@ -924,10 +924,6 @@
           "value": 81.41
         },
         {
-          "date": "2025-07-09",
-          "value": 86.28
-        },
-        {
           "date": "2025-07-16",
           "value": 83.69
         },
@@ -1138,6 +1134,10 @@
         {
           "date": "2026-07-15",
           "value": 95.64
+        },
+        {
+          "date": "2026-07-22",
+          "value": 84.02
         }
       ],
       "role": "avos",
@@ -1147,8 +1147,8 @@
   "source": "NAAIM",
   "tile": {
     "delta": null,
-    "percentile": 91.45,
-    "value": 95.6
+    "percentile": 71.99,
+    "value": 84.0
   },
   "tooltip": "Active-manager equity exposure: 0 flat, 100 fully long, ±200 levered.",
   "unit": ""

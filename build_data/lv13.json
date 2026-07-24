@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "weekly estimate",
   "id": "LV13",
   "name": "L3: Leveraged-ETF financing residual",
-  "notes": "fin = −[nav_ret − (L×TR − fee/252)]×252/(L−1), 60d mean, median over TQQQ/QLD/UPRO/SSO, minus same-day SOFR. Underlying leg = TOTAL return (SPTR/XNDX), so index dividends don't leak in as negative financing (§5.8, total-return fix 2026-07-10). Level is a noisy estimate (the residual amplifies tracking error) — read the trend. Flat 0.9% fee.",
+  "notes": "**What it shows.** The financing spread buried inside leveraged-ETF returns — the cost these funds effectively pay on their embedded swaps, versus SOFR. It is the recurring toll of levered index exposure.\n\n**How it's computed.** The return model is `nav_ret = L·r_tr − fee/252 − (L−1)·fin/252`, so embedded financing backs out as `fin = −[nav_ret − (L·r_tr − fee/252)]·252/(L−1)`. Crucially `r_tr` is the underlying's TOTAL return (SPTR / XNDX), not price return: the funds' swaps earn the index total return, so using price-only return would leave the dividend yield in the residual and read as spurious negative financing. We take a 60-day mean, the median across TQQQ/QLD/UPRO/SSO, minus same-day SOFR, in basis points, with a flat 0.9% fee assumed.\n\n**Caveats.** New-methodology badge. The residual amplifies tiny NAV-versus-index tracking errors into large financing swings, so the level is noisy — read the trend, not the point. Long 2×/3× S&P and Nasdaq funds only (inverse funds' estimator has the opposite sign).",
   "panel": "leverage",
   "provenance": "derived",
   "series": [
@@ -358,18 +358,6 @@
         {
           "date": "2025-06-30",
           "value": 182.072
-        },
-        {
-          "date": "2025-07-18",
-          "value": 180.187
-        },
-        {
-          "date": "2025-07-21",
-          "value": 181.341
-        },
-        {
-          "date": "2025-07-22",
-          "value": 181.376
         },
         {
           "date": "2025-07-23",
@@ -1365,7 +1353,19 @@
         },
         {
           "date": "2026-07-20",
-          "value": 187.326
+          "value": 189.326
+        },
+        {
+          "date": "2026-07-21",
+          "value": 190.053
+        },
+        {
+          "date": "2026-07-22",
+          "value": 173.594
+        },
+        {
+          "date": "2026-07-23",
+          "value": 173.502
         }
       ],
       "role": "avos",
@@ -1379,8 +1379,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 88.8,
-    "value": 187.0
+    "percentile": 82.64,
+    "value": 174.0
   },
   "tooltip": "Financing spread embedded in leveraged-ETF NAV drag, vs SOFR — the cost levered funds actually pay.",
   "unit": " bp vs SOFR"

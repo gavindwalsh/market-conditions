@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-17",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "MH2",
   "name": "Corporate credit (IG/HY OAS)",
-  "notes": "ICE BofA US Corporate (IG) and High Yield OAS. BBG LUACOAS/LF98OAS become primary when the Terminal pull lands (±10bp cross-check, §7.3).",
+  "notes": "**What it shows.** Corporate credit spreads — the extra yield investors demand over Treasuries to hold investment-grade and high-yield bonds — plus the gap between them. Wider spreads mean the market is pricing more credit risk, a classic stress signal that often leads equity weakness.\n\n**How it's computed.** ICE BofA US Corporate (IG) and US High Yield option-adjusted spreads (OAS), in basis points, with the HY−IG difference drawn as a third line. The tile ranks HY OAS against its history.\n\n**Caveats.** FRED's ICE BofA series is the current source; the Bloomberg LUACOAS / LF98OAS indices become primary once the Terminal pull lands, at which point a ±10bp cross-check between the two activates.",
   "panel": "credit",
   "provenance": "fred_cache",
   "series": [
@@ -106,22 +106,6 @@
         {
           "date": "2025-06-30",
           "value": 296.0
-        },
-        {
-          "date": "2025-07-17",
-          "value": 291.0
-        },
-        {
-          "date": "2025-07-18",
-          "value": 293.0
-        },
-        {
-          "date": "2025-07-21",
-          "value": 289.0
-        },
-        {
-          "date": "2025-07-22",
-          "value": 290.0
         },
         {
           "date": "2025-07-23",
@@ -1166,6 +1150,22 @@
         {
           "date": "2026-07-17",
           "value": 273.0
+        },
+        {
+          "date": "2026-07-20",
+          "value": 269.0
+        },
+        {
+          "date": "2026-07-21",
+          "value": 269.0
+        },
+        {
+          "date": "2026-07-22",
+          "value": 268.0
+        },
+        {
+          "date": "2026-07-23",
+          "value": 277.0
         }
       ],
       "role": "avos",
@@ -1270,22 +1270,6 @@
         {
           "date": "2025-06-30",
           "value": 86.0
-        },
-        {
-          "date": "2025-07-17",
-          "value": 80.0
-        },
-        {
-          "date": "2025-07-18",
-          "value": 80.0
-        },
-        {
-          "date": "2025-07-21",
-          "value": 80.0
-        },
-        {
-          "date": "2025-07-22",
-          "value": 81.0
         },
         {
           "date": "2025-07-23",
@@ -2330,6 +2314,22 @@
         {
           "date": "2026-07-17",
           "value": 79.0
+        },
+        {
+          "date": "2026-07-20",
+          "value": 78.0
+        },
+        {
+          "date": "2026-07-21",
+          "value": 78.0
+        },
+        {
+          "date": "2026-07-22",
+          "value": 78.0
+        },
+        {
+          "date": "2026-07-23",
+          "value": 79.0
         }
       ],
       "role": "context",
@@ -2434,22 +2434,6 @@
         {
           "date": "2025-06-30",
           "value": 210.0
-        },
-        {
-          "date": "2025-07-17",
-          "value": 211.0
-        },
-        {
-          "date": "2025-07-18",
-          "value": 213.0
-        },
-        {
-          "date": "2025-07-21",
-          "value": 209.0
-        },
-        {
-          "date": "2025-07-22",
-          "value": 209.0
         },
         {
           "date": "2025-07-23",
@@ -3494,6 +3478,22 @@
         {
           "date": "2026-07-17",
           "value": 194.0
+        },
+        {
+          "date": "2026-07-20",
+          "value": 191.0
+        },
+        {
+          "date": "2026-07-21",
+          "value": 191.0
+        },
+        {
+          "date": "2026-07-22",
+          "value": 190.0
+        },
+        {
+          "date": "2026-07-23",
+          "value": 198.0
         }
       ],
       "role": "benchmark",
@@ -3503,8 +3503,8 @@
   "source": "FRED ICE BofA (fallback; BBG primary pending)",
   "tile": {
     "delta": null,
-    "percentile": 11.72,
-    "value": 273.0
+    "percentile": 16.52,
+    "value": 277.0
   },
   "tooltip": "Investment-grade and high-yield credit spreads; wider = stress.",
   "unit": " bp (tile: HY OAS)"

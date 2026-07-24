@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-17",
+  "asof": "2026-07-22",
   "cadence": "daily",
   "id": "MH3",
   "name": "Household credit — market-priced (MBS CC spread)",
-  "notes": "Agency MBS current-coupon spread — FNMA current coupon minus a 5y/10y Treasury blend. Consumer ABS OAS legs (cards, autos) pending BBG index-ticker verification (§4 MH3).",
+  "notes": "**What it shows.** The market's live price of mortgage credit and prepayment risk — the agency MBS current-coupon spread. It widens when investors demand more to hold mortgage risk, a market-based complement to the survey-based mortgage-rate spread in MH4.\n\n**How it's computed.** The Fannie Mae current-coupon yield (Bloomberg MTGEFNCL) minus a 50/50 blend of the 5- and 10-year Treasury yields (FRED DGS5, DGS10), in basis points — the blend approximates the ~7-year effective life of a current-coupon MBS.\n\n**Caveats.** Agency MBS only in v1; the consumer ABS legs (credit cards, autos) await Bloomberg index-ticker verification.",
   "panel": "credit",
   "provenance": "derived",
   "series": [
@@ -514,18 +514,6 @@
         {
           "date": "2025-06-30",
           "value": 146.359
-        },
-        {
-          "date": "2025-07-17",
-          "value": 146.604
-        },
-        {
-          "date": "2025-07-18",
-          "value": 147.511
-        },
-        {
-          "date": "2025-07-21",
-          "value": 149.706
         },
         {
           "date": "2025-07-22",
@@ -1518,6 +1506,18 @@
         {
           "date": "2026-07-17",
           "value": 110.353
+        },
+        {
+          "date": "2026-07-20",
+          "value": 110.555
+        },
+        {
+          "date": "2026-07-21",
+          "value": 111.434
+        },
+        {
+          "date": "2026-07-22",
+          "value": 112.251
         }
       ],
       "role": "avos",
@@ -1527,8 +1527,8 @@
   "source": "BBG MTGEFNCL − FRED 5/10y blend",
   "tile": {
     "delta": null,
-    "percentile": 62.56,
-    "value": 110.0
+    "percentile": 64.36,
+    "value": 112.0
   },
   "tooltip": "Market price of mortgage credit/prepay risk.",
   "unit": " bp"

@@ -3,7 +3,7 @@
   "cadence": "monthly",
   "id": "IS2",
   "name": "Filing rate (S-1/F-1)",
-  "notes": "Calendar-month sums of new S-1/F-1 registrations from the EDGAR form index; the partial current month is dropped. Amendment (S-1/A) share and the offering-$ parse are available extensions.",
+  "notes": "**What it shows.** The IPO pipeline forming — the number of new S-1 and F-1 registration statements filed each month. A rising count signals more companies queuing to go public, typically well ahead of the deals themselves.\n\n**How it's computed.** Calendar-month counts of new S-1 and F-1 filings from the SEC EDGAR form index, deduplicated per filing by CIK; the partial current month is dropped so it can't read artificially low.\n\n**Caveats.** Counts only for now — the amendment (S-1/A) share and an offering-dollar figure parsed from the filings are available extensions.",
   "panel": "issuance",
   "provenance": "edgar_lake",
   "series": [

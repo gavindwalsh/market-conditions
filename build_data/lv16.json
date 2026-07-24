@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "biweekly",
   "id": "LV16",
   "name": "Short interest aggregate (SPX)",
-  "notes": "Biweekly FINRA prints via BBG bdh backfill (2023-11→) + daily accumulation. Denominator = CURRENT float caps applied backward.",
+  "notes": "**What it shows.** Aggregate short interest across the S&P 500 as a percent of float, with the median days-to-cover alongside. A rising line means more of the index is sold short; high days-to-cover means those shorts would take longer to buy back.\n\n**How it's computed.** `Σ(short shares × price) ÷ Σ float-cap`, where each name's short shares come from the biweekly FINRA print and the price is the last tape close on or before that print date. Days-to-cover is the median SHORT_INT_RATIO across names. History comes from a Bloomberg `bdh` backfill (November 2023 onward) plus daily snapshot appends.\n\n**Caveats.** Current-floats badge: the float-cap denominator uses the current snapshot applied backward, so older readings carry a survivorship and repricing bias.",
   "panel": "leverage",
   "provenance": "derived",
   "series": [
@@ -13,283 +13,295 @@
       "points": [
         {
           "date": "2023-11-15",
-          "value": 0.798
+          "value": 0.805
         },
         {
           "date": "2023-11-30",
-          "value": 0.793
+          "value": 0.8
         },
         {
           "date": "2023-12-15",
-          "value": 0.865
+          "value": 0.873
         },
         {
           "date": "2023-12-29",
-          "value": 0.848
+          "value": 0.856
         },
         {
           "date": "2024-01-12",
-          "value": 0.829
+          "value": 0.837
         },
         {
           "date": "2024-01-31",
-          "value": 0.829
+          "value": 0.836
         },
         {
           "date": "2024-02-15",
-          "value": 0.875
+          "value": 0.883
         },
         {
           "date": "2024-02-29",
-          "value": 0.894
+          "value": 0.902
         },
         {
           "date": "2024-03-15",
-          "value": 0.95
+          "value": 0.959
         },
         {
           "date": "2024-03-28",
-          "value": 0.948
+          "value": 0.957
         },
         {
           "date": "2024-04-15",
-          "value": 0.91
+          "value": 0.918
         },
         {
           "date": "2024-04-30",
-          "value": 0.899
+          "value": 0.908
         },
         {
           "date": "2024-05-15",
-          "value": 0.954
+          "value": 0.963
         },
         {
           "date": "2024-05-31",
-          "value": 0.977
+          "value": 0.986
         },
         {
           "date": "2024-06-14",
-          "value": 1.046
+          "value": 1.056
         },
         {
           "date": "2024-06-28",
-          "value": 1.043
+          "value": 1.052
         },
         {
           "date": "2024-07-15",
-          "value": 1.053
+          "value": 1.063
         },
         {
           "date": "2024-07-31",
-          "value": 0.989
+          "value": 0.998
         },
         {
           "date": "2024-08-15",
-          "value": 1.014
+          "value": 1.023
         },
         {
           "date": "2024-08-30",
-          "value": 1.058
+          "value": 1.068
         },
         {
           "date": "2024-09-13",
-          "value": 1.075
+          "value": 1.085
         },
         {
           "date": "2024-09-30",
-          "value": 1.09
+          "value": 1.101
         },
         {
           "date": "2024-10-15",
-          "value": 1.089
+          "value": 1.099
         },
         {
           "date": "2024-10-31",
-          "value": 1.065
+          "value": 1.075
         },
         {
           "date": "2024-11-15",
-          "value": 1.141
+          "value": 1.151
         },
         {
           "date": "2024-11-29",
-          "value": 1.184
+          "value": 1.195
         },
         {
           "date": "2024-12-13",
-          "value": 1.21
+          "value": 1.222
         },
         {
           "date": "2024-12-31",
-          "value": 1.169
-        },
-        {
-          "date": "2025-01-15",
-          "value": 1.17
-        },
-        {
-          "date": "2025-01-31",
-          "value": 1.148
-        },
-        {
-          "date": "2025-02-14",
-          "value": 1.203
-        },
-        {
-          "date": "2025-02-28",
-          "value": 1.198
-        },
-        {
-          "date": "2025-03-14",
-          "value": 1.161
-        },
-        {
-          "date": "2025-03-31",
-          "value": 1.119
-        },
-        {
-          "date": "2025-04-15",
-          "value": 1.089
-        },
-        {
-          "date": "2025-04-30",
-          "value": 1.131
-        },
-        {
-          "date": "2025-05-15",
-          "value": 1.267
-        },
-        {
-          "date": "2025-05-30",
-          "value": 1.176
-        },
-        {
-          "date": "2025-06-13",
           "value": 1.18
         },
         {
+          "date": "2025-01-15",
+          "value": 1.181
+        },
+        {
+          "date": "2025-01-31",
+          "value": 1.159
+        },
+        {
+          "date": "2025-02-14",
+          "value": 1.215
+        },
+        {
+          "date": "2025-02-28",
+          "value": 1.209
+        },
+        {
+          "date": "2025-03-14",
+          "value": 1.172
+        },
+        {
+          "date": "2025-03-31",
+          "value": 1.129
+        },
+        {
+          "date": "2025-04-15",
+          "value": 1.099
+        },
+        {
+          "date": "2025-04-30",
+          "value": 1.142
+        },
+        {
+          "date": "2025-05-15",
+          "value": 1.279
+        },
+        {
+          "date": "2025-05-30",
+          "value": 1.187
+        },
+        {
+          "date": "2025-06-13",
+          "value": 1.191
+        },
+        {
           "date": "2025-06-30",
-          "value": 1.294
+          "value": 1.306
         },
         {
           "date": "2025-07-15",
-          "value": 1.241
+          "value": 1.252
         },
         {
           "date": "2025-07-31",
-          "value": 1.231
+          "value": 1.243
         },
         {
           "date": "2025-08-15",
-          "value": 1.311
+          "value": 1.323
         },
         {
           "date": "2025-08-29",
-          "value": 1.304
+          "value": 1.316
         },
         {
           "date": "2025-09-15",
-          "value": 1.394
-        },
-        {
-          "date": "2025-09-30",
-          "value": 1.393
-        },
-        {
-          "date": "2025-10-15",
-          "value": 1.353
-        },
-        {
-          "date": "2025-10-31",
           "value": 1.407
         },
         {
+          "date": "2025-09-30",
+          "value": 1.406
+        },
+        {
+          "date": "2025-10-15",
+          "value": 1.365
+        },
+        {
+          "date": "2025-10-31",
+          "value": 1.42
+        },
+        {
           "date": "2025-11-14",
-          "value": 1.429
+          "value": 1.442
         },
         {
           "date": "2025-11-28",
-          "value": 1.513
+          "value": 1.527
         },
         {
           "date": "2025-12-15",
-          "value": 1.562
+          "value": 1.577
         },
         {
           "date": "2025-12-31",
-          "value": 1.533
+          "value": 1.548
         },
         {
           "date": "2026-01-15",
-          "value": 1.575
+          "value": 1.589
         },
         {
           "date": "2026-01-30",
-          "value": 1.564
+          "value": 1.578
         },
         {
           "date": "2026-02-13",
-          "value": 1.596
+          "value": 1.611
         },
         {
           "date": "2026-02-27",
-          "value": 1.592
+          "value": 1.606
         },
         {
           "date": "2026-03-13",
-          "value": 1.529
+          "value": 1.543
         },
         {
           "date": "2026-03-31",
-          "value": 1.584
+          "value": 1.599
         },
         {
           "date": "2026-04-15",
-          "value": 1.696
+          "value": 1.712
         },
         {
           "date": "2026-04-30",
-          "value": 1.782
+          "value": 1.799
         },
         {
           "date": "2026-05-15",
-          "value": 1.916
+          "value": 1.934
         },
         {
           "date": "2026-05-29",
-          "value": 2.049
+          "value": 2.069
         },
         {
           "date": "2026-06-15",
-          "value": 2.147
+          "value": 2.167
         },
         {
           "date": "2026-07-09",
-          "value": 2.131
+          "value": 2.151
         },
         {
           "date": "2026-07-13",
-          "value": 2.082
+          "value": 2.101
         },
         {
           "date": "2026-07-14",
-          "value": 2.088
+          "value": 2.107
         },
         {
           "date": "2026-07-15",
-          "value": 2.083
+          "value": 2.102
         },
         {
           "date": "2026-07-17",
-          "value": 2.054
+          "value": 2.073
         },
         {
           "date": "2026-07-20",
-          "value": 2.049
+          "value": 2.068
         },
         {
           "date": "2026-07-21",
-          "value": 2.049
+          "value": 2.092
+        },
+        {
+          "date": "2026-07-22",
+          "value": 2.086
+        },
+        {
+          "date": "2026-07-23",
+          "value": 2.064
+        },
+        {
+          "date": "2026-07-24",
+          "value": 2.064
         }
       ],
       "role": "avos",
@@ -578,6 +590,18 @@
         {
           "date": "2026-07-21",
           "value": 2.842
+        },
+        {
+          "date": "2026-07-22",
+          "value": 2.842
+        },
+        {
+          "date": "2026-07-23",
+          "value": 2.842
+        },
+        {
+          "date": "2026-07-24",
+          "value": 2.842
         }
       ],
       "role": "context",
@@ -591,8 +615,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 89.29,
-    "value": 2.05
+    "percentile": 84.93,
+    "value": 2.06
   },
   "tooltip": "SPX short interest as % of float (biweekly prints); line = median days-to-cover.",
   "unit": "% of float (tile)"

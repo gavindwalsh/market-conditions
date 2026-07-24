@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "RF8",
   "name": "Small-lot call share / semi premium",
-  "notes": "Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regularity, not identification. 5-day trailing mean.",
+  "notes": "**What it shows.** How much of retail's small-lot option spending goes to calls versus puts — the call share is a directional, speculative read — shown alongside the small-lot premium spent in semiconductors, a perennial retail favorite.\n\n**How it's computed.** Call share is small-lot call premium ÷ small-lot total premium; the semis line is small-lot premium summed across the top semiconductor names. Both are 5-day trailing means. The under-10-contract cutoff is the retail proxy described in Small-lot options proxy above.\n\n**Caveats.** A proxy, not an identification of retail flow.",
   "panel": "retail",
   "provenance": "massive_opra",
   "series": [
@@ -82,18 +82,6 @@
         {
           "date": "2025-06-30",
           "value": 67.066
-        },
-        {
-          "date": "2025-07-18",
-          "value": 66.452
-        },
-        {
-          "date": "2025-07-21",
-          "value": 66.446
-        },
-        {
-          "date": "2025-07-22",
-          "value": 65.749
         },
         {
           "date": "2025-07-23",
@@ -1082,6 +1070,18 @@
         {
           "date": "2026-07-20",
           "value": 59.253
+        },
+        {
+          "date": "2026-07-21",
+          "value": 58.268
+        },
+        {
+          "date": "2026-07-22",
+          "value": 58.089
+        },
+        {
+          "date": "2026-07-23",
+          "value": 55.839
         }
       ],
       "role": "avos",
@@ -1162,18 +1162,6 @@
         {
           "date": "2025-06-30",
           "value": 0.624
-        },
-        {
-          "date": "2025-07-18",
-          "value": 0.591
-        },
-        {
-          "date": "2025-07-21",
-          "value": 0.598
-        },
-        {
-          "date": "2025-07-22",
-          "value": 0.519
         },
         {
           "date": "2025-07-23",
@@ -2162,6 +2150,18 @@
         {
           "date": "2026-07-20",
           "value": 1.949
+        },
+        {
+          "date": "2026-07-21",
+          "value": 2.178
+        },
+        {
+          "date": "2026-07-22",
+          "value": 2.194
+        },
+        {
+          "date": "2026-07-23",
+          "value": 2.187
         }
       ],
       "role": "benchmark",
@@ -2171,8 +2171,8 @@
   "source": "Massive OPRA trades",
   "tile": {
     "delta": null,
-    "percentile": 26.54,
-    "value": 59.3
+    "percentile": 16.38,
+    "value": 55.8
   },
   "tooltip": "Call share of small-lot premium (5-day average); second line = small-lot premium in semis.",
   "unit": "% (tile: call share)"

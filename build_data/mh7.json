@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "MH7",
   "name": "Cross-asset context",
-  "notes": "MOVE on its own level axis; UST 10y and the 2s10s slope (10y − 2y, pct-pts) share the % axis. DXY dropped 2026-07-10.",
+  "notes": "**What it shows.** The rates backdrop for equities on one chart — bond-market volatility (the MOVE index) alongside the 10-year Treasury yield and the 2s10s curve slope. Rising rates vol or a sharply moving curve is a headwind for risk assets, so this is the cross-asset context for everything else on the dashboard.\n\n**How it's computed.** The MOVE index is plotted on its own left (level) axis; the 10-year yield and the 2s10s slope — the 10-year minus 2-year yield, in percentage points — share the right (%) axis.\n\n**Caveats.** The dollar index (DXY) was dropped from this chart on 2026-07-10: its narrow range flatlined beneath MOVE on the shared axis and added the least as context.",
   "panel": "internals",
   "provenance": "bloomberg_cache",
   "series": [
@@ -754,18 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 90.26
-        },
-        {
-          "date": "2025-07-18",
-          "value": 83.29
-        },
-        {
-          "date": "2025-07-21",
-          "value": 86.62
-        },
-        {
-          "date": "2025-07-22",
-          "value": 89.89
         },
         {
           "date": "2025-07-23",
@@ -1758,6 +1746,18 @@
         {
           "date": "2026-07-20",
           "value": 72.66
+        },
+        {
+          "date": "2026-07-21",
+          "value": 74.67
+        },
+        {
+          "date": "2026-07-22",
+          "value": 76.31
+        },
+        {
+          "date": "2026-07-23",
+          "value": 80.08
         }
       ],
       "role": "avos",
@@ -2510,18 +2510,6 @@
         {
           "date": "2025-06-30",
           "value": 4.228
-        },
-        {
-          "date": "2025-07-21",
-          "value": 4.378
-        },
-        {
-          "date": "2025-07-22",
-          "value": 4.344
-        },
-        {
-          "date": "2025-07-23",
-          "value": 4.38
         },
         {
           "date": "2025-07-24",
@@ -3553,7 +3541,19 @@
         },
         {
           "date": "2026-07-21",
-          "value": 4.6
+          "value": 4.628
+        },
+        {
+          "date": "2026-07-22",
+          "value": 4.654
+        },
+        {
+          "date": "2026-07-23",
+          "value": 4.693
+        },
+        {
+          "date": "2026-07-24",
+          "value": 4.657
         }
       ],
       "role": "context",
@@ -4306,18 +4306,6 @@
         {
           "date": "2025-06-30",
           "value": 0.509
-        },
-        {
-          "date": "2025-07-21",
-          "value": 0.517
-        },
-        {
-          "date": "2025-07-22",
-          "value": 0.511
-        },
-        {
-          "date": "2025-07-23",
-          "value": 0.5
         },
         {
           "date": "2025-07-24",
@@ -5349,7 +5337,19 @@
         },
         {
           "date": "2026-07-21",
-          "value": 0.391
+          "value": 0.367
+        },
+        {
+          "date": "2026-07-22",
+          "value": 0.357
+        },
+        {
+          "date": "2026-07-23",
+          "value": 0.346
+        },
+        {
+          "date": "2026-07-24",
+          "value": 0.343
         }
       ],
       "role": "benchmark",
@@ -5359,8 +5359,8 @@
   "source": "BBG MOVE/UST",
   "tile": {
     "delta": null,
-    "percentile": 47.09,
-    "value": 72.66
+    "percentile": 58.29,
+    "value": 80.08
   },
   "tooltip": "Rates vol (left) with the 10-year yield and curve slope (right) — the rates backdrop for equities.",
   "unit": " (tile: MOVE)"

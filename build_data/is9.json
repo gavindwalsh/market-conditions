@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-21",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "IS9",
   "name": "IPO issuance pace — cumulative $ (YTD vs prior years)",
-  "notes": "Ritter-comparable operating-company universe (ex SPAC/ADR/REIT/CEF/bank/unit, offer ≥ $5). Each year anchored to the Jay Ritter roster; proceeds = offer price × shares from Bloomberg. Comparison years run the full calendar; the current year stops at today's day-of-year. Prior-year dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so all curves are in real 2026 dollars. Every deal is included — mega-deals (e.g. SpaceX, ~$75B) show as real steps, not smoothed. 2000 is Ritter-anchored ($64.8B nominal across 390 operating-cos), of which $10.1B across 75 tail deals is estimated.",
+  "notes": "**What it shows.** The pace of IPO issuance this year set against prior years — cumulative operating-company IPO proceeds by day of the year, in real 2026 dollars. This year runs through today while the comparison years show the full calendar, so you can read at a glance whether the current year is running ahead of or behind past cycles.\n\n**How it's computed.** A Ritter-comparable operating-company universe — excluding SPACs, ADRs, REITs, closed-end funds, banks, and unit offerings, with an offer price of at least $5. Each year is anchored to the Jay Ritter IPO roster, and proceeds are offer price × shares from Bloomberg. Prior-year dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so every curve is in real 2026 dollars, and every deal is included — mega-deals such as SpaceX (~$75B) show as real steps rather than being smoothed away.\n\n**Caveats.** The *real 2026 $* badge marks the inflation adjustment; older Ritter-anchored years carry an estimated tail for deals the roster leaves incomplete. 2000 is Ritter-anchored ($64.8B nominal across 390 operating-cos), of which $10.1B across 75 tail deals is estimated.",
   "panel": "issuance",
   "provenance": "ipo_pace",
   "series": [

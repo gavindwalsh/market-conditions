@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "RF5",
   "name": "Avg retail trade size",
-  "notes": "Quote-midpoint classifier (§5.1) identifies roughly a third of retail trades; gated uncalibrated until RF9 >= 0.6. Identified prints only — the ratio is invariant to the ×3 scale factor.",
+  "notes": "**What it shows.** The average dollar size of a single retail trade — a texture read on whether retail is trading in bigger or smaller tickets, which tends to shift with confidence and with the mix of names in play.\n\n**How it's computed.** Identified retail dollars ÷ the count of identified retail trades, each day, using the quote-midpoint classifier described in Retail identification and scaling above.\n\n**Caveats.** Built on identified prints only. Because it is a ratio — dollars per trade — it is unaffected by the ×3 scale factor, so no scaling is applied here.",
   "panel": "retail",
   "provenance": "massive_tape",
   "series": [
@@ -551,6 +551,18 @@
         {
           "date": "2026-07-20",
           "value": 5119.504
+        },
+        {
+          "date": "2026-07-21",
+          "value": 5080.533
+        },
+        {
+          "date": "2026-07-22",
+          "value": 4745.857
+        },
+        {
+          "date": "2026-07-23",
+          "value": 5658.914
         }
       ],
       "role": "avos",
@@ -561,7 +573,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 5120.0
+    "value": 5659.0
   },
   "tooltip": "Average dollar size of an identified retail trade.",
   "unit": " $"

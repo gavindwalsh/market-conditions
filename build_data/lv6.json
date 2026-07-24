@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-23",
   "cadence": "daily",
   "id": "LV6",
   "name": "Leveraged-ETF rebalance notional",
-  "notes": "Σ AUM×L×(L−1)×underlying move across 17 major leveraged funds (curated universe, §A3). Forced flow chases the day's move into the close so it flips sign daily; we plot its magnitude (5d mean) as rebalance intensity rather than the sign-flipping signed series.",
+  "notes": "**What it shows.** How much leveraged ETFs must trade to keep their exposure on target as the market moves — both the structural capacity per 1% index move and the realized forced end-of-day flow. Large capacity means these funds can amplify late-day moves.\n\n**How it's computed.** Rebalance capacity per 1% move is `Σ AUM·|L·(L−1)|·0.01`; realized forced flow is `Σ AUM·L·(L−1)·(underlying daily return)`, both summed across 17 major leveraged funds (a curated universe — see ETF flow universe in Shared methodology). `L` is each fund's leverage factor. Because the forced flow chases the day's move into the close, it flips sign every day; we plot its magnitude on a 5-day mean as rebalance *intensity* rather than the sign-flipping signed series.\n\n**Caveats.** Covers the curated leveraged universe, not every leveraged ETF. The flow line is a magnitude, so it shows how much rebalancing there is, not its direction.",
   "panel": "leverage",
   "provenance": "derived",
   "series": [
@@ -514,18 +514,6 @@
         {
           "date": "2025-06-30",
           "value": 3.99
-        },
-        {
-          "date": "2025-07-18",
-          "value": 4.096
-        },
-        {
-          "date": "2025-07-21",
-          "value": 4.09
-        },
-        {
-          "date": "2025-07-22",
-          "value": 4.037
         },
         {
           "date": "2025-07-23",
@@ -1522,6 +1510,18 @@
         {
           "date": "2026-07-20",
           "value": 4.668
+        },
+        {
+          "date": "2026-07-21",
+          "value": 4.973
+        },
+        {
+          "date": "2026-07-22",
+          "value": 4.968
+        },
+        {
+          "date": "2026-07-23",
+          "value": 4.77
         }
       ],
       "role": "avos",
@@ -2034,18 +2034,6 @@
         {
           "date": "2025-06-30",
           "value": 3.076
-        },
-        {
-          "date": "2025-07-18",
-          "value": 1.356
-        },
-        {
-          "date": "2025-07-21",
-          "value": 1.468
-        },
-        {
-          "date": "2025-07-22",
-          "value": 1.719
         },
         {
           "date": "2025-07-23",
@@ -3042,6 +3030,18 @@
         {
           "date": "2026-07-20",
           "value": 5.967
+        },
+        {
+          "date": "2026-07-21",
+          "value": 6.899
+        },
+        {
+          "date": "2026-07-22",
+          "value": 6.417
+        },
+        {
+          "date": "2026-07-23",
+          "value": 6.019
         }
       ],
       "role": "context",
@@ -3052,7 +3052,7 @@
   "tile": {
     "delta": null,
     "percentile": 98.26,
-    "value": 4.7
+    "value": 4.8
   },
   "tooltip": "Rebalance capacity per 1% index move (structural); second line = realized forced end-of-day flow magnitude, 5-day average.",
   "unit": " $B (tile: per-1% capacity)"

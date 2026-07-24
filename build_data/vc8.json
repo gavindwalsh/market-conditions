@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-20",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "VC8",
   "name": "NDX implied (VXN) vs realized vol",
-  "notes": "VXN implied-vol index vs realized vol from log returns over 360 trading days, sqrt(260) annualized. Tile: VXN.",
+  "notes": "**What it shows.** NDX's 30-day implied volatility (VXN) against the volatility NDX has actually realized. Implied sitting above realized is the normal state — the variance risk premium that sellers of options earn; the gap narrowing, or the two lines crossing, marks stress.\n\n**How it's computed.** The implied leg is the VXN index — 30-day, skew-inclusive expected volatility. The realized leg is 360-day realized volatility built per the realized-volatility conventions above: daily log returns of index closes, a rolling 360-trading-day window, annualized by √260 to tie to Bloomberg's VOLATILITY_360D field. The tile ranks VXN against its trailing history.\n\n**Caveats.** The implied tenor (30 days) is far shorter than the realized window (360 days), so part of the level gap reflects that tenor mismatch rather than the risk premium alone — read the direction and size of changes in the gap, not the raw level.",
   "panel": "volatility",
   "provenance": "bloomberg_cache",
   "series": [
@@ -754,22 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 19.56
-        },
-        {
-          "date": "2025-07-18",
-          "value": 18.61
-        },
-        {
-          "date": "2025-07-21",
-          "value": 18.71
-        },
-        {
-          "date": "2025-07-22",
-          "value": 18.95
-        },
-        {
-          "date": "2025-07-23",
-          "value": 17.94
         },
         {
           "date": "2025-07-24",
@@ -1762,6 +1746,22 @@
         {
           "date": "2026-07-20",
           "value": 28.53
+        },
+        {
+          "date": "2026-07-21",
+          "value": 26.66
+        },
+        {
+          "date": "2026-07-22",
+          "value": 26.74
+        },
+        {
+          "date": "2026-07-23",
+          "value": 28.06
+        },
+        {
+          "date": "2026-07-24",
+          "value": 28.49
         }
       ],
       "role": "avos",
@@ -2446,22 +2446,6 @@
         {
           "date": "2025-06-30",
           "value": 23.262
-        },
-        {
-          "date": "2025-07-18",
-          "value": 23.148
-        },
-        {
-          "date": "2025-07-21",
-          "value": 23.138
-        },
-        {
-          "date": "2025-07-22",
-          "value": 23.139
-        },
-        {
-          "date": "2025-07-23",
-          "value": 23.097
         },
         {
           "date": "2025-07-24",
@@ -3454,6 +3438,22 @@
         {
           "date": "2026-07-20",
           "value": 23.241
+        },
+        {
+          "date": "2026-07-21",
+          "value": 23.291
+        },
+        {
+          "date": "2026-07-22",
+          "value": 23.297
+        },
+        {
+          "date": "2026-07-23",
+          "value": 23.329
+        },
+        {
+          "date": "2026-07-24",
+          "value": 23.331
         }
       ],
       "role": "benchmark",
@@ -3463,8 +3463,8 @@
   "source": "BBG VXN + index closes",
   "tile": {
     "delta": null,
-    "percentile": 85.31,
-    "value": 28.53
+    "percentile": 85.23,
+    "value": 28.49
   },
   "tooltip": "VXN (30-day implied vol, skew-inclusive) vs 360-day realized (Bloomberg convention).",
   "unit": "vol pts"

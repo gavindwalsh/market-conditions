@@ -3,7 +3,7 @@
   "cadence": "monthly",
   "id": "OP9",
   "name": "Personal saving rate",
-  "notes": "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA). Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
+  "notes": "**What it shows.** Personal saving as a share of disposable income — how much of what they earn households are setting aside. A lower rate can signal confidence or financial stretch; a higher one, caution.\n\n**How it's computed.** The BEA's PSAVERT series — personal saving ÷ disposable personal income — monthly, seasonally adjusted.\n\n**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they run off-chart rather than flattening the rest of the history.",
   "panel": "ownership",
   "provenance": "fred_cache",
   "series": [
