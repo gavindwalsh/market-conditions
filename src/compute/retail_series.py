@@ -9,6 +9,7 @@ they join memberships and SPX returns onto the same aggregates.
 """
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 from .. import store, util
@@ -267,39 +268,64 @@ def build() -> dict[str, bool]:
             "RF3": rf3, "RF4": rf4}
 
 
+def _roll_dipbuy_beta(ret: np.ndarray, net_b: np.ndarray, win: int) -> list[float]:
+    """Rolling OLS slope of net flow ($B) on SPX % return over `win` trailing
+    days, SIGN-FLIPPED so a positive value = net buying rises as the market
+    falls (buying the dip). NaN until the window is full or returns are flat."""
+    out: list[float] = []
+    for i in range(len(net_b)):
+        lo = i + 1 - win
+        if lo < 0 or float(np.nanstd(ret[lo:i + 1])) == 0.0:
+            out.append(float("nan"))
+            continue
+        out.append(-float(np.polyfit(ret[lo:i + 1], net_b[lo:i + 1], 1)[0]))
+    return out
+
+
 def _build_rf4(day: pd.DataFrame) -> bool:
-    """RF4 buy-the-dip: rolling 60d mean(retail net on SPX down days) /
-    mean(retail net, all days). Needs >=20 midpoint-signed days incl >=5 down
-    days — unlocks automatically as the tape backfill accumulates."""
+    """RF4 buy-the-dip sensitivity: rolling OLS slope of daily retail net flow
+    ($B, identified floor) on the SPX daily % return, sign-flipped so a positive
+    reading = retail buys into declines. Two windows — 63d (3-month, the primary
+    trend) and 21d (1-month, faster but noisier context). Contemporaneous; the
+    shape is scale-invariant. Unlocks once >=63 midpoint-signed days carrying an
+    SPX return have accumulated (the 63d window fills)."""
     signed = day[day["signing"] == "midpoint"].copy()
     spx = store.read_latest("bbg_spx")
-    if spx is None or len(signed) < 20:
+    if spx is None or len(signed) < 63:
         return False
     spx = spx.copy()
     spx["date"] = pd.to_datetime(spx["date"])
-    spx["down"] = spx["value"].pct_change() < 0
-    m = signed.merge(spx[["date", "down"]], on="date", how="inner").sort_values("date")
-    if len(m) < 20 or m["down"].sum() < 5:
+    spx = spx.sort_values("date")                       # pct_change needs date order
+    spx["ret"] = spx["value"].pct_change() * 100.0
+    m = (signed.merge(spx[["date", "ret"]], on="date", how="inner")
+               .sort_values("date").dropna(subset=["ret"]))
+    if len(m) < 63:
         return False
-    m["net_m"] = m["net"] / 1e6
-    roll_down = m["net_m"].where(m["down"]).rolling(60, min_periods=20).mean()
-    roll_all = m["net_m"].rolling(60, min_periods=20).mean()
-    m["value"] = roll_down / roll_all
-    df = m[["date", "value"]].dropna()
-    if df.empty:
+    m["net_b"] = m["net"] / 1e9
+    ret, net_b = m["ret"].to_numpy(float), m["net_b"].to_numpy(float)
+    m["b63"] = _roll_dipbuy_beta(ret, net_b, 63)
+    m["b21"] = _roll_dipbuy_beta(ret, net_b, 21)
+    d63 = m[["date", "b63"]].rename(columns={"b63": "value"}).dropna()
+    d21 = m[["date", "b21"]].rename(columns={"b21": "value"}).dropna()
+    if d63.empty:
         return False
     store.write_display("RF4", {
-        "id": "RF4", "name": "Buy-the-dip ratio", "panel": "retail",
+        "id": "RF4", "name": "Buy-the-dip sensitivity", "panel": "retail",
         "source": "Massive tape × BBG SPX", "cadence": "daily",
-        "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": "×",
-        "series": [_display_series(df, "Retail net on down days ÷ all-day avg (60d roll)")],
-        "tile": {"value": round(float(df["value"].iloc[-1]), 2), "delta": None,
-                 "percentile": util.trailing_percentile(df["value"])},
+        "asof": d63["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B/1%",
+        "series": [_display_series(d63, "3-month (63d) — trend", role="avos", unit="$B/1%"),
+                   _display_series(d21, "1-month (21d) — faster, noisier",
+                                   role="context", unit="$B/1%")],
+        "tile": {"value": round(float(d63["value"].iloc[-1]), 2), "delta": None,
+                 "percentile": util.trailing_percentile(d63["value"])},
         "provenance": "massive_tape",
         "status": {"level": "provisional", "label": "classifier floor"},
-        "tooltip": ">1 = retail buys dips harder than its average day.",
-        "notes": FLOOR_NOTE + " 60d rolling mean of midpoint-signed net flow on SPX down "
-                 "days ÷ the all-day rolling mean; scale-invariant.",
+        "tooltip": "Net retail $B bought per 1% SPX decline — higher = retail buys dips harder.",
+        "notes": FLOOR_NOTE + " Rolling OLS slope of daily identified retail net flow ($B, "
+                 "unscaled floor) regressed on the SPX daily % return, sign-flipped so a "
+                 "positive value = buying into declines. Solid line is the 63d (3-month) "
+                 "trend; faint line the 21d (1-month) window — faster but ~4× noisier. "
+                 "Contemporaneous; identified floor, not ×3-scaled.",
     })
     return True
 

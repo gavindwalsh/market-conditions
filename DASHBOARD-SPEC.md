@@ -152,7 +152,7 @@ The §3 principle reassigns the heavy per-name pulls off Bloomberg. Reassigned m
 | RF1 | Retail net flow ($, shares) | subpenny identification + **quote-midpoint signing** (§5.1) | Massive trades + NBBO | daily | 2 | 2016→ backfill |
 | RF2 | Retail participation | identified retail volume / total tape volume | RF1 pipeline | daily | 2 | 2016→ |
 | RF3 | Retail concentration | share of retail $ in top-10 SPX names; in semis; in leveraged ETFs | RF1 × SC1/SC3 memberships | daily | 2 | 2016→ |
-| RF4 | Buy-the-dip ratio | retail net buy on SPX down days / all-day average, rolling | RF1 + BBG SPX returns | daily | 2 | 2016→ |
+| RF4 | Buy-the-dip sensitivity | rolling OLS slope of daily retail net flow ($B) on SPX % return, sign-flipped (+ = buys dips); 63d + 21d windows | RF1 + BBG SPX returns | daily | 2 | 2016→ |
 | RF5 | Avg retail trade size | identified retail $ / trade count | RF1 pipeline | daily | 2 | 2016→ |
 | RF6 | Wholesaler volume (structural check) | weekly non-ATS volume, top wholesalers | FINRA Query API `WeeklySummary` | weekly (2–4-wk lag) | 1 | 2016→ |
 | RF7 | Small-lot options premium | premium $ where trade size < 10 contracts (retail **proxy**, labeled as such) | Massive OPRA trades | daily | 3 | at feed |
