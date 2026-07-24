@@ -185,7 +185,7 @@ _REGISTRY_ROWS = [
     _m("RF2", "retail", "Retail participation (FINRA-anchored)", "Massive+FINRA", "weekly", 2, "2016→", "5.1"),
     _m("RF3", "retail", "Retail concentration", "Massive", "daily", 2, "2016→", "5.1"),
     _m("RF4", "retail", "Buy-the-dip sensitivity", "Massive+BBG", "daily", 2, "2016→"),
-    _m("RF5", "retail", "Avg retail trade size", "Massive", "daily", 2, "2016→"),
+    # RF5 (avg retail trade size) removed 2026-07-24 (CIO cleanup — not helpful).
     _m("RF6", "retail", "Wholesaler volume (structural check)", "FINRA", "weekly", 1, "2016→"),
     _m("RF7", "retail", "Small-lot options premium (proxy)", "Massive OPRA", "daily", 3, "at feed", "5.2"),
     _m("RF8", "retail", "Small-lot call share / semi premium", "Massive OPRA", "daily", 3, "at feed", "5.2"),
@@ -193,23 +193,19 @@ _REGISTRY_ROWS = [
     # LV2 (0DTE share whole-market) dropped same day — redundant given LV3's 0DTE bucket.
     _m("LV3", "retail", "Volume by DTE bucket", "Massive OPRA", "daily", 3, "at feed"),
     _m("RF9", "retail", "Validation series (vs RTAT10)", "Nasdaq", "daily", 2, "rolling"),
-    # Panel 4 — Leverage & Its Price
-    _m("LV1", "leverage", "0DTE share — SPX complex", "Cboe", "daily", 1, "2022→"),
-    _m("LV4", "leverage", "Options/stock notional ratio", "Massive OPRA", "daily", 3, "at feed"),
-    # LV5/LV7/LV10/LV14 render via the LVT snapshot table until history accrues
-    # (CIO 2026-07-10); computes keep accumulating their series JSONs.
+    # Panel 4 — Leverage & Its Price — card order set by CIO 2026-07-24:
+    # LV15, LV13, LV6, LV8, LV16. LV9 + the LVT snapshot table removed (not
+    # helpful). LV5/LV7/LV10/LV14 keep computing (history accruing) but no
+    # longer surface anywhere now that LVT is gone.
+    _m("LV15", "leverage", "L4 FINRA margin debt (% of GDP)", "FINRA+FRED", "monthly", 1, "1997→"),
+    _m("LV13", "leverage", "L3 Leveraged-ETF financing residual", "BBG", "weekly", 1, "2020→", "5.8"),
     _m("LV6", "leverage", "Leveraged-ETF rebalance notional", "BBG+OP7", "daily", 1, "2020→"),
     _m("LV8", "leverage", "L1 ES roll implied financing", "BBG", "daily", 1, "2018→"),
-    _m("LV9", "leverage", "L2 Single-name synthetic financing", "Massive OPRA", "daily", 3, "at feed", "5.5,5.10"),
-    _m("LV12", "leverage", "L3 Realized retail toll", "Massive OPRA", "daily", 3, "at feed", "5.7"),
-    _m("LV13", "leverage", "L3 Leveraged-ETF financing residual", "BBG", "weekly", 1, "2020→", "5.8"),
-    _m("LV15", "leverage", "L4 FINRA margin debt", "FINRA", "monthly", 1, "1997→"),
     _m("LV16", "leverage", "Short interest aggregate", "BBG", "biweekly", 1, "2023-11→"),
-    # LVT: no-history leverage measures (LV5 GEX, LV7 box, LV10 wings, LV14
-    # rates) shown as one snapshot TABLE until each accrues chartable history
-    # (CIO 2026-07-10). Their computes keep writing series JSONs so the flip
-    # back to charts is automatic later.
-    _m("LVT", "leverage", "Leverage levels — snapshot", "derived", "daily", 1, "—"),
+    # Registry-only (phase-gated / no chartable data yet) — sit after the cards:
+    _m("LV1", "leverage", "0DTE share — SPX complex", "Cboe", "daily", 1, "2022→"),
+    _m("LV4", "leverage", "Options/stock notional ratio", "Massive OPRA", "daily", 3, "at feed"),
+    _m("LV12", "leverage", "L3 Realized retail toll", "Massive OPRA", "daily", 3, "at feed", "5.7"),
     # Panel — Volatility and Correlation (vol first, then correlation; CIO 2026-07-09)
     _m("VC7", "volatility", "SPX ATM implied vs realized vol", "BBG", "daily", 1, "2010→"),
     _m("VC8", "volatility", "NDX ATM implied vs realized vol", "BBG", "daily", 1, "2010→"),

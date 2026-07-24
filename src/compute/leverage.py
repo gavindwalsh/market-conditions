@@ -480,115 +480,55 @@ def build_lv14() -> bool:
 
 
 def build_lv15() -> bool:
-    """LV15: FINRA margin debt — level + YoY, 1997→ (archive + live page)."""
+    """LV15: FINRA margin debt as a share of nominal GDP, 1997→ (archive + live
+    page). Normalizing by GDP makes the leverage stock comparable across the
+    cycle rather than growing mechanically with the economy."""
     md = store.read_latest("finra_margin_debt")
-    if md is None or md.empty:
+    gdp = store.read_latest("fred_gdp")
+    if md is None or md.empty or gdp is None or gdp.empty:
         return False
     md = md.sort_values("date").copy()
+    md["date"] = pd.to_datetime(md["date"])
     md["bn"] = md["value"] / 1e3          # $M → $B
-    md["yoy"] = md["bn"].pct_change(12) * 100.0
-    level = md[["date", "bn"]].rename(columns={"bn": "value"})
-    yoy = md[["date", "yoy"]].rename(columns={"yoy": "value"}).dropna()
+    gdp = gdp.sort_values("date").copy()
+    gdp["date"] = pd.to_datetime(gdp["date"])
+    # GDP is quarterly ($B, SAAR); carry each print forward onto the monthly
+    # margin-debt dates so the ratio steps at quarter boundaries.
+    m = pd.merge_asof(md, gdp.rename(columns={"value": "gdp_bn"})[["date", "gdp_bn"]],
+                      on="date", direction="backward").dropna(subset=["gdp_bn"])
+    m["pct"] = m["bn"] / m["gdp_bn"] * 100.0
+    pct = m[["date", "pct"]].rename(columns={"pct": "value"})
     store.write_display("LV15", {
-        "id": "LV15", "name": "L4: FINRA margin debt", "panel": "leverage",
-        "source": "FINRA margin statistics", "cadence": "monthly",
-        "asof": md["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B",
-        "series": [_display_series(level, "Margin debt ($B)", unit="$B"),
-                   _display_series(yoy, "YoY (%)", role="benchmark", unit="%")],
-        "tile": {"value": round(float(md["bn"].iloc[-1]), 0), "delta": None,
-                 "percentile": util.trailing_percentile(md["bn"], min_history=120)},
+        "id": "LV15", "name": "L4: FINRA margin debt (% of GDP)", "panel": "leverage",
+        "source": "FINRA margin statistics · FRED GDP", "cadence": "monthly",
+        "asof": m["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " %",
+        "series": [_display_series(pct, "Margin debt (% of GDP)", unit="%")],
+        "tile": {"value": round(float(m["pct"].iloc[-1]), 2), "delta": None,
+                 "percentile": util.trailing_percentile(m["pct"], min_history=120)},
         "provenance": "finra_cache",
-        "tooltip": "Debit balances in securities margin accounts — the stock of retail "
-                   "leverage.",
+        "tooltip": "Debit balances in securities margin accounts as a share of nominal GDP "
+                   "— the stock of investor leverage, scaled to the economy.",
         "notes": (
             "**What it shows.** Total debit balances in securities margin accounts — the "
-            "outstanding stock of investor leverage — with its year-over-year growth. A "
-            "classic risk-appetite gauge: sharp rises tend to accompany late-cycle "
-            "exuberance.\n\n"
-            "**How it's computed.** FINRA's monthly margin statistics, plotted as the "
-            "level in billions of dollars and as the 12-month year-over-year percent "
-            "change. History stitches a 1997–2021 archive to the live FINRA page "
-            "table.\n\n"
-            "**Caveats.** Reported with roughly a three-week lag after month-end."
-        ),
-    })
-    return True
-
-
-def build_lvt() -> bool:
-    """LVT: snapshot TABLE for the no-history leverage measures (CIO 2026-07-10)
-    — LV5 GEX, LV7 box yields, LV10 call wings, LV14 broker rates. Each keeps
-    computing/accumulating its own display JSON; this card is what the page
-    shows until they have chartable history. Runs LAST in build()."""
-    display = store.load_all_display()
-    rows, asofs = [], []
-
-    lv5 = display.get("LV5")
-    if lv5 and lv5.get("series") and lv5["series"][0].get("points"):
-        pts = lv5["series"][0]["points"]
-        ext = lv5.get("extremes") or {}
-        flag = ", ".join(f"{k} {v:+.1f}" for k, v in list(ext.items())[:4]) or "OI-convention"
-        rows.append(["Dealer GEX, aggregate (LV5)", f"{pts[-1]['value']:+,.1f} $B/1%",
-                     lv5.get("asof", "—"), flag])
-        asofs.append(lv5.get("asof"))
-
-    lv7 = display.get("LV7")
-    if lv7 and lv7.get("series"):
-        for s in lv7["series"]:
-            if s.get("points"):
-                rows.append([f"Box − SOFR, {s['name'].split(' ')[0]} (LV7)",
-                             f"{s['points'][-1]['value']:+,.0f} bp",
-                             lv7.get("asof", "—"), "near-close quotes preferred"])
-        asofs.append(lv7.get("asof"))
-
-    lv10 = display.get("LV10")
-    if lv10 and lv10.get("series") and lv10["series"][0].get("points"):
-        rows.append(["Call-wing richness (LV10)",
-                     f"{lv10['series'][0]['points'][-1]['value']:+,.2f} vol pts",
-                     lv10.get("asof", "—"), "+ = upside chased"])
-        asofs.append(lv10.get("asof"))
-
-    lv14 = display.get("LV14")
-    if lv14 and lv14.get("series"):
-        from ..pull.free import BROKER_RATES_VERIFIED
-        for s in lv14["series"]:
-            if s.get("points"):
-                rows.append([f"Margin rate — {s['name']} (LV14)",
-                             f"{s['points'][-1]['value']:,.2f} %",
-                             lv14.get("asof", "—"),
-                             "" if BROKER_RATES_VERIFIED else "UNVERIFIED"])
-        asofs.append(lv14.get("asof"))
-
-    if not rows:
-        return False
-    store.write_display("LVT", {
-        "id": "LVT", "name": "Leverage levels — snapshot", "panel": "leverage",
-        "source": "derived", "cadence": "daily",
-        "asof": max(a for a in asofs if a), "unit": "",
-        "series": [],
-        "table": {"columns": ["Measure", "Latest", "As-of", "Flag"], "rows": rows},
-        "tile": {"value": None, "delta": None, "percentile": None},
-        "provenance": "derived",
-        "status": {"level": "building", "label": "history accruing"},
-        "tooltip": "Point-in-time leverage reads without chartable history yet — each "
-                   "returns as a chart as its history accrues.",
-        "notes": (
-            "**What it shows.** A point-in-time table of the leverage measures that don't "
-            "yet have enough history to chart — dealer GEX (LV5), box-spread yields "
-            "(LV7), call-wing richness (LV10), and broker margin rates (LV14). Each "
-            "returns as its own chart once its history accrues.\n\n"
-            "**How it's computed.** Reads the latest value of each of those metrics from "
-            "the current run and lays them out with their as-of dates and flags.\n\n"
-            "**Caveats.** History-accruing badge: this is a snapshot, not a time series — "
-            "see the individual metrics above for their construction."
+            "outstanding stock of investor leverage — as a percentage of nominal GDP, so "
+            "the level is comparable across decades rather than drifting up with the size "
+            "of the economy. A classic risk-appetite gauge: sharp rises tend to accompany "
+            "late-cycle exuberance.\n\n"
+            "**How it's computed.** FINRA's monthly margin statistics (debit balances, in "
+            "billions of dollars) divided by nominal GDP — FRED series GDP, quarterly in "
+            "billions at a seasonally-adjusted annual rate, carried forward to each month "
+            "— times 100. Margin-debt history stitches a 1997–2021 archive to the live "
+            "FINRA page table.\n\n"
+            "**Caveats.** Margin debt is reported with roughly a three-week lag after "
+            "month-end; GDP is quarterly, so the denominator steps at quarter boundaries."
         ),
     })
     return True
 
 
 def build() -> dict[str, bool]:
-    # LVT is assembled at the END of the opra pass (compute order runs leverage
-    # before opra, and LVT needs opra's LV5/LV10 from the SAME run)
+    # LV7/LV14 keep computing so their history accrues (they no longer surface
+    # on the page: the LVT snapshot table was removed 2026-07-24, CIO cleanup).
     return {"LV6": build_lv6(), "LV7": build_lv7(), "LV8": build_lv8(),
             "LV11": build_lv11(), "LV13": build_lv13(), "LV14": build_lv14(),
             "LV15": build_lv15(), "LV16": build_lv16()}

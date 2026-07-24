@@ -591,8 +591,8 @@ therefore multiplied by a scale factor of ×3.0 to estimate market-wide totals.
 That factor is provisional: it is flagged *uncalibrated* until it has been
 fit empirically against Nasdaq's Retail Activity Tracker (RTAT), the gate being
 a trailing 60-day correlation of at least 0.6 between our identified flow and
-RTAT. Ratio metrics — concentration, buy-the-dip, average trade size — are
-unaffected by the scale factor and are shown unscaled.
+RTAT. Ratio and slope metrics — retail concentration and buy-the-dip
+sensitivity — are unaffected by the scale factor and are shown unscaled.
 
 ### Small-lot options proxy
 Options trades smaller than 10 contracts are used as a *proxy* for retail

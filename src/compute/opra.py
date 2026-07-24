@@ -276,91 +276,10 @@ def build_lv10() -> bool:
     return True
 
 
-def build_lv9() -> bool:
-    """LV9: single-name synthetic financing (§5.5) — put-call-parity implied
-    forward from ATM C/P day closes, ~1M expiry; financing = ln(F/S)/T (no
-    per-name dividend adj in v1 — labeled); spread vs SOFR, volume-weighted."""
-    hist = massive.read_snapshots()
-    f = store.read_latest("fred_sofr")
-    if hist is None or f is None:
-        return False
-    sofr = float(f.sort_values("date")["value"].iloc[-1])
-
-    rows = []
-    for (d, u), g in hist.groupby(["date", "underlying"]):
-        g = g.dropna(subset=["day_close", "strike", "expiry", "und_price"])
-        if g.empty:
-            continue
-        S = float(g["und_price"].iloc[0])
-        g = g.copy()
-        g["dte"] = (pd.to_datetime(g["expiry"]) - pd.to_datetime(d)).dt.days
-        g = g[g["dte"].between(20, 45)]
-        if g.empty:
-            continue
-        exp = g.loc[(g["dte"] - 30).abs().idxmin(), "expiry"]
-        ge = g[g["expiry"] == exp]
-        strikes = ge[ge["cp"] == "call"].merge(
-            ge[ge["cp"] == "put"], on="strike", suffixes=("_c", "_p"))
-        if strikes.empty:
-            continue
-        strikes["k_dist"] = (strikes["strike"] - S).abs()
-        atm = strikes.loc[strikes["k_dist"].idxmin()]
-        T = float(atm["dte_c"]) / 365.0
-        F = atm["strike"] + (atm["day_close_c"] - atm["day_close_p"]) * np.exp(sofr / 100 * T)
-        if F <= 0 or S <= 0:
-            continue
-        fin = np.log(F / S) / T * 100.0
-        vol = ge["day_volume"].sum()
-        rows.append({"date": d, "underlying": u, "fin": fin, "vol": vol})
-    if not rows:
-        return False
-    df = pd.DataFrame(rows)
-    comp = df.groupby("date").apply(
-        lambda g: np.average(g["fin"], weights=g["vol"].clip(lower=1)),
-        include_groups=False).rename("value").reset_index()
-    comp["date"] = pd.to_datetime(comp["date"])
-    comp["value"] = (comp["value"] - sofr) * 100.0  # spread in bp
-    # §7.4 sanity bound: parity from non-synchronous EOD closes must land within
-    # a plausible financing band; outside it, suppress rather than ship.
-    if abs(float(comp["value"].iloc[-1])) > 500:
-        store.log_run("compute:LV9", "sanity_fail",
-                      f"spread {comp['value'].iloc[-1]:.0f}bp outside ±500bp — suppressed; "
-                      "needs synchronous quote pairing (itemized)")
-        return False
-    store.write_display("LV9", {
-        "id": "LV9", "name": "L2: Single-name synthetic financing", "panel": "leverage",
-        "source": "Massive snapshots (parity)", "cadence": "daily",
-        "asof": comp["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " bp vs SOFR",
-        "series": [_display_series(comp, "Volume-weighted implied financing − SOFR (bp)")],
-        "tile": {"value": round(float(comp["value"].iloc[-1]), 0), "delta": None,
-                 "percentile": None},
-        "provenance": "massive_snapshot",
-        "notes": (
-            "**What it shows.** The financing rate embedded in single-name options — "
-            "what it implicitly costs to carry a synthetic long position built from "
-            "options — quoted as a spread over SOFR. A widening spread signals stronger "
-            "leveraged demand for those names.\n\n"
-            "**How it's computed.** From put-call parity we back out the implied "
-            "forward, `F = K + (C − P)·e^(SOFR·T)`, at the at-the-money strike near "
-            "one-month expiry (`C`, `P` are the ATM call and put closes, `K` the "
-            "strike, `T` the year fraction). The implied financing rate is `ln(F/S)/T`, "
-            "and the plotted series is that rate minus SOFR, volume-weighted across "
-            "names and expressed in basis points.\n\n"
-            "**Caveats.** A labeled estimate: parity built from non-synchronous "
-            "end-of-day closes adds noise, and v1 makes no per-name dividend adjustment "
-            "(which biases financing down for dividend payers, though retail favorites "
-            "are mostly low-dividend). Readings beyond ±500bp are treated as parity "
-            "artifacts and suppressed. Compare against the LV7 box-spread for the "
-            "leveraged-demand premium."
-        ),
-    })
-    return True
-
-
 def build() -> dict[str, bool]:
+    # LV9 (single-name synthetic financing) + the LVT snapshot table removed
+    # 2026-07-24 (CIO cleanup). LV5/LV10 keep computing so their history accrues.
     out = build_lv3()
     out.update(build_rf78())
-    out.update({"LV5": build_lv5(), "LV10": build_lv10(), "LV9": build_lv9()})
-    from .leverage import build_lvt
-    out["LVT"] = build_lvt()  # last: needs this run's LV5/LV10 + leverage's LV7/LV14
+    out.update({"LV5": build_lv5(), "LV10": build_lv10()})
     return out

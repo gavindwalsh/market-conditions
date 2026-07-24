@@ -3,7 +3,7 @@ aggregates (massive.RETAIL_TABLE). §5.1 floor/trend caveat renders on every
 tile. These soft-skip until the first process_tape_day run lands.
 
 RF1  net retail flow ($, daily)        RF2  retail participation (of tape $)
-RF5  avg retail trade size             MH9  off-exchange + odd-lot share
+MH9  off-exchange + odd-lot share
 RF3/RF4 (concentration, buy-the-dip) land after the first real tape days —
 they join memberships and SPX returns onto the same aggregates.
 """
@@ -31,7 +31,7 @@ def _daily() -> pd.DataFrame | None:
 def build() -> dict[str, bool]:
     df = _daily()
     if df is None:
-        return {"RF1": False, "RF2": False, "RF5": False, "MH9": False}
+        return {"RF1": False, "RF2": False, "MH9": False}
 
     for c, default in (("retail_ident_usd", None), ("retail_ident_trades", None),
                        ("moc_volume", 0), ("signing", "midpoint")):
@@ -290,22 +290,7 @@ def build() -> dict[str, bool]:
         ),
     })
 
-    day["avg_size"] = (day["ident_usd"] / day["ident_trades"].clip(lower=1))
-    _emit("RF5", "Avg retail trade size", "retail",
-          [("avg_size", "Identified retail $ / trade", "avos")], "avg_size", " $", 0,
-          bars=True, tooltip="Average dollar size of an identified retail trade.",
-          note=(
-              "**What it shows.** The average dollar size of a single retail trade — a "
-              "texture read on whether retail is trading in bigger or smaller tickets, "
-              "which tends to shift with confidence and with the mix of names in play.\n\n"
-              "**How it's computed.** Identified retail dollars ÷ the count of identified "
-              "retail trades, each day, using the quote-midpoint classifier described in "
-              "Retail identification and scaling above.\n\n"
-              "**Caveats.** Built on identified prints only. Because it is a ratio — "
-              "dollars per trade — it is unaffected by the ×3 scale factor, so no scaling "
-              "is applied here."
-          ))
-
+    # RF5 (avg retail trade size) removed 2026-07-24 (CIO cleanup — not helpful).
     # OP8 (MOC auction share) killed 2026-07-10 — not interesting (CIO).
     day["offexch_pct"] = day["offexch"] / day["tape_vol"] * 100.0
     day["oddlot_pct"] = day["oddlot"] / day["tape_trades"] * 100.0
@@ -330,7 +315,7 @@ def build() -> dict[str, bool]:
 
     rf3 = _build_rf3(df, F)
     rf4 = _build_rf4(day)
-    return {"RF1": rf1, "RF2": True, "RF10": True, "RF5": True, "MH9": True,
+    return {"RF1": rf1, "RF2": True, "RF10": True, "MH9": True,
             "RF3": rf3, "RF4": rf4}
 
 
@@ -379,9 +364,8 @@ def _build_rf4(day: pd.DataFrame) -> bool:
         "id": "RF4", "name": "Buy-the-dip sensitivity", "panel": "retail",
         "source": "Massive tape × BBG SPX", "cadence": "daily",
         "asof": d63["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B/1%",
-        "series": [_display_series(d63, "3-month (63d) — trend", role="avos", unit="$B/1%"),
-                   _display_series(d21, "1-month (21d) — faster, noisier",
-                                   role="context", unit="$B/1%")],
+        "series": [_display_series(d63, "3-month", role="avos", unit="$B/1%"),
+                   _display_series(d21, "1-month", role="context", unit="$B/1%")],
         "tile": {"value": round(float(d63["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(d63["value"])},
         "provenance": "massive_tape",
