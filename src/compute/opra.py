@@ -16,8 +16,6 @@ from .. import config, store, util
 from ..pull import massive
 from .ownership import _display_series
 
-PROXY_NOTE = "Small-lot (<10 contracts) = retail PROXY (§5.2) — observed regularity, not identification."
-
 
 def _opra() -> pd.DataFrame | None:
     df = massive.read_opra_daily()
@@ -56,7 +54,18 @@ def build_lv3() -> dict[str, bool]:
         "provenance": "massive_opra",
         "tooltip": "Composition of option volume by days-to-expiry — weekly average, "
                    "stacks to 100%.",
-        "notes": "Weekly mean of daily bucket shares of contract volume.",
+        "notes": (
+            "**What it shows.** How option volume splits by time to expiry — same-day "
+            "(0 DTE), 1–5, 6–30, and more than 30 days — as weekly stacked bars that sum "
+            "to 100%. A growing 0 DTE stack is the signature of short-dated, "
+            "retail-heavy speculation.\n\n"
+            "**How it's computed.** Each day, contract volume is sorted into the four "
+            "days-to-expiry buckets; each bucket's daily share of total volume is then "
+            "averaged over the Friday-ended week. The tile shows the latest 0 DTE "
+            "share.\n\n"
+            "**Caveats.** This is whole-market OPRA volume, not retail-only, and the "
+            "shares are of contract count, not premium dollars."
+        ),
     })
     return {"LV3": True}
 
@@ -94,8 +103,20 @@ def build_rf78() -> dict[str, bool]:
         "provenance": "massive_opra",
         "tooltip": "Small-lot (<10 contract) option premium per day (retail proxy), "
                    "smoothed on a 5-day trailing average.",
-        "notes": PROXY_NOTE + " 5-day trailing mean; zero-premium feed days rendered as "
-                 "gaps, not zeros.",
+        "notes": (
+            "**What it shows.** The dollar premium spent on small (fewer than 10 "
+            "contracts) option trades each day — a proxy for retail options activity — "
+            "with that small-lot premium also shown as a share of all option premium. A "
+            "rising line means retail is leaning harder into options.\n\n"
+            "**How it's computed.** Small-lot premium is summed each day and smoothed "
+            "with a 5-day trailing mean; the share is small-lot premium ÷ total option "
+            "premium. The under-10-contract cutoff is the retail proxy described in "
+            "Small-lot options proxy above.\n\n"
+            "**Caveats.** This is a proxy — an observed regularity, not a positive "
+            "identification of retail. Days when the feed reports zero premium are drawn "
+            "as gaps rather than dropped to zero, since they are feed artifacts, not "
+            "genuine days of no activity."
+        ),
     })
 
     callsh = _sm(day["smalllot_call_prem"] / day["smalllot_prem"] * 100.0)
@@ -116,7 +137,17 @@ def build_rf78() -> dict[str, bool]:
         "provenance": "massive_opra",
         "tooltip": "Call share of small-lot premium (5-day average); second line = "
                    "small-lot premium in semis.",
-        "notes": PROXY_NOTE + " 5-day trailing mean.",
+        "notes": (
+            "**What it shows.** How much of retail's small-lot option spending goes to "
+            "calls versus puts — the call share is a directional, speculative read — "
+            "shown alongside the small-lot premium spent in semiconductors, a "
+            "perennial retail favorite.\n\n"
+            "**How it's computed.** Call share is small-lot call premium ÷ small-lot "
+            "total premium; the semis line is small-lot premium summed across the top "
+            "semiconductor names. Both are 5-day trailing means. The under-10-contract "
+            "cutoff is the retail proxy described in Small-lot options proxy above.\n\n"
+            "**Caveats.** A proxy, not an identification of retail flow."
+        ),
     })
     return {"RF7": True, "RF8": True}
 
@@ -158,8 +189,23 @@ def build_lv5() -> bool:
         "extremes": {k: round(float(v), 1) for k, v in top.items()},
         "status": {"level": "provisional", "label": "OI-convention"},
         "tooltip": "Dealer gamma exposure estimate — changes are the signal, not levels.",
-        "notes": "OI-convention estimator (dealers +γ calls / −γ puts, §5.3 revised). "
-                 "Universe = retail top-25 + majors + semis (~32 names).",
+        "notes": (
+            "**What it shows.** An estimate of dealer gamma exposure — how much dealers "
+            "must buy or sell to stay delta-hedged as the market moves. Large negative "
+            "readings imply dealers amplify moves (selling into falls); positive "
+            "readings imply they dampen them. The direction of change matters more than "
+            "the absolute level.\n\n"
+            "**How it's computed.** For each option, `GEX = sign · γ · OI · 100 · S² · "
+            "0.01`, where `γ` is gamma, `OI` open interest, `S` the underlying price, "
+            "`100` the contract multiplier, and `sign` is +1 for calls and −1 for puts "
+            "(the open-interest convention, taking dealers long calls and short puts). "
+            "These are summed across the universe and expressed in billions of dollars "
+            "per 1% move. The universe is roughly 32 names — the retail top-25 plus "
+            "index majors and semiconductors.\n\n"
+            "**Caveats.** This is the open-interest estimator, inferring dealer "
+            "positioning from OI rather than signed order flow — hence the "
+            "*OI-convention* badge. Read the trend, not the level."
+        ),
     })
     return True
 
@@ -212,9 +258,20 @@ def build_lv10() -> bool:
         "provenance": "massive_snapshot",
         "status": {"level": "provisional", "label": "snapshot universe"},
         "tooltip": "Positive = upside call wings bid vs ATM (call-demand regime).",
-        "notes": "25Δ call IV − ATM IV per name (20-45d expiry), volume-weighted across "
-                 "the ~32-name snapshot universe; % SPX members inverted lands with the "
-                 "member-breadth extension.",
+        "notes": (
+            "**What it shows.** How expensive upside calls are relative to "
+            "at-the-money options. Positive means the call wing is bid up versus ATM — "
+            "a call-demand, upside-chasing regime; near zero or negative means that "
+            "demand has faded.\n\n"
+            "**How it's computed.** For each name we take `25Δ call IV − ATM IV` at "
+            "20–45 day expiry — the implied vol of the roughly 0.25-delta call minus "
+            "the roughly 0.50-delta (ATM) call — then volume-weight across the ~32-name "
+            "snapshot universe. Names where those deltas can't be matched closely are "
+            "dropped so a bad strike can't skew the composite.\n\n"
+            "**Caveats.** Computed on the snapshot universe (hence the badge). The "
+            "breadth companion — the share of S&P 500 members with an inverted call "
+            "skew — arrives with a later member-breadth extension."
+        ),
     })
     return True
 
@@ -278,10 +335,24 @@ def build_lv9() -> bool:
         "tile": {"value": round(float(comp["value"].iloc[-1]), 0), "delta": None,
                  "percentile": None},
         "provenance": "massive_snapshot",
-        "notes": "Parity forward from ATM C/P EOD closes (non-synchronous closes add "
-                 "noise — labeled estimate); NO per-name dividend adjustment in v1 "
-                 "(biases financing DOWN for dividend payers; retail favorites are "
-                 "mostly low-div). Compare vs LV7 box for the demand premium (§5.5).",
+        "notes": (
+            "**What it shows.** The financing rate embedded in single-name options — "
+            "what it implicitly costs to carry a synthetic long position built from "
+            "options — quoted as a spread over SOFR. A widening spread signals stronger "
+            "leveraged demand for those names.\n\n"
+            "**How it's computed.** From put-call parity we back out the implied "
+            "forward, `F = K + (C − P)·e^(SOFR·T)`, at the at-the-money strike near "
+            "one-month expiry (`C`, `P` are the ATM call and put closes, `K` the "
+            "strike, `T` the year fraction). The implied financing rate is `ln(F/S)/T`, "
+            "and the plotted series is that rate minus SOFR, volume-weighted across "
+            "names and expressed in basis points.\n\n"
+            "**Caveats.** A labeled estimate: parity built from non-synchronous "
+            "end-of-day closes adds noise, and v1 makes no per-name dividend adjustment "
+            "(which biases financing down for dividend payers, though retail favorites "
+            "are mostly low-dividend). Readings beyond ±500bp are treated as parity "
+            "artifacts and suppressed. Compare against the LV7 box-spread for the "
+            "leveraged-demand premium."
+        ),
     })
     return True
 

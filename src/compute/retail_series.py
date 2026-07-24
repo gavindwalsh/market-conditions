@@ -15,10 +15,9 @@ from .. import store, util
 from ..pull import massive
 from .ownership import _display_series
 
-FLOOR_NOTE = ("Quote-midpoint classifier (§5.1) identifies roughly a third of retail "
-              "trades; gated uncalibrated until RF9 >= 0.6.")
-SCALE_NOTE = ("Dollar values scaled ×{f:.0f} from the identified floor to estimated "
-              "total retail; factor provisional until RF9 fits it empirically.")
+# Per-metric appendix prose is self-contained and follows the What/How/Caveats
+# template, referencing the shared "Retail identification and scaling" section
+# by name rather than prepending a shared caveat blob.
 
 
 def _daily() -> pd.DataFrame | None:
@@ -53,7 +52,7 @@ def build() -> dict[str, bool]:
     asof = day["date"].iloc[-1].strftime("%Y-%m-%d")
 
     def _emit(mid, name, panel, series_defs, tile_col, unit, fmt=2, note="", bars=False,
-              tooltip=None, status=None, shared_note=True):
+              tooltip=None, status=None):
         # series_defs tuples: (col, label, role[, kind[, unit]]) — kind 'bar'/'line'
         series = []
         for sdef in series_defs:
@@ -72,7 +71,7 @@ def build() -> dict[str, bool]:
             "tile": {"value": round(float(day[tile_col].iloc[-1]), fmt), "delta": None,
                      "percentile": util.trailing_percentile(day[tile_col])},
             "provenance": "massive_tape",
-            "notes": ((FLOOR_NOTE + " " + note) if shared_note else note).strip(),
+            "notes": note.strip(),
         }
         if tooltip:
             payload["tooltip"] = tooltip
@@ -82,7 +81,6 @@ def build() -> dict[str, bool]:
 
     from .. import config as _cfg
     F = _cfg.RETAIL_SCALE_FACTOR
-    scale_note = SCALE_NOTE.format(f=F)
     signed = day[day["signing"] == "midpoint"].copy()
     rf1 = not signed.empty
     if rf1:
@@ -100,7 +98,25 @@ def build() -> dict[str, bool]:
             "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
             "tooltip": "Estimated total retail net buying per day — classifier floor ×3 "
                        "until the RF9 calibration lands.",
-            "notes": FLOOR_NOTE + " " + scale_note,
+            "notes": (
+                "**What it shows.** Estimated net dollar flow from retail traders each "
+                "day — buys minus sells — scaled to a whole-market figure. Positive "
+                "bars are net buying, negative bars net selling; together they track "
+                "the daily push and pull of the retail crowd.\n\n"
+                "**How it's computed.** Every retail trade is identified and signed by "
+                "the quote-midpoint classifier described in \"Retail identification and "
+                "scaling\" above — off-exchange sub-penny prints, signed buy or sell "
+                "against the NBBO midpoint. Each day's net identified dollars are summed "
+                "and multiplied by the ×3 scale factor to estimate the market-wide "
+                "total: `RF1 = 3.0 × Σ(signed identified retail $)`, plotted in billions "
+                "of dollars per day.\n\n"
+                "**Caveats.** The ×3 factor is provisional, so the series carries an "
+                "*uncalibrated* badge until it is fit against Nasdaq's Retail Activity "
+                "Tracker and clears the calibration gate (see the shared section). "
+                "Trades executing exactly at the midpoint are excluded because their "
+                "direction is ambiguous, so this is a net-direction estimate, not a "
+                "gross-volume one — for gross retail dollar volume see RF10."
+            ),
         })
     # RF2: weekly participation splice — FINRA T1+T2 non-ATS anchor, a T1-only
     # bridge over FINRA's publication lag, then our classifier estimate.
@@ -174,11 +190,27 @@ def build() -> dict[str, bool]:
         "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
         "tooltip": "Retail share of tape volume — solid bars are the FINRA-anchored official "
                    "trend, lighter bars our estimate covering FINRA's publication lag.",
-        "notes": FLOOR_NOTE + " Splice: FINRA T1+T2 non-ATS weekly volume (OTCE excluded) "
-                 "rescaled onto our definition by k = mean(ours/FINRA) over overlap weeks — "
-                 "FINRA per-firm rows count both sides of trades, ~2x retail. T1-only weeks "
-                 "in FINRA's publication lag are rescaled separately; our ×3 classifier "
-                 "estimate covers weeks FINRA has not published.",
+        "notes": (
+            "**What it shows.** Retail's share of total tape volume each week, scaled "
+            "to a market-wide estimate. A rising line means retail is accounting for a "
+            "larger slice of everything that trades.\n\n"
+            "**How it's computed.** Our weekly reading is identified retail dollars ÷ "
+            "total tape dollars, ×3-scaled to an estimated total, averaged over the "
+            "week (weeks with fewer than three trading days are dropped). The official "
+            "trend anchor, though, is FINRA's own data: weekly non-ATS (T1+T2) share "
+            "volume divided by our tape volume, rescaled onto our definition per the "
+            "FINRA participation anchor described in Shared methodology. Because FINRA "
+            "T1 tiers publish about two weeks ahead of T2, a T1-only segment is "
+            "rescaled separately to bridge that gap, and our own ×3 classifier estimate "
+            "fills the most recent weeks FINRA has not yet published. The chart shows "
+            "the three segments in sequence: FINRA-anchored (solid), the T1-only "
+            "bridge, then our estimate.\n\n"
+            "**Caveats.** The classifier captures only about a third of retail, so the "
+            "level depends on the provisional ×3 factor and the series carries an "
+            "*uncalibrated* badge until that factor clears the RTAT calibration gate "
+            "(see Shared methodology). The tile reads the last complete week, excluding "
+            "the in-progress one."
+        ),
     })
 
     # RF10: total retail DOLLAR volume — weekly, 2023->. Gross activity in $
@@ -237,18 +269,41 @@ def build() -> dict[str, bool]:
         "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
         "tooltip": "Estimated total retail dollars traded per week — gross activity, not net "
                    "(see RF1 for net). FINRA-anchored history spliced with the recent Massive tape.",
-        "notes": FLOOR_NOTE + " Gross dollar volume, not net direction — FINRA weekly OTC has no "
-                 "buy/sell split, so RF1 remains the net view. History = FINRA T1+T2 non-ATS share "
-                 "volume × weekly tape $/share, rescaled onto our estimated-total definition by "
-                 "k = mean(ours/FINRA) over overlap weeks (FINRA per-firm rows count both sides, "
-                 "~2×); recent weeks in FINRA's publication lag are the ×3 classifier estimate.",
+        "notes": (
+            "**What it shows.** Estimated total dollars retail traded each week — gross "
+            "activity, buys and sells added together, not a net direction. For the net "
+            "buy-minus-sell view see RF1.\n\n"
+            "**How it's computed.** Our recent weeks are the identified retail dollars "
+            "×3-scaled to an estimated total and summed by week (weeks with fewer than "
+            "three trading days dropped). The history is anchored to FINRA: FINRA T1+T2 "
+            "non-ATS share volume is turned into dollars using that week's "
+            "volume-weighted tape price (`$/share`), then rescaled onto our "
+            "estimated-total definition per the FINRA participation anchor in Shared "
+            "methodology. The most recent weeks — inside FINRA's roughly four-week "
+            "publication lag — use the ×3 classifier estimate. The two segments are "
+            "spliced into one series.\n\n"
+            "**Caveats.** This is gross volume, not net flow — FINRA's weekly OTC data "
+            "carries no buy/sell split, which is why RF1 remains the only net view. The "
+            "×3 factor is provisional, so the series carries an *uncalibrated* badge "
+            "until it clears the RTAT calibration gate (see Shared methodology)."
+        ),
     })
 
     day["avg_size"] = (day["ident_usd"] / day["ident_trades"].clip(lower=1))
     _emit("RF5", "Avg retail trade size", "retail",
           [("avg_size", "Identified retail $ / trade", "avos")], "avg_size", " $", 0,
           bars=True, tooltip="Average dollar size of an identified retail trade.",
-          note="Identified prints only — the ratio is invariant to the ×3 scale factor.")
+          note=(
+              "**What it shows.** The average dollar size of a single retail trade — a "
+              "texture read on whether retail is trading in bigger or smaller tickets, "
+              "which tends to shift with confidence and with the mix of names in play.\n\n"
+              "**How it's computed.** Identified retail dollars ÷ the count of identified "
+              "retail trades, each day, using the quote-midpoint classifier described in "
+              "Retail identification and scaling above.\n\n"
+              "**Caveats.** Built on identified prints only. Because it is a ratio — "
+              "dollars per trade — it is unaffected by the ×3 scale factor, so no scaling "
+              "is applied here."
+          ))
 
     # OP8 (MOC auction share) killed 2026-07-10 — not interesting (CIO).
     day["offexch_pct"] = day["offexch"] / day["tape_vol"] * 100.0
@@ -256,10 +311,21 @@ def build() -> dict[str, bool]:
     _emit("MH9", "Off-exchange + odd-lot share", "health",
           [("offexch_pct", "TRF share of volume (%)", "avos", "bar", "% of volume"),
            ("oddlot_pct", "Odd-lot share of trades (%)", "context", "line", "% of trades")],
-          "offexch_pct", "%", shared_note=False,
+          "offexch_pct", "%",
           tooltip="Share of volume printed off-exchange (bars, left) and share of trades "
                   "under 100 shares (line, right).",
-          note="Off-exchange = FINRA TRF prints / total volume; odd-lot = trades <100sh.")
+          note=(
+              "**What it shows.** Two market-structure gauges that have climbed alongside "
+              "retail and internalization: the share of volume printing away from the lit "
+              "exchanges (bars, left axis) and the share of trades that are odd lots — "
+              "fewer than 100 shares (line, right axis).\n\n"
+              "**How it's computed.** Off-exchange share is FINRA TRF print volume ÷ total "
+              "tape volume; odd-lot share is the count of sub-100-share trades ÷ total "
+              "trade count. Both are daily.\n\n"
+              "**Caveats.** Off-exchange share captures all internalized and dark volume, "
+              "not retail alone, so read it as a structure indicator rather than a pure "
+              "retail gauge."
+          ))
 
     rf3 = _build_rf3(df, F)
     rf4 = _build_rf4(day)
@@ -298,8 +364,21 @@ def _build_rf4(day: pd.DataFrame) -> bool:
         "provenance": "massive_tape",
         "status": {"level": "provisional", "label": "classifier floor"},
         "tooltip": ">1 = retail buys dips harder than its average day.",
-        "notes": FLOOR_NOTE + " 60d rolling mean of midpoint-signed net flow on SPX down "
-                 "days ÷ the all-day rolling mean; scale-invariant.",
+        "notes": (
+            "**What it shows.** Whether retail leans into weakness. Above 1 means "
+            "retail's net buying on S&P 500 down days runs stronger than on its average "
+            "day — active dip-buying; below 1 means retail pulls back when the market "
+            "falls.\n\n"
+            "**How it's computed.** A 60-day rolling ratio: `mean(retail net $ on SPX "
+            "down days) ÷ mean(retail net $, all days)`. Retail net flow is the "
+            "midpoint-signed flow from the classifier (see Retail identification and "
+            "scaling above); a down day is any close-to-close decline in the S&P 500. "
+            "The window needs at least 20 signed days, including at least 5 down days, "
+            "before it renders.\n\n"
+            "**Caveats.** Being a ratio, it is scale-invariant — the ×3 factor cancels — "
+            "but it is still built on the identified third of retail, so it carries the "
+            "*classifier floor* badge marking it as provisional until calibration."
+        ),
     })
     return True
 
@@ -348,7 +427,22 @@ def _build_rf3(df: pd.DataFrame, scale: float) -> bool:
         "status": {"level": "provisional", "label": "classifier floor"},
         "tooltip": "Where retail dollars concentrate — bars = est. retail $ in the top-10 "
                    "names, lines = shares of all retail $.",
-        "notes": FLOOR_NOTE + f" Bars ×{scale:.0f}-scaled to est. total $; shares use "
-                 "identified $ only; membership = latest BBG SPX snapshot.",
+        "notes": (
+            "**What it shows.** Where retail dollars pile up. The bars are estimated "
+            "total retail dollars flowing into the ten largest S&P 500 names; the lines "
+            "are the share of all retail dollars going to those top-10 names and to "
+            "semiconductors. A rising line means retail is crowding into a narrower set "
+            "of names.\n\n"
+            "**How it's computed.** Bars: identified retail dollars in the top-10 names, "
+            "×3-scaled to an estimated total ($B). Lines: top-10 retail $ ÷ all retail "
+            "$, and semis retail $ ÷ all retail $ — shares computed on identified "
+            "dollars only. Index membership is the latest Bloomberg S&P 500 snapshot; "
+            "semis are GICS sub-industry 453010. See Retail identification and scaling "
+            "above for the classifier.\n\n"
+            "**Caveats.** The bars depend on the provisional ×3 factor; the share lines "
+            "are ratios and so are scale-invariant. Membership is applied backward "
+            "through history, so the name list carries a survivorship bias. The "
+            "*classifier floor* badge marks the metric provisional until calibration."
+        ),
     })
     return True

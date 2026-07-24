@@ -89,10 +89,20 @@ def build_lv8() -> bool:
         "provenance": "derived",
         "tooltip": "Implied cost of index leverage from the ES futures roll, vs SOFR — "
                    "rich = leverage demand paying up.",
-        "notes": "Implied rate = ln(ES2/ES1)/0.25y + trailing SPX dividend yield "
-                 "(SPTR−SPX drift), minus SOFR. Days within ±2bd of quarterly expiry "
-                 "dropped (generic-contract roll artifacts) plus a ±150bp-vs-rolling-"
-                 "median backstop.",
+        "notes": (
+            "**What it shows.** The implied cost of index leverage read from the S&P 500 "
+            "(ES) futures roll, quoted as a spread over SOFR. A rich (positive) spread "
+            "means leverage demand is paying up to be long the index via futures.\n\n"
+            "**How it's computed.** The calendar between the front and second ES "
+            "contracts implies a financing rate, `ln(ES2/ES1)/Δt` with `Δt ≈ 0.25y` "
+            "(91/365). Because holding futures forgoes dividends, we add back the "
+            "trailing S&P 500 dividend yield — estimated from the one-year SPTR-minus-SPX "
+            "return drift — and subtract SOFR, leaving a spread in basis points.\n\n"
+            "**Caveats.** On generic-contract roll days the front/second ratio explodes "
+            "(verified swings of several hundred bp around quarterly expiry), so days "
+            "within ±2 business days of the March/June/September/December third Friday "
+            "are dropped, backed by a ±150bp-versus-60-day-median filter."
+        ),
     })
     return True
 
@@ -126,8 +136,24 @@ def build_lv11() -> bool:
         "provenance": "derived",
         "tooltip": "Implied vol minus what was subsequently realized — the toll option "
                    "buyers paid; ends ~1 month ago by construction.",
-        "notes": "Implied 1M (VIX/VXN) minus vol realized over the SUBSEQUENT 21 "
-                 "sessions.",
+        "notes": (
+            "**What it shows.** What a month of implied volatility turned out to cost "
+            "versus what actually came to pass — one-month implied vol (VIX for the "
+            "S&P 500, VXN for the Nasdaq-100) minus the volatility realized over the "
+            "month that followed. Positive means option buyers overpaid and sellers "
+            "earned the premium; negative means realized vol overshot what was priced. "
+            "Because it looks forward to realized outcomes, the series necessarily "
+            "ends about a month ago.\n\n"
+            "**How it's computed.** For each index, `VRP = IV_1M − RV_next21`, where "
+            "`IV_1M` is the implied-vol index and `RV_next21` is realized volatility "
+            "over the subsequent 21 trading sessions — daily returns, a rolling 21-day "
+            "standard deviation, annualized by √252, then shifted back so each day is "
+            "paired with the volatility that came after it. The tile ranks the S&P 500 "
+            "series.\n\n"
+            "**Caveats.** The forward-looking realized leg cannot be computed for the "
+            "most recent ~21 sessions, so by construction the line stops about one "
+            "month short of today."
+        ),
     })
     return True
 
@@ -181,10 +207,22 @@ def build_lv6() -> bool:
         "provenance": "derived",
         "tooltip": "Rebalance capacity per 1% index move (structural); second line = "
                    "realized forced end-of-day flow magnitude, 5-day average.",
-        "notes": f"Σ AUM×L×(L−1)×underlying move across {len(flows)} major leveraged funds "
-                 "(curated universe, §A3). Forced flow chases the day's move into the "
-                 "close so it flips sign daily; we plot its magnitude (5d mean) as "
-                 "rebalance intensity rather than the sign-flipping signed series.",
+        "notes": (
+            "**What it shows.** How much leveraged ETFs must trade to keep their exposure "
+            "on target as the market moves — both the structural capacity per 1% index "
+            "move and the realized forced end-of-day flow. Large capacity means these "
+            "funds can amplify late-day moves.\n\n"
+            f"**How it's computed.** Rebalance capacity per 1% move is `Σ AUM·|L·(L−1)|·"
+            f"0.01`; realized forced flow is `Σ AUM·L·(L−1)·(underlying daily return)`, "
+            f"both summed across {len(flows)} major leveraged funds (a curated universe — "
+            "see ETF flow universe in Shared methodology). `L` is each fund's leverage "
+            "factor. Because the forced flow chases the day's move into the close, it "
+            "flips sign every day; we plot its magnitude on a 5-day mean as rebalance "
+            "*intensity* rather than the sign-flipping signed series.\n\n"
+            "**Caveats.** Covers the curated leveraged universe, not every leveraged ETF. "
+            "The flow line is a magnitude, so it shows how much rebalancing there is, not "
+            "its direction."
+        ),
     })
     return True
 
@@ -251,11 +289,23 @@ def build_lv13() -> bool:
         "status": {"level": "provisional", "label": "new methodology"},
         "tooltip": "Financing spread embedded in leveraged-ETF NAV drag, vs SOFR — "
                    "the cost levered funds actually pay.",
-        "notes": "fin = −[nav_ret − (L×TR − fee/252)]×252/(L−1), 60d mean, median over "
-                 "TQQQ/QLD/UPRO/SSO, minus same-day SOFR. Underlying leg = TOTAL return "
-                 "(SPTR/XNDX), so index dividends don't leak in as negative financing "
-                 "(§5.8, total-return fix 2026-07-10). Level is a noisy estimate (the "
-                 "residual amplifies tracking error) — read the trend. Flat 0.9% fee.",
+        "notes": (
+            "**What it shows.** The financing spread buried inside leveraged-ETF returns "
+            "— the cost these funds effectively pay on their embedded swaps, versus SOFR. "
+            "It is the recurring toll of levered index exposure.\n\n"
+            "**How it's computed.** The return model is `nav_ret = L·r_tr − fee/252 − "
+            "(L−1)·fin/252`, so embedded financing backs out as `fin = −[nav_ret − (L·r_tr "
+            "− fee/252)]·252/(L−1)`. Crucially `r_tr` is the underlying's TOTAL return "
+            "(SPTR / XNDX), not price return: the funds' swaps earn the index total "
+            "return, so using price-only return would leave the dividend yield in the "
+            "residual and read as spurious negative financing. We take a 60-day mean, the "
+            "median across TQQQ/QLD/UPRO/SSO, minus same-day SOFR, in basis points, with a "
+            "flat 0.9% fee assumed.\n\n"
+            "**Caveats.** New-methodology badge. The residual amplifies tiny NAV-versus-"
+            "index tracking errors into large financing swings, so the level is noisy — "
+            "read the trend, not the point. Long 2×/3× S&P and Nasdaq funds only "
+            "(inverse funds' estimator has the opposite sign)."
+        ),
     })
     return True
 
@@ -321,8 +371,20 @@ def build_lv16() -> bool:
         "status": {"level": "provisional", "label": "current floats"},
         "tooltip": "SPX short interest as % of float (biweekly prints); line = median "
                    "days-to-cover.",
-        "notes": "Biweekly FINRA prints via BBG bdh backfill (2023-11→) + daily "
-                 "accumulation. Denominator = CURRENT float caps applied backward.",
+        "notes": (
+            "**What it shows.** Aggregate short interest across the S&P 500 as a percent "
+            "of float, with the median days-to-cover alongside. A rising line means more "
+            "of the index is sold short; high days-to-cover means those shorts would take "
+            "longer to buy back.\n\n"
+            "**How it's computed.** `Σ(short shares × price) ÷ Σ float-cap`, where each "
+            "name's short shares come from the biweekly FINRA print and the price is the "
+            "last tape close on or before that print date. Days-to-cover is the median "
+            "SHORT_INT_RATIO across names. History comes from a Bloomberg `bdh` backfill "
+            "(November 2023 onward) plus daily snapshot appends.\n\n"
+            "**Caveats.** Current-floats badge: the float-cap denominator uses the current "
+            "snapshot applied backward, so older readings carry a survivorship and "
+            "repricing bias."
+        ),
     })
     return True
 
@@ -355,16 +417,25 @@ def build_lv7() -> bool:
         return False
     store.write_display("LV7", {
         "id": "LV7", "name": "L1: Box-spread implied yield vs SOFR", "panel": "leverage",
-        "source": "BBG SPX chain (§5.4)", "cadence": "daily",
+        "source": "BBG SPX chain", "cadence": "daily",
         "asof": tile["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " bp (tile: 3M)",
         "series": series,
         "tile": {"value": round(float(tile["value"].iloc[-1]), 0), "delta": None,
                  "percentile": util.trailing_percentile(tile["value"])},
         "provenance": "bloomberg_cache",
         "tooltip": "Equity-implied borrow rate from SPX box spreads, vs SOFR.",
-        "notes": "Median across 5 wide strike pairs, NBBO midpoints. History accumulates "
-                 "from 2026-07-09 (§6 gate applies). Cross-check vs boxtrades.com ±25bp "
-                 "(§7.3). Quotes pulled off-close are wider — prefer near-close runs.",
+        "notes": (
+            "**What it shows.** The risk-free borrowing rate implied by S&P 500 options "
+            "box spreads, versus SOFR — an equity-market read on funding costs, and a "
+            "clean benchmark for the other financing measures.\n\n"
+            "**How it's computed.** A box spread (offsetting call and put pairs at two "
+            "strikes) locks in a fixed payoff, so its price implies a fixed financing "
+            "rate. We take the median implied rate across five wide strike pairs at NBBO "
+            "midpoints, minus SOFR, for the 1-month and 3-month tenors (basis points).\n\n"
+            "**Caveats.** History accumulates one point per tenor per run day. Quotes "
+            "pulled away from the close are wider, so near-close runs are preferred; the "
+            "series is cross-checked against boxtrades.com within ±25bp."
+        ),
     })
     return True
 
@@ -392,11 +463,18 @@ def build_lv14() -> bool:
         "status": (None if BROKER_RATES_VERIFIED
                    else {"level": "unverified", "label": "unverified seeds"}),
         "tooltip": "Posted broker margin rates — the price of retail leverage.",
-        "notes": f"Manual-quarterly posted rates, as-of {BROKER_RATES_ASOF}. Discount "
-                 "tiered vs full-service base rates."
-                 + ("" if BROKER_RATES_VERIFIED else
-                    " SEED VALUES pending verification against broker pages "
-                    "(pull/free.py)."),
+        "notes": (
+            "**What it shows.** The posted margin interest rates at major retail brokers "
+            "— the headline price of retail leverage. The tile shows the spread between "
+            "the cheapest and most expensive broker.\n\n"
+            f"**How it's computed.** Posted rates entered by hand each quarter (no API "
+            f"exists), as of {BROKER_RATES_ASOF}, each with its own source and date; "
+            "discount-broker tiered rates are shown against full-service base rates.\n\n"
+            "**Caveats.** Manual quarterly values, not a live feed."
+            + ("" if BROKER_RATES_VERIFIED else
+               " The current figures are seed values pending verification against the "
+               "brokers' posted pages.")
+        ),
     })
     return True
 
@@ -422,8 +500,17 @@ def build_lv15() -> bool:
         "provenance": "finra_cache",
         "tooltip": "Debit balances in securities margin accounts — the stock of retail "
                    "leverage.",
-        "notes": "FINRA monthly margin statistics (~3-week lag). Archive 1997–2021 + "
-                 "live page table stitched.",
+        "notes": (
+            "**What it shows.** Total debit balances in securities margin accounts — the "
+            "outstanding stock of investor leverage — with its year-over-year growth. A "
+            "classic risk-appetite gauge: sharp rises tend to accompany late-cycle "
+            "exuberance.\n\n"
+            "**How it's computed.** FINRA's monthly margin statistics, plotted as the "
+            "level in billions of dollars and as the 12-month year-over-year percent "
+            "change. History stitches a 1997–2021 archive to the live FINRA page "
+            "table.\n\n"
+            "**Caveats.** Reported with roughly a three-week lag after month-end."
+        ),
     })
     return True
 
@@ -485,8 +572,16 @@ def build_lvt() -> bool:
         "status": {"level": "building", "label": "history accruing"},
         "tooltip": "Point-in-time leverage reads without chartable history yet — each "
                    "returns as a chart as its history accrues.",
-        "notes": "Aggregates the latest LV5/LV7/LV10/LV14 values; those metrics keep "
-                 "accumulating their own series behind the scenes.",
+        "notes": (
+            "**What it shows.** A point-in-time table of the leverage measures that don't "
+            "yet have enough history to chart — dealer GEX (LV5), box-spread yields "
+            "(LV7), call-wing richness (LV10), and broker margin rates (LV14). Each "
+            "returns as its own chart once its history accrues.\n\n"
+            "**How it's computed.** Reads the latest value of each of those metrics from "
+            "the current run and lays them out with their as-of dates and flags.\n\n"
+            "**Caveats.** History-accruing badge: this is a snapshot, not a time series — "
+            "see the individual metrics above for their construction."
+        ),
     })
     return True
 

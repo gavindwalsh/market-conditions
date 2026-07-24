@@ -36,8 +36,27 @@ def build_vc1() -> bool:
         "provenance": "bloomberg_cache",
         "tooltip": "Implied correlation — low means single-name moves dominate the index "
                    "(dispersion regime).",
-        "notes": "Cboe implied correlation indices; tile ranks COR1M. The spread vs "
-                 "realized correlation is VC2.",
+        "notes": (
+            "**What it shows.** The average correlation between S&P 500 members "
+            "that index-options prices imply for the coming month. Low readings mean "
+            "index options are cheap relative to single-name options — the market "
+            "expects stocks to move on their own news (a dispersion, stock-picker's "
+            "regime). High readings mean stocks are priced to move together, an "
+            "index-like, macro-driven tape.\n\n"
+            "**How it's computed.** We plot Cboe's published COR1M (1-month) with "
+            "COR3M (3-month) alongside; the tile ranks COR1M against its own trailing "
+            "history. Cboe derives implied correlation from the identity that links "
+            "index variance to member variances: index options price the index "
+            "variance `σ_index²`, single-name options price each member's variance "
+            "`σᵢ²`, and the implied average correlation `ρ` is the value that "
+            "reconciles the two — `σ_index² = Σ wᵢ² σᵢ² + ρ · ΣΣ wᵢ wⱼ σᵢ σⱼ` (the "
+            "double sum runs over distinct member pairs, `wᵢ` are index weights). "
+            "Solving for `ρ` gives the index.\n\n"
+            "**Caveats.** This is an implied, forward-looking measure read from "
+            "options prices, not correlation that has actually occurred. The gap "
+            "between implied and realized correlation — the correlation risk premium "
+            "— is charted separately as VC2."
+        ),
     })
     return True
 
@@ -59,8 +78,19 @@ def build_vc3() -> bool:
                  "percentile": util.trailing_percentile(ratio["value"])},
         "provenance": "bloomberg_cache",
         "tooltip": "VIX/VIX3M above 1 = stress inversion; low = carry-friendly contango.",
-        "notes": "Daily close ratio of VIX to VIX3M. Per-name term-structure slopes for "
-                 "top names are a noted extension.",
+        "notes": (
+            "**What it shows.** The slope of the S&P 500's implied-volatility term "
+            "structure — near-term expected vol (VIX, 30-day) divided by 3-month "
+            "expected vol (VIX3M). Above 1 the curve is inverted: near-term fear "
+            "exceeds the medium term, the classic stress signature. Below 1 the curve "
+            "is in contango (upward-sloping), the calm-market norm that makes selling "
+            "short-dated vol profitable to carry.\n\n"
+            "**How it's computed.** The daily ratio `VIX ÷ VIX3M` of closing index "
+            "levels. The tile ranks the ratio against its trailing history.\n\n"
+            "**Caveats.** A ratio of two Cboe indices measuring 30-day and 3-month "
+            "expected S&P 500 volatility. Per-name term-structure slopes for the "
+            "largest single names are a possible future extension."
+        ),
     })
     return True
 
@@ -87,8 +117,19 @@ def build_mh7() -> bool:
         "provenance": "bloomberg_cache",
         "tooltip": "Rates vol (left) with the 10-year yield and curve slope (right) — "
                    "the rates backdrop for equities.",
-        "notes": "MOVE on its own level axis; UST 10y and the 2s10s slope (10y − 2y, "
-                 "pct-pts) share the % axis. DXY dropped 2026-07-10.",
+        "notes": (
+            "**What it shows.** The rates backdrop for equities on one chart — bond-market "
+            "volatility (the MOVE index) alongside the 10-year Treasury yield and the "
+            "2s10s curve slope. Rising rates vol or a sharply moving curve is a headwind "
+            "for risk assets, so this is the cross-asset context for everything else on "
+            "the dashboard.\n\n"
+            "**How it's computed.** The MOVE index is plotted on its own left (level) "
+            "axis; the 10-year yield and the 2s10s slope — the 10-year minus 2-year "
+            "yield, in percentage points — share the right (%) axis.\n\n"
+            "**Caveats.** The dollar index (DXY) was dropped from this chart on "
+            "2026-07-10: its narrow range flatlined beneath MOVE on the shared axis and "
+            "added the least as context."
+        ),
     })
     return True
 
@@ -145,8 +186,29 @@ def build_vc2() -> bool:
         "provenance": "derived",
         "tooltip": "Implied minus realized correlation — the premium dispersion sellers "
                    "are earning.",
-        "notes": "Realized correlation from the index-variance identity over SPX members, "
-                 "21d rolling, current membership applied backward.",
+        "notes": (
+            "**What it shows.** How far implied correlation (VC1's COR1M) sits above "
+            "the correlation S&P 500 members actually realized. That excess is the "
+            "correlation risk premium — what dispersion sellers (short index vol, long "
+            "single-name vol) are paid. A wide positive spread means dispersion trades "
+            "were richly compensated.\n\n"
+            "**How it's computed.** We compute realized average pairwise correlation "
+            "from member returns using the index-variance identity, solved for a "
+            "single correlation: `ρ = (σ_idx² − Σ wᵢ² σᵢ²) / ((Σ wᵢ σᵢ)² − Σ wᵢ² "
+            "σᵢ²)`, where `σ_idx` is the 21-day rolling volatility of the S&P 500, "
+            "`σᵢ` the 21-day rolling volatility of member `i`, and `wᵢ` its index "
+            "weight. The numerator strips each stock's own variance out of index "
+            "variance, leaving the covariance term; the denominator normalizes by the "
+            "same quantity under an all-pairs-equal-correlation assumption, so `ρ` is "
+            "the one correlation that reproduces the observed index variance. The "
+            "plotted spread is `COR1M − 100·ρ`; a realized line is shown for context. "
+            "The 21-day window follows the realized-volatility conventions above, "
+            "matched to COR1M's one-month tenor.\n\n"
+            "**Caveats.** Realized correlation is clipped to the [−1, 1] range before "
+            "scaling. The calculation uses today's index membership and weights "
+            "applied backward through history, so older values carry a survivorship "
+            "bias — the same limitation noted for the realized-dispersion chart."
+        ),
     })
     return True
 
@@ -264,8 +326,22 @@ def build_vc6() -> bool:
         "provenance": "bloomberg_cache",
         "tooltip": "Equal-weight single-name 3M implied vol by sector basket — same "
                    "construction, comparable levels.",
-        "notes": "Per-name 3M ATM IV averaged equally within each basket; a basket only "
-                 "renders with at least half its names (min 3). Tile: semis.",
+        "notes": (
+            "**What it shows.** Three-month at-the-money implied volatility, averaged "
+            "across the names in each sector basket (semiconductors, hyperscalers, "
+            "healthcare, staples). Because every basket is built the same way, the "
+            "levels are directly comparable — you can read straight off the chart "
+            "which part of the market options traders expect to be most volatile.\n\n"
+            "**How it's computed.** For each name we take Bloomberg's 3-month ATM "
+            "implied vol, then equal-weight average across the basket: `IV_basket = "
+            "mean(IVᵢ)`. A basket renders on a given day only if at least half its "
+            "names — and no fewer than three — have data, so a thin feed can't distort "
+            "the average. The tile ranks the semis basket.\n\n"
+            "**Caveats.** This is equal-weight single-name implied vol, deliberately "
+            "not sector-ETF implied vol: an ETF's option vol embeds the correlation "
+            "across its holdings and prints materially lower, which would not be "
+            "comparable to a basket of individual names."
+        ),
     })
     return True
 
@@ -307,8 +383,24 @@ def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
         name = f"{idx_name} 10% OTM call/put IV"
         tip = ("Downside and upside 10% OTM wing vol vs realized — the gap between "
                "wings is the skew.")
-        note = ("90%/110% moneyness 30d IV; realized leg uses log returns over 360 "
-                "trading days, sqrt(260) annualized. Tile: put wing.")
+        note = (
+            f"**What it shows.** The implied volatility of 10%-out-of-the-money puts "
+            f"(90% moneyness) and calls (110% moneyness) on {idx_name}, with realized "
+            "vol for reference. The put wing sits above the call wing in normal "
+            "markets — the standing cost of downside protection. The distance between "
+            "the two wings is the skew, and it widens as hedging demand rises.\n\n"
+            "**How it's computed.** Both wings are 30-day implied vols read at fixed "
+            "moneyness — strikes set at 90% and 110% of spot. The realized leg is "
+            "360-day realized volatility built per the realized-volatility conventions "
+            "above (daily log returns of index closes, rolling 360-trading-day window, "
+            "annualized by √260 to tie to Bloomberg's VOLATILITY_360D field). The tile "
+            "ranks the put wing.\n\n"
+            "**Caveats.** These are moneyness-based wings, not delta-based: the strikes "
+            "are fixed percentages of spot rather than a fixed option delta, so they do "
+            "not re-strike as volatility changes. As with the VIX/VXN charts, the "
+            "30-day wings are compared against a 360-day realized window, so part of "
+            "any level gap is the tenor difference."
+        )
     else:
         vi = _lake_series(vol_idx)
         if vi is None:
@@ -325,8 +417,23 @@ def _build_iv_pair(mid: str, idx_name: str, iv_prefix: str, px_mnemonic: str,
         name = f"{idx_name} implied ({vlabel}) vs realized vol"
         tip = (f"{vlabel} (30-day implied vol, skew-inclusive) vs 360-day realized "
                "(Bloomberg convention).")
-        note = (f"{vlabel} implied-vol index vs realized vol from log returns over 360 "
-                f"trading days, sqrt(260) annualized. Tile: {vlabel}.")
+        note = (
+            f"**What it shows.** {idx_name}'s 30-day implied volatility ({vlabel}) "
+            f"against the volatility {idx_name} has actually realized. Implied sitting "
+            "above realized is the normal state — the variance risk premium that "
+            "sellers of options earn; the gap narrowing, or the two lines crossing, "
+            "marks stress.\n\n"
+            f"**How it's computed.** The implied leg is the {vlabel} index — 30-day, "
+            "skew-inclusive expected volatility. The realized leg is 360-day realized "
+            "volatility built per the realized-volatility conventions above: daily log "
+            "returns of index closes, a rolling 360-trading-day window, annualized by "
+            "√260 to tie to Bloomberg's VOLATILITY_360D field. The tile ranks "
+            f"{vlabel} against its trailing history.\n\n"
+            "**Caveats.** The implied tenor (30 days) is far shorter than the realized "
+            "window (360 days), so part of the level gap reflects that tenor mismatch "
+            "rather than the risk premium alone — read the direction and size of "
+            "changes in the gap, not the raw level."
+        )
     store.write_display(mid, {
         "id": mid, "name": name, "panel": "volatility",
         "source": src, "cadence": "daily",

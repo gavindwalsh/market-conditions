@@ -88,8 +88,18 @@ def build_sc4() -> bool:
         "provenance": "bloomberg_cache",
         "tooltip": "Cboe implied dispersion — how much single names are expected to move "
                    "independently of the index.",
-        "notes": "Cboe implied-dispersion index, full history from inception. "
-                 "Cboe EOD CSV is the fallback if the BBG pull fails.",
+        "notes": (
+            "**What it shows.** Cboe's implied dispersion index (DSPX) — how much single "
+            "stocks are expected to move independently of the index over the coming "
+            "month. High dispersion is a stock-picker's environment; low dispersion means "
+            "names are expected to move together. It is the implied, forward-looking "
+            "counterpart to the realized dispersion in SC5.\n\n"
+            "**How it's computed.** The published Cboe S&P 500 Dispersion Index (DSPX), "
+            "with full history from its inception; the tile ranks the latest level "
+            "against that history.\n\n"
+            "**Caveats.** Sourced from Bloomberg, with Cboe's end-of-day CSV as a "
+            "fallback if the Terminal pull fails."
+        ),
     })
     return True
 
@@ -133,10 +143,18 @@ def build_sc5() -> bool:
         "tooltip": "Spread of same-day returns across S&P 500 members — realized "
                    "dispersion.",
         "status": {"level": "provisional", "label": "survivorship"},
-        "notes": "Per-day std-dev of member daily returns; days with <400 member "
-                 "returns dropped. Uses TODAY'S membership applied backward until "
-                 "historical membership lands; backfill extends via "
-                 "massive.pull_grouped_range.",
+        "notes": (
+            "**What it shows.** Realized cross-sectional dispersion — how widely S&P 500 "
+            "members' same-day returns spread out. It is the realized counterpart to "
+            "DSPX (SC4): high readings mean big winners and losers on the same day, a "
+            "stock-picker's tape; low readings mean the index moves as one.\n\n"
+            "**How it's computed.** Each day, the standard deviation of member daily "
+            "returns (×100), computed only on days with at least 400 members reporting a "
+            "return, so a thin cross-section can't distort it.\n\n"
+            "**Caveats.** Survivorship badge: the calculation uses today's membership "
+            "applied backward until historical membership lands, so older readings carry "
+            "that bias while recent ones are exact."
+        ),
     })
     return True
 

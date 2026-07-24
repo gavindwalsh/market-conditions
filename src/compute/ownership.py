@@ -64,8 +64,18 @@ def build_op1() -> bool:
         "series": series,
         "tile": {"value": tile_val, "delta": None, "percentile": tile_pct},
         "provenance": "fred_cache",
-        "notes": "Levels in $T per cohort; tile = bottom-50% share of aggregate. "
-                 "DFA lands ~11 weeks after quarter-end; OP2 nowcast (dashed) pending BBG.",
+        "notes": (
+            "**What it shows.** How much corporate equity US households own, split into "
+            "four wealth cohorts — bottom 50%, 50th–90th, 90th–99th, and top 1%. The "
+            "tile is the bottom-50%'s share of the total, a direct read on how "
+            "concentrated equity ownership is.\n\n"
+            "**How it's computed.** Federal Reserve Distributional Financial Accounts "
+            "(DFA) equity levels, shown in trillions of dollars per cohort; the tile "
+            "ranks the bottom-50% share of aggregate household equity against its own "
+            "history.\n\n"
+            "**Caveats.** The DFA is released about 11 weeks after quarter-end; OP2 is "
+            "the daily nowcast that bridges that lag."
+        ),
     })
     return True
 
@@ -96,8 +106,17 @@ def build_op3() -> bool:
         "series": [_display_series(ratio, "Cash % of financial assets")],
         "tile": {"value": tile_val, "delta": None, "percentile": pct},
         "provenance": "fred_cache",
-        "notes": "(checkable+currency + time/savings + MMF) / total financial assets, "
-                 "households (Z.1 B.101). OP4 weekly nowcast (dashed) pending ICI+H.8.",
+        "notes": (
+            "**What it shows.** How much of household financial assets sit in cash-like "
+            "holdings — a dry-powder and risk-appetite gauge. A rising line means "
+            "households are holding back; a falling one means cash is being put to "
+            "work.\n\n"
+            "**How it's computed.** `(checkable deposits + currency + time & savings "
+            "deposits + money-market funds) ÷ total household financial assets`, from the "
+            "Fed's Z.1 Financial Accounts (table B.101), quarterly.\n\n"
+            "**Caveats.** Quarterly; the weekly nowcast (OP4) that would bridge the "
+            "reporting lag is pending ICI and Fed H.8 data."
+        ),
     })
     return True
 
@@ -146,7 +165,7 @@ def build_op2() -> bool:
 
     store.write_display("OP2", {
         "id": "OP2", "name": "Household equity — nowcast", "panel": "ownership",
-        "source": "FRED DFA × BBG SPTR (§5.6)", "cadence": "daily",
+        "source": "FRED DFA × BBG SPTR", "cadence": "daily",
         "asof": asof,
         "unit": " $T",
         "series": [_display_series(official, "Household corporate equities (DFA, official)"),
@@ -156,9 +175,20 @@ def build_op2() -> bool:
         "provenance": "derived",
         "tooltip": "Official quarterly household equity rolled forward daily with SPX "
                    "total return (dashed = nowcast).",
-        "notes": "Last DFA print rolled forward with SPX total return; cohort shares "
-                 "frozen until the next DFA print (Q2 2026 lands 2026-09-11). Official "
-                 "series trimmed to ~12 quarters; percentile suppressed on the nowcast.",
+        "notes": (
+            "**What it shows.** The OP1 household-equity level brought up to date daily. "
+            "The official quarterly print is rolled forward with the S&P 500's total "
+            "return, so you can see roughly where household equity stands today rather "
+            "than a quarter ago.\n\n"
+            "**How it's computed.** The last DFA cohort levels are grown by the S&P 500 "
+            "total return since quarter-end, holding each cohort's share fixed until the "
+            "next DFA release. The official prints are drawn solid; the rolled-forward "
+            "segment is dashed.\n\n"
+            "**Caveats.** A nowcast, not data — cohort shares are frozen between DFA "
+            "prints (the next, Q2 2026, is expected 2026-09-11). The official line is "
+            "trimmed to about 12 quarters (OP1 carries the full history), and no "
+            "percentile is shown on the nowcast segment."
+        ),
     })
     return True
 
@@ -189,8 +219,7 @@ def build_op567() -> dict[str, bool]:
     if f is None:
         return {"OP5": False, "OP6": False, "OP7": False}
     f = f.dropna(subset=["flow"])
-    coverage_note = (f"Curated {f['ticker'].nunique()}-fund universe (top of complex, "
-                     "§A3 coverage label) — not all US ETFs. Flows = Δshares × NAV.")
+    n_funds = f["ticker"].nunique()
 
     # OP5 — aggregate daily net flow + cumulative-YTD vs prior years (Citadel ch.7)
     daily = f.groupby("date")["flow"].sum() / 1e3  # $B
@@ -216,7 +245,18 @@ def build_op567() -> dict[str, bool]:
                  "percentile": util.trailing_percentile(daily.rolling(20).sum().dropna())},
         "provenance": "bloomberg_cache",
         "tooltip": "Cumulative ETF net flows year-to-date, overlaid by year.",
-        "notes": coverage_note + " Overlaid cumulative-YTD by year.",
+        "notes": (
+            "**What it shows.** Cumulative net flows into the ETF universe over the year "
+            "to date, with the last few years overlaid so the current year's pace stands "
+            "against its predecessors.\n\n"
+            "**How it's computed.** Daily net flow via the shares-outstanding method "
+            "(`flow = Δshares × NAV`, see ETF flow universe in Shared methodology), "
+            "summed across the universe and accumulated within each calendar year. Each "
+            "year is plotted on a common day-of-year axis so the curves line up. The tile "
+            "is the trailing 20-day sum.\n\n"
+            f"**Caveats.** Covers the curated {n_funds}-fund universe — the largest of "
+            "each complex — not every US ETF."
+        ),
     })
 
     # OP6 — flows by category, stacked WEEKLY bars (CIO 2026-07-10). Ghost rows
@@ -247,7 +287,17 @@ def build_op567() -> dict[str, bool]:
                                 if lev_w is not None else None)},
         "provenance": "bloomberg_cache",
         "tooltip": "Weekly net ETF flows stacked by category — positives up, redemptions down.",
-        "notes": coverage_note + " Weekly sums per category; in-progress week dropped.",
+        "notes": (
+            "**What it shows.** Weekly net ETF flows stacked by category (equity, "
+            "leveraged, and so on) — creations up, redemptions down. It shows where money "
+            "is rotating across the fund complex.\n\n"
+            "**How it's computed.** The same shares-outstanding flows (see ETF flow "
+            "universe in Shared methodology) summed per category per Friday-ended week, "
+            "with about three years shown. The tile is the latest complete leveraged-"
+            "category week.\n\n"
+            f"**Caveats.** Covers the curated {n_funds}-fund universe, not every US ETF; "
+            "the in-progress week is dropped."
+        ),
     })
 
     # OP7 — leveraged AUM total + single-stock slice
@@ -267,8 +317,18 @@ def build_op567() -> dict[str, bool]:
                  "percentile": util.trailing_percentile(tot)},
         "provenance": "bloomberg_cache",
         "tooltip": "Assets in the leveraged-ETF complex; second line = the single-stock slice.",
-        "notes": "AUM (FUND_TOTAL_ASSETS) summed over the curated leveraged universe — "
-                 "not all US leveraged ETFs; single-stock slice broken out.",
+        "notes": (
+            "**What it shows.** Total assets in the leveraged-ETF complex, with the "
+            "single-stock-leveraged slice broken out — a gauge of how much levered "
+            "exposure investors are holding, and how fast the single-stock corner is "
+            "growing.\n\n"
+            "**How it's computed.** Bloomberg FUND_TOTAL_ASSETS summed across the curated "
+            "leveraged universe (see ETF flow universe in Shared methodology); the "
+            "single-stock line is the funds that track individual names rather than "
+            "QQQ, SPY, or SMH.\n\n"
+            "**Caveats.** Covers the curated leveraged universe, not every US leveraged "
+            "ETF."
+        ),
     })
     return {"OP5": True, "OP6": True, "OP7": True}
 
@@ -312,21 +372,37 @@ def build_households() -> dict[str, bool]:
             "OP9", "psavert", "Personal saving rate", "%", "monthly", "FRED PSAVERT",
             "Personal saving as a share of disposable personal income (monthly). "
             "The 2020-21 stimulus spikes run off the top so the rest is legible.",
-            "PSAVERT — personal saving / disposable personal income (BEA, monthly, SA). "
-            "Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
+            "**What it shows.** Personal saving as a share of disposable income — how "
+            "much of what they earn households are setting aside. A lower rate can signal "
+            "confidence or financial stretch; a higher one, caution.\n\n"
+            "**How it's computed.** The BEA's PSAVERT series — personal saving ÷ "
+            "disposable personal income — monthly, seasonally adjusted.\n\n"
+            "**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they "
+            "run off-chart rather than flattening the rest of the history.",
             fmt=1, min_hist=120, clip_pandemic=True),
         "OP10": _build_fred_line(
             "OP10", "pmsave", "Personal saving (level)", " $B", "monthly", "FRED PMSAVE",
             "Total personal saving in dollars (monthly, annual-rate). The 2020-21 "
             "stimulus spikes run off the top so the rest is legible.",
-            "PMSAVE — personal saving level, $B seasonally-adjusted annual rate (BEA). "
-            "Y-axis capped below the 2020-21 COVID spikes (they run off-chart).",
+            "**What it shows.** The dollar level of personal saving — the same household "
+            "behavior as the saving rate (OP9), but in dollars rather than as a share of "
+            "income.\n\n"
+            "**How it's computed.** The BEA's PMSAVE series — the personal saving level in "
+            "billions of dollars, quoted at a seasonally-adjusted annual rate, "
+            "monthly.\n\n"
+            "**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they "
+            "run off-chart rather than flattening the rest of the history.",
             fmt=0, min_hist=120, clip_pandemic=True),
         "OP11": _build_fred_line(
             "OP11", "tdsp", "Debt service ratio", "%", "quarterly", "FRED TDSP",
             "Household debt-service payments as a share of disposable income.",
-            "TDSP — required mortgage + consumer debt payments / disposable income "
-            "(Fed, quarterly).", fmt=1),
+            "**What it shows.** Required household debt payments — mortgage plus consumer "
+            "— as a share of disposable income. It measures how burdened household "
+            "balance sheets are by debt service; rising readings squeeze spending "
+            "power.\n\n"
+            "**How it's computed.** The Federal Reserve's TDSP series (total debt-service "
+            "payments ÷ disposable personal income), quarterly.\n\n"
+            "**Caveats.** Quarterly and released with a lag.", fmt=1),
     }
 
 

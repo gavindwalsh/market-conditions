@@ -149,14 +149,23 @@ def build_pace() -> bool:
         "provenance": "ipo_pace",
         "tooltip": ("Cumulative operating-company IPO proceeds by day-of-year, in real "
                     "2026 dollars — this year (through today) vs prior years full-year."),
-        "notes": ("Ritter-comparable operating-company universe (ex SPAC/ADR/REIT/"
-                  "CEF/bank/unit, offer ≥ $5). Each year anchored to the Jay Ritter "
-                  "roster; proceeds = offer price × shares from Bloomberg. Comparison "
-                  "years run the full calendar; the current year stops at today's "
-                  "day-of-year. Prior-year dollars are inflation-adjusted to 2026 "
-                  "(×1.95 for 2000, ×1.24 for 2021) so all curves are in real 2026 "
-                  "dollars. Every deal is included — mega-deals (e.g. SpaceX, ~$75B) "
-                  "show as real steps, not smoothed." + plug_txt),
+        "notes": (
+            "**What it shows.** The pace of IPO issuance this year set against prior "
+            "years — cumulative operating-company IPO proceeds by day of the year, in "
+            "real 2026 dollars. This year runs through today while the comparison years "
+            "show the full calendar, so you can read at a glance whether the current "
+            "year is running ahead of or behind past cycles.\n\n"
+            "**How it's computed.** A Ritter-comparable operating-company universe — "
+            "excluding SPACs, ADRs, REITs, closed-end funds, banks, and unit offerings, "
+            "with an offer price of at least $5. Each year is anchored to the Jay Ritter "
+            "IPO roster, and proceeds are offer price × shares from Bloomberg. Prior-year "
+            "dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so "
+            "every curve is in real 2026 dollars, and every deal is included — mega-deals "
+            "such as SpaceX (~$75B) show as real steps rather than being smoothed "
+            "away.\n\n"
+            "**Caveats.** The *real 2026 $* badge marks the inflation adjustment; older "
+            "Ritter-anchored years carry an estimated tail for deals the roster leaves "
+            "incomplete." + plug_txt),
         "status": {"level": "uncalibrated", "label": "real 2026 $"},
     })
 
@@ -171,8 +180,16 @@ def build_pace() -> bool:
         "provenance": "ipo_pace",
         "tooltip": ("Cumulative operating-company IPO count by day-of-year — this year "
                     "(through today) vs prior years shown full-year."),
-        "notes": ("Companion count view to IS9; same Ritter-comparable universe. "
-                  "Comparison years run the full calendar; the current year stops at today."),
+        "notes": (
+            "**What it shows.** The same issuance-pace comparison as IS9, but counting "
+            "deals rather than dollars — cumulative operating-company IPO count by day of "
+            "the year, this year against prior years. Reading it next to IS9 separates a "
+            "few mega-deals from a genuinely broad issuance wave.\n\n"
+            "**How it's computed.** The companion count view to IS9, built on the same "
+            "Ritter-comparable universe; comparison years run the full calendar and the "
+            "current year stops at today.\n\n"
+            "**Caveats.** Same universe and the same Ritter-anchoring caveats as IS9."
+        ),
     })
 
     def _ncomp(c):

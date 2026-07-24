@@ -40,8 +40,18 @@ def build_mh2() -> bool:
         "tile": {"value": tile_val, "delta": None, "percentile": pct},
         "provenance": "fred_cache",
         "tooltip": "Investment-grade and high-yield credit spreads; wider = stress.",
-        "notes": "ICE BofA US Corporate (IG) and High Yield OAS. BBG LUACOAS/LF98OAS "
-                 "become primary when the Terminal pull lands (±10bp cross-check, §7.3).",
+        "notes": (
+            "**What it shows.** Corporate credit spreads — the extra yield investors "
+            "demand over Treasuries to hold investment-grade and high-yield bonds — plus "
+            "the gap between them. Wider spreads mean the market is pricing more credit "
+            "risk, a classic stress signal that often leads equity weakness.\n\n"
+            "**How it's computed.** ICE BofA US Corporate (IG) and US High Yield "
+            "option-adjusted spreads (OAS), in basis points, with the HY−IG difference "
+            "drawn as a third line. The tile ranks HY OAS against its history.\n\n"
+            "**Caveats.** FRED's ICE BofA series is the current source; the Bloomberg "
+            "LUACOAS / LF98OAS indices become primary once the Terminal pull lands, at "
+            "which point a ±10bp cross-check between the two activates."
+        ),
     })
     return True
 
@@ -72,8 +82,18 @@ def build_mh4() -> bool:
         "tile": {"value": tile_val, "delta": None, "percentile": pct},
         "provenance": "fred_cache",
         "tooltip": "What new mortgage borrowers pay over the 10-year Treasury.",
-        "notes": "Primary mortgage spread. Optimal Blue daily locks, card APR − FF (G.19), "
-                 "auto 60mo, and the FHFA lock-in gap extend this row later (§4 MH4).",
+        "notes": (
+            "**What it shows.** What new mortgage borrowers pay over the 10-year Treasury "
+            "— the primary-mortgage spread. It isolates the cost of household credit "
+            "beyond the risk-free rate, so it moves with lender risk appetite and "
+            "capacity rather than with the level of rates.\n\n"
+            "**How it's computed.** Freddie Mac's PMMS 30-year mortgage rate minus the "
+            "10-year Treasury yield (FRED DGS10), aligned to the weekly PMMS release, in "
+            "basis points.\n\n"
+            "**Caveats.** This is the mortgage spread alone for now; daily lock data "
+            "(Optimal Blue), credit-card APR over fed funds (G.19), auto-loan rates, and "
+            "the FHFA rate lock-in gap are slated to extend this row later."
+        ),
     })
     return True
 
@@ -125,9 +145,19 @@ def build_mh1() -> bool:
                  "percentile": util.trailing_percentile(pct50)},
         "provenance": "derived",
         "tooltip": "Share of S&P 500 members above their 50- and 200-day averages.",
-        "notes": "Membership = current list applied backward (survivorship caveat). "
-                 "200dma series appears once the grouped-bars backfill provides the "
-                 "lookback. Leadership ratios: MH1B.",
+        "notes": (
+            "**What it shows.** Market breadth — the share of S&P 500 members trading "
+            "above their 50-day and 200-day moving averages. High readings mean broad "
+            "participation; a falling line while the index itself holds up is the "
+            "signature of narrowing, mega-cap-driven leadership.\n\n"
+            "**How it's computed.** From daily member closes on the grouped tape, the "
+            "percent of members above each moving average, computed only on days when at "
+            "least 400 members have data (and enough history for the lookback).\n\n"
+            "**Caveats.** Membership is the current S&P 500 list applied backward, so "
+            "older readings carry a survivorship bias. The 200-day series appears once "
+            "the tape backfill provides a deep enough lookback. Leadership ratios live "
+            "in MH1B."
+        ),
     })
     return True
 
@@ -174,8 +204,17 @@ def build_mh1b() -> bool:
         "provenance": "derived",
         "tooltip": "Equal-weight vs cap-weight and NDX vs SPX, rebased to 100 — "
                    "falling RSP/SPY = mega-cap leadership.",
-        "notes": f"Both ratios rebased to 100 at the common window start "
-                 f"({start.strftime('%Y-%m-%d')}).",
+        "notes": (
+            "**What it shows.** Two leadership ratios — equal-weight versus cap-weight "
+            "(RSP/SPY) and mega-cap growth versus the broad market (NDX/SPX) — each "
+            "rebased to 100. A falling RSP/SPY means a handful of the largest names are "
+            "carrying the index; a rising NDX/SPX means growth is leading.\n\n"
+            f"**How it's computed.** The RSP÷SPY and NDX÷SPX daily-close ratios, both "
+            f"rebased to 100 at their common start date ({start.strftime('%Y-%m-%d')}) so "
+            "they share the axis fairly.\n\n"
+            "**Caveats.** These are rebased indices, not levels — read the moves relative "
+            "to that common starting point, not the absolute numbers."
+        ),
     })
     return True
 
@@ -208,9 +247,18 @@ def build_mh3() -> bool:
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "derived",
         "tooltip": "Market price of mortgage credit/prepay risk.",
-        "notes": "Agency MBS current-coupon spread — FNMA current coupon minus a 5y/10y "
-                 "Treasury blend. Consumer ABS OAS legs (cards, autos) pending BBG "
-                 "index-ticker verification (§4 MH3).",
+        "notes": (
+            "**What it shows.** The market's live price of mortgage credit and prepayment "
+            "risk — the agency MBS current-coupon spread. It widens when investors demand "
+            "more to hold mortgage risk, a market-based complement to the survey-based "
+            "mortgage-rate spread in MH4.\n\n"
+            "**How it's computed.** The Fannie Mae current-coupon yield (Bloomberg "
+            "MTGEFNCL) minus a 50/50 blend of the 5- and 10-year Treasury yields (FRED "
+            "DGS5, DGS10), in basis points — the blend approximates the ~7-year effective "
+            "life of a current-coupon MBS.\n\n"
+            "**Caveats.** Agency MBS only in v1; the consumer ABS legs (credit cards, "
+            "autos) await Bloomberg index-ticker verification."
+        ),
     })
     return True
 
@@ -248,8 +296,17 @@ def build_mh5() -> bool:
         "provenance": "nyfed_cache",
         "tooltip": "Household debt balances by product — the stack totals to the "
                    "headline number.",
-        "notes": "Quarterly HHDC balances by product, stacked. G.19 monthly and H.8 "
-                 "weekly nowcast legs land later (§4 MH5).",
+        "notes": (
+            "**What it shows.** Total household debt broken into products — mortgage, "
+            "auto, credit card, student, HELOC, other — as a stacked bar, so the height "
+            "is aggregate household debt and the segments show its composition over "
+            "time.\n\n"
+            "**How it's computed.** New York Fed Household Debt & Credit balances, "
+            "quarterly, stacked largest-first (mortgage at the base) in trillions of "
+            "dollars. The tile is the total across products.\n\n"
+            "**Caveats.** Quarterly; monthly (Fed G.19) and weekly (Fed H.8) nowcast legs "
+            "are slated to extend this row later."
+        ),
     })
     return True
 
@@ -289,8 +346,15 @@ def build_mh6() -> bool:
         "provenance": "nyfed_cache",
         "tooltip": "% of balances newly 30+ days delinquent, by product — the earliest "
                    "household-stress read.",
-        "notes": "Quarterly HHDC 'New Delinquent Balances by Loan Type' (flow into 30+ "
-                 "delinquency, % of balances).",
+        "notes": (
+            "**What it shows.** The flow of household balances newly falling 30 or more "
+            "days past due, by product — the earliest read on household credit stress, "
+            "visible well before loans are charged off.\n\n"
+            "**How it's computed.** The New York Fed HHDC 'new delinquent balances by "
+            "loan type' — the share of balances transitioning into 30+ day delinquency "
+            "each quarter. The tile tracks credit cards.\n\n"
+            "**Caveats.** Quarterly, and reported with the usual HHDC lag."
+        ),
     })
     return True
 
@@ -311,8 +375,16 @@ def build_mh8() -> bool:
                  "percentile": util.trailing_percentile(df["value"], min_history=52)},
         "provenance": "scrape_cache",
         "tooltip": "Active-manager equity exposure: 0 flat, 100 fully long, ±200 levered.",
-        "notes": "NAAIM weekly manager-exposure survey. AAII bull−bear leg blocked "
-                 "(survey file now members-only) — see blockers list.",
+        "notes": (
+            "**What it shows.** How much equity exposure active managers are actually "
+            "running — the NAAIM survey. A reading of 0 is flat, 100 is fully invested, "
+            "and values above 100 (up to ±200) mean leverage or net-short. A crowded-long "
+            "reading can flag complacency; a washed-out one, capitulation.\n\n"
+            "**How it's computed.** The weekly NAAIM Exposure Index — the mean equity "
+            "exposure reported by member managers.\n\n"
+            "**Caveats.** NAAIM only for now — the AAII bull-minus-bear sentiment leg is "
+            "blocked because that survey file is now members-only."
+        ),
     })
     return True
 

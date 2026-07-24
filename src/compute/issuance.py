@@ -52,9 +52,17 @@ def build_is2() -> bool:
                  "percentile": util.trailing_percentile(df["value"], min_history=24)},
         "provenance": "edgar_lake",
         "tooltip": "New S-1/F-1 registration filings per month — the IPO pipeline forming.",
-        "notes": "Calendar-month sums of new S-1/F-1 registrations from the EDGAR form "
-                 "index; the partial current month is dropped. Amendment (S-1/A) share "
-                 "and the offering-$ parse are available extensions.",
+        "notes": (
+            "**What it shows.** The IPO pipeline forming — the number of new S-1 and F-1 "
+            "registration statements filed each month. A rising count signals more "
+            "companies queuing to go public, typically well ahead of the deals "
+            "themselves.\n\n"
+            "**How it's computed.** Calendar-month counts of new S-1 and F-1 filings from "
+            "the SEC EDGAR form index, deduplicated per filing by CIK; the partial "
+            "current month is dropped so it can't read artificially low.\n\n"
+            "**Caveats.** Counts only for now — the amendment (S-1/A) share and an "
+            "offering-dollar figure parsed from the filings are available extensions."
+        ),
     })
     return True
 
@@ -89,8 +97,18 @@ def build_is4() -> bool:
                  "percentile": util.trailing_percentile(df["value"])},
         "provenance": "massive_cache",
         "tooltip": "Recent-IPO basket vs SPY — rising = aftermarket appetite for new issues.",
-        "notes": "Daily close of Renaissance IPO ETF (IPO) ÷ SPY close, indexed to 100 "
-                 "on 2024-01-02.",
+        "notes": (
+            "**What it shows.** Whether investors are rewarding recent IPOs — the "
+            "Renaissance IPO ETF measured against SPY. A rising line means the "
+            "recent-issue basket is outperforming the broad market, a sign of healthy "
+            "aftermarket appetite for new deals; a falling one means new issues are out "
+            "of favor.\n\n"
+            "**How it's computed.** The daily close of the Renaissance IPO ETF (ticker "
+            "IPO) ÷ the SPY close, indexed to 100 on 2024-01-02. The anchor date is "
+            "fixed so the level's meaning doesn't drift as the data window moves.\n\n"
+            "**Caveats.** A rebased relative-strength ratio — read moves against the "
+            "anchor date, not the absolute number."
+        ),
     })
     return True
 
@@ -139,10 +157,19 @@ def build_is7() -> bool:
         "provenance": "edgar_lake",
         "tooltip": "Weekly new fund-registration filings — a launch-pipeline proxy (not "
                    "launches by category; that needs the BBG fund screen).",
-        "notes": "Fri-ended weekly counts of 485APOS (new series of existing trusts) + "
-                 "N-1A (new funds); insurance-product registrants (variable annuity / "
-                 "separate account) excluded by company name. Partial current week "
-                 "dropped; category split lands with the BBG fund screen (OP5-7 work).",
+        "notes": (
+            "**What it shows.** The fund-launch pipeline — weekly counts of new fund "
+            "registrations. It is a proxy for how fast asset managers are bringing new "
+            "products to market, a gauge of product-side risk appetite.\n\n"
+            "**How it's computed.** Friday-ended weekly counts of 485APOS filings (new "
+            "series of existing trusts) plus N-1A filings (brand-new funds) from SEC "
+            "EDGAR, with insurance-product registrants — variable annuity and separate-"
+            "account filers — excluded by company name. The partial current week is "
+            "dropped.\n\n"
+            "**Caveats.** A filing-pipeline proxy, not a count of actual launches by "
+            "category; that breakdown, along with fund closures, arrives with the "
+            "Bloomberg fund screen (the OP5–OP7 work)."
+        ),
     })
     return True
 
