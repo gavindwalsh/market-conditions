@@ -34,7 +34,8 @@ UNIVERSES = {
 # participation) are scaled by this factor to ESTIMATED TOTALS, labeled as such
 # in every tooltip. NOT applied to options small-lot metrics (RF7/RF8 — that
 # proxy already reconciles to market totals vs Citadel ch.11) nor to ratios
-# (RF3/RF4/RF5, scale-invariant). Provisional until RF9 calibration fits the
+# (RF3/RF5, scale-invariant) nor RF4 (a regression slope shown on the identified
+# floor, not ×3-scaled — its shape is scale-invariant). Provisional until RF9 fits the
 # factor empirically vs Nasdaq RTAT; revisit monthly with the §7.2 re-check.
 RETAIL_SCALE_FACTOR = 3.0
 
@@ -158,7 +159,7 @@ _REGISTRY_ROWS = [
     _m("RF10", "retail", "Retail dollar volume — weekly (est. total)", "Massive+FINRA", "weekly", 2, "2023→", "5.1"),
     _m("RF2", "retail", "Retail participation (FINRA-anchored)", "Massive+FINRA", "weekly", 2, "2016→", "5.1"),
     _m("RF3", "retail", "Retail concentration", "Massive", "daily", 2, "2016→", "5.1"),
-    _m("RF4", "retail", "Buy-the-dip ratio", "Massive+BBG", "daily", 2, "2016→"),
+    _m("RF4", "retail", "Buy-the-dip sensitivity", "Massive+BBG", "daily", 2, "2016→"),
     _m("RF5", "retail", "Avg retail trade size", "Massive", "daily", 2, "2016→"),
     _m("RF6", "retail", "Wholesaler volume (structural check)", "FINRA", "weekly", 1, "2016→"),
     _m("RF7", "retail", "Small-lot options premium (proxy)", "Massive OPRA", "daily", 3, "at feed", "5.2"),

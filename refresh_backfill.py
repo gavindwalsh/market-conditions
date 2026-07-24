@@ -34,8 +34,8 @@ def main():
     r2 = opra.build()
     ok = {**r1, **r2}
     print("computes:", " ".join(f"{k}={'ok' if v else 'skip'}" for k, v in ok.items()))
-    if n_signed < 20:
-        print(f"  (RF4 unlocks at 20 signed days — {20 - n_signed} to go)")
+    if n_signed < 63:
+        print(f"  (RF4 unlocks at 63 signed days — {63 - n_signed} to go)")
 
     out = render.build(build_version="backfill-refresh")
     print("rendered:", out)
