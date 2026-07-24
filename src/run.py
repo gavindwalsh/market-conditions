@@ -129,6 +129,14 @@ def main():
         compute_all()
     out = render.build(run_date=run_date, build_version=args.build_version)
     print(f"Rendered {out}")
+    # drop the agent-readable bundle (manifest + per-metric JSON + methodology)
+    # into AGENT_BUNDLE_DIR for Cowork synthesis — soft-fail, never kills the run.
+    from . import export_bundle
+    res = _safe("export:bundle", export_bundle.export)
+    if res and res.get("exported"):
+        print(f"Agent bundle: {res['metric_count']} metrics + {res['docs']} docs -> {res['dest']}")
+    elif res and res.get("reason"):
+        print(f"Agent bundle: skipped ({res['reason']})")
     # post-run digest: per-source PASS/FAIL/SKIP + stale-metric check (§2) so the
     # console tells you whether the run was clean without grepping run_log.jsonl
     from . import report

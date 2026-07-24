@@ -9,6 +9,7 @@ the human contract, this dict is the executable one.
 """
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 
 # ---- global run switch -----------------------------------------------------
@@ -16,6 +17,30 @@ PHASE = 3  # 1 = BBG + free · 2 = + Massive stocks · 3 = + Massive options (§
 
 APP_SLUG = "market-conditions"   # S3 prefix / URL path on lens.avos.co (§2)
 SIZE_BUDGET_MB = 8               # §1 self-contained page target
+
+
+def _load_env_config() -> dict:
+    """Parse infra/config.env (KEY=VALUE lines) — the same non-secret,
+    machine-specific config file deploy.py reads."""
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "infra", "config.env")
+    cfg = {}
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    cfg[k.strip()] = v.strip().strip("'\"")
+    return cfg
+
+
+# Directory where `python -m src.run` drops the agent-readable dashboard bundle
+# (manifest + per-metric JSON + methodology docs) so Cowork instances can
+# synthesize the dashboard without the auth-gated web page. $AGENT_BUNDLE_DIR
+# wins; then infra/config.env; else None → the export step is skipped (§2).
+# See src/export_bundle.py.
+AGENT_BUNDLE_DIR = os.environ.get("AGENT_BUNDLE_DIR") or _load_env_config().get("AGENT_BUNDLE_DIR") or None
 
 # ---- universes -------------------------------------------------------------
 # Concrete tickers resolved at pull time; these name the sets §4/§5 reference.
