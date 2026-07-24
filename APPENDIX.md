@@ -366,13 +366,13 @@ window and annualization factor.
 **Caveats.** Quarterly and released with a lag.
 
 ### MH2 — Corporate credit (IG/HY OAS)
-*Source: FRED ICE BofA (fallback; BBG primary pending) · cadence: daily*
+*Source: Bloomberg LUACOAS / LF98OAS · cadence: daily*
 
 **What it shows.** Corporate credit spreads — the extra yield investors demand over Treasuries to hold investment-grade and high-yield bonds — plus the gap between them. Wider spreads mean the market is pricing more credit risk, a classic stress signal that often leads equity weakness.
 
-**How it's computed.** ICE BofA US Corporate (IG) and US High Yield option-adjusted spreads (OAS), in basis points, with the HY−IG difference drawn as a third line. The tile ranks HY OAS against its history.
+**How it's computed.** US investment-grade and high-yield corporate option-adjusted spreads (OAS), in basis points, with the HY−IG difference drawn as a third line. The tile ranks HY OAS against its full history.
 
-**Caveats.** FRED's ICE BofA series is the current source; the Bloomberg LUACOAS / LF98OAS indices become primary once the Terminal pull lands, at which point a ±10bp cross-check between the two activates.
+**Caveats.** Bloomberg's LUACOAS (IG, from 1990) and LF98OAS (HY, from 1994) are the primary source, giving multi-cycle history through the 1998, 2008 and 2020 stress episodes. FRED's ICE BofA OAS is the recent-only fallback and cross-check (its history here begins mid-2023).
 
 ### MH3 — Household credit — market-priced (MBS CC spread)
 *Source: BBG MTGEFNCL − FRED 5/10y blend · cadence: daily*
@@ -529,7 +529,7 @@ window and annualization factor.
 - **Cboe volatility & correlation indices.** VIX, VIX3M, VXN, S&P 500 Implied Correlation (COR1M / COR3M), and S&P 500 Dispersion (DSPX) index methodologies, Cboe Global Markets.
 - **Realized-volatility & Terminal fields.** Bloomberg VOLATILITY_360D and related fields — trading-day window, log returns, √260 annualization.
 - **Rates volatility.** ICE BofA MOVE Index (bond-market implied volatility).
-- **Corporate credit spreads.** ICE BofA US Corporate (IG) and US High Yield option-adjusted spreads, via FRED; Bloomberg LUACOAS / LF98OAS pending.
+- **Corporate credit spreads.** Bloomberg US Corporate (LUACOAS, IG) and US High Yield (LF98OAS, HY) option-adjusted spreads, primary (deep history); ICE BofA OAS via FRED as the recent cross-check.
 - **Mortgage & agency MBS.** Freddie Mac Primary Mortgage Market Survey (PMMS); Fannie Mae current-coupon yield (Bloomberg MTGEFNCL).
 - **Household debt & delinquency.** Federal Reserve Bank of New York, Household Debt and Credit Report (HHDC).
 - **Household balance sheet & saving.** Federal Reserve Z.1 Financial Accounts (table B.101) and Distributional Financial Accounts (DFA); household debt-service ratio (TDSP); U.S. Bureau of Economic Analysis personal saving (PSAVERT, PMSAVE) — accessed via FRED.
