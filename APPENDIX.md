@@ -37,8 +37,8 @@ therefore multiplied by a scale factor of ×3.0 to estimate market-wide totals.
 That factor is provisional: it is flagged *uncalibrated* until it has been
 fit empirically against Nasdaq's Retail Activity Tracker (RTAT), the gate being
 a trailing 60-day correlation of at least 0.6 between our identified flow and
-RTAT. Ratio metrics — concentration, buy-the-dip, average trade size — are
-unaffected by the scale factor and are shown unscaled.
+RTAT. Ratio and slope metrics — retail concentration and buy-the-dip
+sensitivity — are unaffected by the scale factor and are shown unscaled.
 
 ### Small-lot options proxy
 Options trades smaller than 10 contracts are used as a *proxy* for retail
@@ -210,15 +210,6 @@ window and annualization factor.
 
 **Caveats.** Built on the identified floor of retail flow, not the ×3-scaled total — but as a regression slope its shape is scale-invariant. It unlocks only once at least 63 signed days carrying an S&P 500 return have accumulated, and carries the *classifier floor* badge marking it provisional until calibration.
 
-### RF5 — Avg retail trade size
-*Source: Massive SIP tape (classifier) · cadence: daily*
-
-**What it shows.** The average dollar size of a single retail trade — a texture read on whether retail is trading in bigger or smaller tickets, which tends to shift with confidence and with the mix of names in play.
-
-**How it's computed.** Identified retail dollars ÷ the count of identified retail trades, each day, using the quote-midpoint classifier described in Retail identification and scaling above.
-
-**Caveats.** Built on identified prints only. Because it is a ratio — dollars per trade — it is unaffected by the ×3 scale factor, so no scaling is applied here.
-
 ### RF7 — Small-lot options premium (proxy)
 *Source: Massive OPRA trades · cadence: daily*
 
@@ -246,6 +237,25 @@ window and annualization factor.
 
 **Caveats.** This is whole-market OPRA volume, not retail-only, and the shares are of contract count, not premium dollars.
 
+### LV15 — L4: FINRA margin debt (% of GDP)
+*Source: FINRA margin statistics · FRED GDP · cadence: monthly*
+
+**What it shows.** Total debit balances in securities margin accounts — the outstanding stock of investor leverage — as a percentage of nominal GDP, so the level is comparable across decades rather than drifting up with the size of the economy. A classic risk-appetite gauge: sharp rises tend to accompany late-cycle exuberance.
+
+**How it's computed.** FINRA's monthly margin statistics (debit balances, in billions of dollars) divided by nominal GDP — FRED series GDP, quarterly in billions at a seasonally-adjusted annual rate, carried forward to each month — times 100. Margin-debt history stitches a 1997–2021 archive to the live FINRA page table.
+
+**Caveats.** Margin debt is reported with roughly a three-week lag after month-end; GDP is quarterly, so the denominator steps at quarter boundaries.
+
+### LV13 — L3: Leveraged-ETF financing residual
+**Status: new methodology**
+*Source: BBG NAV × total-return index · cadence: weekly*
+
+**What it shows.** The financing spread buried inside leveraged-ETF returns — the cost these funds effectively pay on their embedded swaps, versus SOFR. It is the recurring toll of levered index exposure.
+
+**How it's computed.** The return model is `nav_ret = L·r_tr − fee/252 − (L−1)·fin/252`, so embedded financing backs out as `fin = −[nav_ret − (L·r_tr − fee/252)]·252/(L−1)`. Crucially `r_tr` is the underlying's TOTAL return (SPTR / XNDX), not price return: the funds' swaps earn the index total return, so using price-only return would leave the dividend yield in the residual and read as spurious negative financing. We take a 60-day mean, the median across TQQQ/QLD/UPRO/SSO, minus same-day SOFR, in basis points, with a flat 0.9% fee assumed.
+
+**Caveats.** New-methodology badge. The residual amplifies tiny NAV-versus-index tracking errors into large financing swings, so the level is noisy — read the trend, not the point. Long 2×/3× S&P and Nasdaq funds only (inverse funds' estimator has the opposite sign).
+
 ### LV6 — Leveraged-ETF rebalance notional
 *Source: BBG AUM × Massive moves · cadence: daily*
 
@@ -264,30 +274,6 @@ window and annualization factor.
 
 **Caveats.** On generic-contract roll days the front/second ratio explodes (verified swings of several hundred bp around quarterly expiry), so days within ±2 business days of the March/June/September/December third Friday are dropped, backed by a ±150bp-versus-60-day-median filter.
 
-### LV9 — L2: Single-name synthetic financing
-*Source: Massive snapshots (parity) · cadence: daily*
-
-Parity forward from ATM C/P EOD closes (non-synchronous closes add noise — labeled estimate); NO per-name dividend adjustment in v1 (biases financing DOWN for dividend payers; retail favorites are mostly low-div). Compare vs LV7 box for the demand premium (§5.5).
-
-### LV13 — L3: Leveraged-ETF financing residual
-**Status: new methodology**
-*Source: BBG NAV × total-return index · cadence: weekly*
-
-**What it shows.** The financing spread buried inside leveraged-ETF returns — the cost these funds effectively pay on their embedded swaps, versus SOFR. It is the recurring toll of levered index exposure.
-
-**How it's computed.** The return model is `nav_ret = L·r_tr − fee/252 − (L−1)·fin/252`, so embedded financing backs out as `fin = −[nav_ret − (L·r_tr − fee/252)]·252/(L−1)`. Crucially `r_tr` is the underlying's TOTAL return (SPTR / XNDX), not price return: the funds' swaps earn the index total return, so using price-only return would leave the dividend yield in the residual and read as spurious negative financing. We take a 60-day mean, the median across TQQQ/QLD/UPRO/SSO, minus same-day SOFR, in basis points, with a flat 0.9% fee assumed.
-
-**Caveats.** New-methodology badge. The residual amplifies tiny NAV-versus-index tracking errors into large financing swings, so the level is noisy — read the trend, not the point. Long 2×/3× S&P and Nasdaq funds only (inverse funds' estimator has the opposite sign).
-
-### LV15 — L4: FINRA margin debt
-*Source: FINRA margin statistics · cadence: monthly*
-
-**What it shows.** Total debit balances in securities margin accounts — the outstanding stock of investor leverage — with its year-over-year growth. A classic risk-appetite gauge: sharp rises tend to accompany late-cycle exuberance.
-
-**How it's computed.** FINRA's monthly margin statistics, plotted as the level in billions of dollars and as the 12-month year-over-year percent change. History stitches a 1997–2021 archive to the live FINRA page table.
-
-**Caveats.** Reported with roughly a three-week lag after month-end.
-
 ### LV16 — Short interest aggregate (SPX)
 **Status: current floats**
 *Source: BBG SHORT_INT × Massive prices · cadence: biweekly*
@@ -297,16 +283,6 @@ Parity forward from ATM C/P EOD closes (non-synchronous closes add noise — lab
 **How it's computed.** `Σ(short shares × price) ÷ Σ float-cap`, where each name's short shares come from the biweekly FINRA print and the price is the last tape close on or before that print date. Days-to-cover is the median SHORT_INT_RATIO across names. History comes from a Bloomberg `bdh` backfill (November 2023 onward) plus daily snapshot appends.
 
 **Caveats.** Current-floats badge: the float-cap denominator uses the current snapshot applied backward, so older readings carry a survivorship and repricing bias.
-
-### LVT — Leverage levels — snapshot
-**Status: history accruing**
-*Source: derived · cadence: daily*
-
-**What it shows.** A point-in-time table of the leverage measures that don't yet have enough history to chart — dealer GEX (LV5), box-spread yields (LV7), call-wing richness (LV10), and broker margin rates (LV14). Each returns as its own chart once its history accrues.
-
-**How it's computed.** Reads the latest value of each of those metrics from the current run and lays them out with their as-of dates and flags.
-
-**Caveats.** History-accruing badge: this is a snapshot, not a time series — see the individual metrics above for their construction.
 
 ### OP5 — ETF net flows
 *Source: BBG Δshares × NAV · cadence: daily*

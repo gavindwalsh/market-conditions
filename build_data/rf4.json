@@ -9,7 +9,7 @@
   "series": [
     {
       "estimated_from": null,
-      "name": "3-month (63d) — trend",
+      "name": "3-month",
       "points": [
         {
           "date": "2026-04-02",
@@ -321,7 +321,7 @@
     },
     {
       "estimated_from": null,
-      "name": "1-month (21d) — faster, noisier",
+      "name": "1-month",
       "points": [
         {
           "date": "2026-02-02",
