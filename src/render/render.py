@@ -651,7 +651,7 @@ APPENDIX_REFERENCES = """\
 - **Cboe volatility & correlation indices.** VIX, VIX3M, VXN, S&P 500 Implied Correlation (COR1M / COR3M), and S&P 500 Dispersion (DSPX) index methodologies, Cboe Global Markets.
 - **Realized-volatility & Terminal fields.** Bloomberg VOLATILITY_360D and related fields — trading-day window, log returns, √260 annualization.
 - **Rates volatility.** ICE BofA MOVE Index (bond-market implied volatility).
-- **Corporate credit spreads.** ICE BofA US Corporate (IG) and US High Yield option-adjusted spreads, via FRED; Bloomberg LUACOAS / LF98OAS pending.
+- **Corporate credit spreads.** Bloomberg US Corporate (LUACOAS, IG) and US High Yield (LF98OAS, HY) option-adjusted spreads, primary (deep history); ICE BofA OAS via FRED as the recent cross-check.
 - **Mortgage & agency MBS.** Freddie Mac Primary Mortgage Market Survey (PMMS); Fannie Mae current-coupon yield (Bloomberg MTGEFNCL).
 - **Household debt & delinquency.** Federal Reserve Bank of New York, Household Debt and Credit Report (HHDC).
 - **Household balance sheet & saving.** Federal Reserve Z.1 Financial Accounts (table B.101) and Distributional Financial Accounts (DFA); household debt-service ratio (TDSP); U.S. Bureau of Economic Analysis personal saving (PSAVERT, PMSAVE) — accessed via FRED.
