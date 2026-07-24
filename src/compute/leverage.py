@@ -326,6 +326,14 @@ def build_lv16() -> bool:
     if members is None or grouped is None or (hist is None and snap_si is None):
         return False
     from .structure import _bbg_to_massive
+    # The daily snapshot re-reports the SAME biweekly print every capture day, so
+    # date each snapshot row by its settlement date (short_int_dt) — collapsing
+    # the daily duplicates onto one biweekly point. Rows captured before that
+    # field existed carry no settlement date; drop them (hist covers those
+    # prints) rather than plotting stale short interest at daily capture dates.
+    if snap_si is not None and not snap_si.empty and "short_int_dt" in snap_si.columns:
+        snap_si = snap_si[snap_si["short_int_dt"].notna()].copy()
+        snap_si["date"] = pd.to_datetime(snap_si["short_int_dt"])
     parts = [x for x in (hist, snap_si) if x is not None and not x.empty]
     si = pd.concat(parts, ignore_index=True)
     si["date"] = pd.to_datetime(si["date"])

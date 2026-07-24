@@ -101,6 +101,11 @@ INDEX_SERIES = {
     "es1": ("ES1 Index", "2018-01-01"),          # LV8 roll financing
     "es2": ("ES2 Index", "2018-01-01"),
     "fncc": ("MTGEFNCL Index", "2015-01-01"),    # MH3 FNMA current coupon (verify)
+    # MH2 credit OAS — Bloomberg is primary with deep history (FRED's ICE BofA
+    # series only serve ~3y here). LUACOAS = US IG OAS (1990→), LF98OAS = US HY
+    # OAS (1994→); both in percent, ×100 → bp in the compute.
+    "ig_oas": ("LUACOAS Index", "1990-01-01"),
+    "hy_oas": ("LF98OAS Index", "1994-01-01"),
 }
 
 
@@ -209,16 +214,38 @@ def pull_short_interest_history(start: str = "2023-11-01") -> int:
 
 
 def pull_short_interest(tickers: list[str]) -> pd.DataFrame:
-    """LV16: per-member short interest snapshot (biweekly print; accumulate)."""
+    """LV16: per-member short interest snapshot (biweekly print; accumulate).
+
+    Stamps short_int_dt with the print's SETTLEMENT date so LV16 can plot each
+    point on its true biweekly date rather than the daily capture date (the
+    daily bdp otherwise re-reports the same print every day). The FINRA
+    settlement calendar is market-wide, so we read it once from the latest
+    SHORT_INT bdh date on a liquid reference name."""
+    from datetime import timedelta
+
     from .. import store
     blp = _blp()
     frames = []
     for i in range(0, len(tickers), CHUNK):
-        frames.append(blp.bdp(tickers[i:i + CHUNK], ["SHORT_INT", "SHORT_INT_RATIO"]))
+        frames.append(blp.bdp(tickers[i:i + CHUNK],
+                              ["SHORT_INT", "SHORT_INT_RATIO", "SI_PERCENT_EQUITY_FLOAT"]))
     df = pd.concat(frames)
-    df.columns = ["short_int", "short_int_ratio"][:len(df.columns)]
+    df.columns = ["short_int", "short_int_ratio", "si_pct_float"][:len(df.columns)]
     df = df.reset_index().rename(columns={"index": "ticker"})
     df["date"] = date.today().isoformat()
+    # settlement date of the current print (market-wide biweekly calendar):
+    # the latest SHORT_INT bdh date on a liquid reference name.
+    settle = None
+    try:
+        ref = next((t for t in tickers if t.startswith("AAPL")), tickers[0] if tickers else None)
+        if ref:
+            h = blp.bdh(ref, ["SHORT_INT"], (date.today() - timedelta(days=45)).isoformat(),
+                        date.today().isoformat())
+            if h is not None and not h.empty:
+                settle = pd.to_datetime(h.index.max()).strftime("%Y-%m-%d")
+    except Exception:  # noqa: BLE001 — settlement date is best-effort; compute falls back
+        settle = None
+    df["short_int_dt"] = settle
     store.append_parquet("bbg_short_interest", df,
                          pulled_at=datetime.now().isoformat(timespec="seconds"))
     return df

@@ -15,8 +15,16 @@ from .ownership import _display_series
 
 
 def build_mh2() -> bool:
-    ig = store.read_latest("fred_ig_oas")
-    hy = store.read_latest("fred_hy_oas")
+    # Bloomberg LUACOAS/LF98OAS are primary — deep history (IG 1990→, HY 1994→).
+    # FRED's ICE BofA series (fred_ig_oas/fred_hy_oas) only serve ~3y here, so
+    # they're the fallback / recent cross-check.
+    ig = store.read_latest("bbg_ig_oas")
+    hy = store.read_latest("bbg_hy_oas")
+    source = "Bloomberg LUACOAS / LF98OAS"
+    if ig is None or hy is None or ig.empty or hy.empty:
+        ig = store.read_latest("fred_ig_oas")
+        hy = store.read_latest("fred_hy_oas")
+        source = "FRED ICE BofA (fallback)"
     if ig is None or hy is None:
         return False
     ig = ig.sort_values("date"); hy = hy.sort_values("date")
@@ -30,7 +38,7 @@ def build_mh2() -> bool:
 
     store.write_display("MH2", {
         "id": "MH2", "name": "Corporate credit (IG/HY OAS)", "panel": "credit",
-        "source": "FRED ICE BofA (fallback; BBG primary pending)", "cadence": "daily",
+        "source": source, "cadence": "daily",
         "asof": asof, "unit": " bp (tile: HY OAS)",
         "series": [
             _display_series(hy[["date", "value"]].assign(value=lambda d: d.value * 100), "HY OAS"),
@@ -45,12 +53,13 @@ def build_mh2() -> bool:
             "demand over Treasuries to hold investment-grade and high-yield bonds — plus "
             "the gap between them. Wider spreads mean the market is pricing more credit "
             "risk, a classic stress signal that often leads equity weakness.\n\n"
-            "**How it's computed.** ICE BofA US Corporate (IG) and US High Yield "
+            "**How it's computed.** US investment-grade and high-yield corporate "
             "option-adjusted spreads (OAS), in basis points, with the HY−IG difference "
-            "drawn as a third line. The tile ranks HY OAS against its history.\n\n"
-            "**Caveats.** FRED's ICE BofA series is the current source; the Bloomberg "
-            "LUACOAS / LF98OAS indices become primary once the Terminal pull lands, at "
-            "which point a ±10bp cross-check between the two activates."
+            "drawn as a third line. The tile ranks HY OAS against its full history.\n\n"
+            "**Caveats.** Bloomberg's LUACOAS (IG, from 1990) and LF98OAS (HY, from 1994) "
+            "are the primary source, giving multi-cycle history through the 1998, 2008 and "
+            "2020 stress episodes. FRED's ICE BofA OAS is the recent-only fallback and "
+            "cross-check (its history here begins mid-2023)."
         ),
     })
     return True
