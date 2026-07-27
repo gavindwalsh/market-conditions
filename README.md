@@ -21,8 +21,19 @@ python -m pip install -r requirements.txt
 #   .massive_api_key     (Phase 2/3, when procured)
 python -m src.run                 # pull → compute → render
 python -m src.run --render        # re-render from build_data only (deterministic)
+python -m src.run --commit        # + commit & push the refreshed artifacts
 python deploy.py market-conditions
 ```
+
+`src.run` rewrites **tracked** files (`build_data/*.json`, the generated
+`APPENDIX.md`), so without `--commit` a daily run leaves them as uncommitted
+edits that accumulate until something merging `build_data/` collides with them.
+`--commit` stages *only* those artifact paths (never your source edits),
+commits, and pushes when the branch tracks an upstream. To make it standing on
+this machine, put `AUTO_COMMIT_ARTIFACTS=1` in `infra/config.env` (or export
+`$AUTO_COMMIT_ARTIFACTS=1`) and the plain `python -m src.run` does it. Add
+`--no-push` to commit locally only. The step soft-fails and never blocks a
+deploy — see `src/sync.py`.
 Bloomberg pulls need a running Terminal on the machine (`xbbg`/`blpapi`
 auto-install on first use). The build/render step needs neither — it reads the
 `build_data/` display layer.
