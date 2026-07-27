@@ -2,6 +2,7 @@
 
   python -m src.run              # full run at the configured PHASE
   python -m src.run --render     # re-render from existing build_data (no pulls)
+  python -m src.run --commit     # + commit/push the refreshed artifacts (src/sync.py)
 
 Design guarantees:
   * A source failure never kills the run (§2): each source is pulled in a
@@ -119,6 +120,11 @@ def compute_all():
 def main():
     ap = argparse.ArgumentParser(description="Market Pulse Dashboard build")
     ap.add_argument("--render", action="store_true", help="re-render only, no pulls")
+    ap.add_argument("--commit", action="store_true",
+                    help="commit + push the refreshed artifacts (build_data/, APPENDIX.md); "
+                         "also enabled standing via AUTO_COMMIT_ARTIFACTS=1 in infra/config.env")
+    ap.add_argument("--no-push", action="store_true",
+                    help="with --commit: commit locally but never push")
     ap.add_argument("--build-version", default="dev")
     args = ap.parse_args()
 
@@ -137,6 +143,12 @@ def main():
         print(f"Agent bundle: {res['metric_count']} metrics + {res['docs']} docs -> {res['dest']}")
     elif res and res.get("reason"):
         print(f"Agent bundle: skipped ({res['reason']})")
+    # commit (and push) the tracked artifacts this run rewrote, so they don't pile
+    # up as uncommitted edits — soft-fail, never blocks the deploy (see sync.py).
+    from . import sync
+    if args.commit or sync.enabled():
+        res = _safe("git:sync", sync.commit_and_push, push=not args.no_push)
+        print(sync.describe(res))
     # post-run digest: per-source PASS/FAIL/SKIP + stale-metric check (§2) so the
     # console tells you whether the run was clean without grepping run_log.jsonl
     from . import report
