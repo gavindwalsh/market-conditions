@@ -149,6 +149,49 @@ def pull_etf_universe() -> int:
     return n
 
 
+RAY_CF_FIELDS = ["CF_DECR_CAP_STOCK", "CF_INCR_CAP_STOCK", "CUR_MKT_CAP", "PX_LAST"]
+# Daily history begins mid-1998 (verified 2026-07-27: 1998-07-01 returns all four
+# fields; 1998-02 silently drops the two cash-flow columns). Ask from 1998-01-01
+# and keep whatever comes back — six years deeper than the 2004 the IS6 spec
+# assumed. Quarterly history reaches 1995 Q1 but is patchy (1995-97 carry Q1/Q2
+# only), so we do not stitch it on.
+RAY_CF_START = "1998-01-01"
+
+
+def pull_ray_cashflow() -> int:
+    """IS6/IS6B: Russell 3000 index-level gross buybacks + gross cash equity
+    issuance, rolling TTM in index points, daily.
+
+    §A1.2 trap: these fields exist on BDH only — BDP returns nothing for them on
+    an index ticker — and an unavailable field is SILENTLY DROPPED from the
+    response rather than erroring. So we verify both cash-flow columns came back
+    and fail loudly if not, rather than landing a half-empty table.
+
+    CF_DECR_CAP_STOCK arrives NEGATIVE (buybacks are a cash outflow); the compute
+    keeps that sign convention rather than flipping to a magnitude.
+    """
+    from .. import store
+    pulled_at = datetime.now().isoformat(timespec="seconds")
+    h = _blp().bdh("RAY Index", RAY_CF_FIELDS, RAY_CF_START, date.today().isoformat())
+    if h.empty:
+        raise RuntimeError("RAY Index cash-flow pull returned nothing")
+    h.columns = [c[1].lower() for c in h.columns]
+    missing = {"cf_decr_cap_stock", "cf_incr_cap_stock"} - set(h.columns)
+    if missing:
+        raise RuntimeError(f"RAY cash-flow fields silently dropped: {sorted(missing)} "
+                           f"(got {sorted(h.columns)}) — see §A1.2")
+    out = h.reset_index().rename(columns={"index": "date"})
+    out["date"] = pd.to_datetime(out["date"]).dt.strftime("%Y-%m-%d")
+    out = out.rename(columns={"cf_decr_cap_stock": "buybacks_pts",
+                              "cf_incr_cap_stock": "issuance_pts",
+                              "cur_mkt_cap": "mktcap_mn", "px_last": "px"})
+    out = out.dropna(subset=["buybacks_pts", "issuance_pts", "mktcap_mn", "px"])
+    store.append_parquet("bbg_ray_cashflow", out, pulled_at=pulled_at)
+    store.log_run("bbg:ray_cf", "ok",
+                  f"{len(out)} daily obs {out['date'].iloc[0]}→{out['date'].iloc[-1]}")
+    return len(out)
+
+
 def pull_iv_histories() -> int:
     """VC4/VC6 IV histories: SPX 30d wings + ATM (2010→), semi 3M ATM (2016→).
     Moneyness-based (90/100/110%) — the delta-based §4 fields are OVDV-only."""

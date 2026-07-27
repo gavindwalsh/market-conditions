@@ -38,6 +38,12 @@ SERIES = {
     "dgs5": "DGS5",                 # MH3 current-coupon spread blend leg
     "sofr": "SOFR",                 # LV7/LV8/LV9 financing benchmark
     "gdp": "GDP",                   # LV15/OP2/OP10 denominator — nominal GDP, $B SAAR (quarterly)
+    # IS6 — Nonfinancial Corporate Business; Corporate Equities; Liability,
+    # Transactions. Quarterly SAAR, $mn, 1946-Q4→. NEGATIVE = net retirement.
+    # Do NOT add FBCELIQ027S to get financials: Z.1 books ETF/CEF share creation
+    # as a financial-sector equity liability, so it runs ~+$1.6tn SAAR and would
+    # swamp the series (IS6 spec §A1.1).
+    "ncb_equity_issuance": "NCBCEBQ027S",
     # OP1 — DFA corporate equities + MF shares by wealth cohort, levels ($M, Q)
     "dfa_eq_top1": "WFRBLT01014",       # top 1% (99th-100th)
     "dfa_eq_next9": "WFRBLN09041",      # 90th-99th
