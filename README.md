@@ -22,6 +22,7 @@ python -m pip install -r requirements.txt
 python -m src.run                 # pull → compute → render
 python -m src.run --render        # re-render from build_data only (deterministic)
 python -m src.run --commit        # + commit & push the refreshed artifacts
+python -m src.run --commit --no-push   # ...commit locally, don't push
 python deploy.py market-conditions
 ```
 
@@ -34,6 +35,7 @@ this machine, put `AUTO_COMMIT_ARTIFACTS=1` in `infra/config.env` (or export
 `$AUTO_COMMIT_ARTIFACTS=1`) and the plain `python -m src.run` does it. Add
 `--no-push` to commit locally only. The step soft-fails and never blocks a
 deploy — see `src/sync.py`.
+
 Bloomberg pulls need a running Terminal on the machine (`xbbg`/`blpapi`
 auto-install on first use). The build/render step needs neither — it reads the
 `build_data/` display layer.
@@ -46,6 +48,7 @@ src/
   util.py              percentile (1yr gate), display downsample, staleness
   store.py             DuckDB/Parquet lake + build_data JSON emit + run log
   run.py               orchestrator (soft-fail per source)
+  sync.py              --commit: stage build_data/ + APPENDIX.md, commit, push
   pull/                fred.py (live) · bbg/massive/finra/edgar/free (landing per §8)
   compute/             metric constructions (§5) — lands per build order
   render/              Jinja2 template + house.css + ECharts boot
@@ -55,7 +58,7 @@ deploy.py, infra/      S3 + CloudFront push to lens.avos.co/<slug>
 ```
 
 ## Phases (§8)
-1. **Bloomberg + free** — SC/OP/VC/MH/IS + LV(1,6,7,8,11,13,14,15,16). Ship + deploy.
+1. **Bloomberg + free** — SC/OP/VC/MH/IS + LV(1,6,7,8,11,13,14,15). Ship + deploy.
 2. **+ Massive stocks** — retail flows RF1–6, OP8, MH9, SC5. Gate: RF9 ≥ 0.6.
 3. **+ Massive options/OPRA** — vol engine (§5.10), LV2–5/9/10/12, RF7–8.
 
