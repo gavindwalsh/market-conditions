@@ -151,101 +151,56 @@ def build_is6() -> bool:
     """IS6 (Chart A): US net corporate equity issuance, % of nominal GDP.
 
     The Fed's definitive level — the only measure here that captures cash-M&A
-    retirement and employee share issuance — carried forward daily with Bloomberg
-    buybacks between quarterly releases.
+    retirement and employee share issuance — as published, quarterly.
 
     Shown as a share of GDP, not dollars: the published history runs to 1947 and
     a dollar axis makes the first fifty years invisible next to today (same
     reason OP2/OP10/LV15 are normalized).
+
+    Changed 2026-07-27 (CIO): the trailing-12-month line and the daily
+    Bloomberg-carried extension are both GONE — just the quarterly prints now.
+    The two went together: on a trailing-12-month basis the carry-forward
+    operator beat a flat carry (MAE 51 vs 57), but on raw quarterly SAAR prints
+    it is WORSE than doing nothing (177 vs 171 — no skill), because a single
+    quarter's annualized flow is too volatile to nowcast and adding a
+    twelve-month buyback delta to a one-quarter level mixes bases. Timeliness
+    lives on IS6B, which is genuinely daily and needs no estimate.
     """
     fred = store.read_latest("fred_ncb_equity_issuance")
     gdp = store.read_latest("fred_gdp")
-    ray = _ray_cashflow()
     if fred is None or fred.empty or gdp is None or gdp.empty:
         return False
     q = fred[["date", "value"]].sort_values("date").copy()
     q["date"] = pd.to_datetime(q["date"])
     q["saar_bn"] = q["value"] / 1e3                       # $mn → $bn, already SAAR
-    # Each SAAR print is 4× the quarter's flow, so the 4-quarter MEAN is the TTM
-    # level — same $/yr unit as the prints themselves, not a different basis.
-    q["ttm_bn"] = q["saar_bn"].rolling(4).mean()
     # Z.1 dates are quarter-START; the level is as of quarter-END (as in OP2).
     q["date"] = q["date"] + pd.offsets.QuarterEnd(1)
 
     g = gdp[["date", "value"]].rename(columns={"value": "gdp_bn"}).sort_values("date").copy()
     g["date"] = pd.to_datetime(g["date"])
     q = pd.merge_asof(q, g, on="date", direction="backward").dropna(subset=["gdp_bn"])
-    q["saar_pct"] = q["saar_bn"] / q["gdp_bn"] * 100.0
-    q["ttm_pct"] = q["ttm_bn"] / q["gdp_bn"] * 100.0
-    ttm = q.dropna(subset=["ttm_pct"])
-    if ttm.empty:
+    q["pct"] = q["saar_bn"] / q["gdp_bn"] * 100.0
+    if q.empty:
         return False
-
-    series = [
-        _display_series(ttm[["date", "ttm_pct"]].rename(columns={"ttm_pct": "value"}),
-                        "Net issuance, 4-quarter level (% of GDP)", unit="%", ds="none"),
-        _display_series(q[["date", "saar_pct"]].rename(columns={"saar_pct": "value"}),
-                        "As published, quarterly (% of GDP)", role="context", unit="%",
-                        ds="none"),
-    ]
-
-    anchor = ttm.iloc[-1]
-    qend, tile_val, asof = anchor["date"], float(anchor["ttm_pct"]), anchor["date"]
-    carried_note = ""
-    if ray is not None:
-        base = ray[ray["date"] <= qend]
-        fwd = ray[ray["date"] > qend]
-        if not base.empty and not fwd.empty:
-            # Rising buybacks make net issuance MORE negative, so subtract the
-            # buyback delta. Buyback-delta beats a net-based delta and a flat
-            # carry on the spec's 85-quarter backtest (MAE 51 vs 56 and 57).
-            #
-            # Take the delta in INDEX POINTS and price it at the anchor date's
-            # divisor, NOT as a difference of two dollar figures. The divisor is
-            # CUR_MKT_CAP/PX_LAST, so it drifts every day with market cap: over
-            # 2026-06-30→07-24 the index points never moved (flat at -71.8811,
-            # nothing filed) yet the dollar buyback figure fell ~$8.5bn purely on
-            # divisor drift. Differencing dollars would let that leak into the
-            # estimate and make the line wander between earnings seasons, when the
-            # whole point is that it steps on reports and sits still otherwise.
-            pts0 = float(base["buybacks_pts"].iloc[-1])
-            div0_bn = float(base["mktcap_mn"].iloc[-1] / 1e3 / base["px"].iloc[-1])
-            # current-quarter GDP is unpublished; hold the last print flat
-            gdp_now = float(g["gdp_bn"].iloc[-1])
-            carried = fwd[["date"]].copy()
-            # buybacks_pts is negative; a further fall = more buybacks = more
-            # negative net issuance, so the delta carries its own sign.
-            carried["value"] = (anchor["ttm_bn"]
-                                + (fwd["buybacks_pts"].values - pts0) * div0_bn) \
-                / gdp_now * 100.0
-            carried = pd.concat([pd.DataFrame({"date": [qend], "value": [tile_val]}),
-                                 carried], ignore_index=True)
-            series.append({**_display_series(carried, "Carried forward with BBG buybacks",
-                                             role="nowcast", unit="%", ds="none"),
-                           "estimated_from": qend.strftime("%Y-%m-%d")})
-            tile_val = float(carried["value"].iloc[-1])
-            asof = carried["date"].iloc[-1]
-            carried_note = (f" Carried {(asof - qend).days} days past the "
-                            f"{qend.strftime('%Y-%m-%d')} quarter-end.")
+    last = q.iloc[-1]
 
     store.write_display("IS6", {
         "id": "IS6", "name": "US net corporate equity issuance (% of GDP)",
         "panel": "issuance",
-        "source": "FRED NCBCEBQ027S · FRED GDP · BBG RAY buybacks", "cadence": "daily",
-        "asof": pd.Timestamp(asof).strftime("%Y-%m-%d"), "unit": " % of GDP",
-        # Mixed cadence by construction — quarterly prints plus a daily carried
-        # segment — so this card depends on the renderer's time x-axis (line-only
-        # charts with date keys); equal-width category slots would hand two-thirds
-        # of the width to the last four months.
-        "series": series,
-        "tile": {"value": round(tile_val, 2), "delta": None,
-                 "percentile": util.trailing_percentile(ttm["ttm_pct"], value=tile_val,
-                                                        min_history=40)},
-        "provenance": "derived",
-        "status": {"level": "provisional", "label": "carried estimate"},
+        "source": "FRED NCBCEBQ027S · FRED GDP", "cadence": "quarterly",
+        "asof": last["date"].strftime("%Y-%m-%d"), "unit": " % of GDP",
+        # Needs the renderer's time x-axis (line-only, date keys): this series is
+        # ANNUAL 1947-1951 and quarterly from 1952, so equal-width category slots
+        # would give each of the five early years a full quarter's width.
+        "series": [_display_series(q[["date", "pct"]].rename(columns={"pct": "value"}),
+                                   "Net issuance, as published (% of GDP)", unit="%",
+                                   ds="none")],
+        "tile": {"value": round(float(last["pct"]), 2), "delta": None,
+                 "percentile": util.trailing_percentile(q["pct"], min_history=40)},
+        "provenance": "fred_cache",
         "tooltip": "Fed measure of equity net-issued or retired by US nonfinancial "
                    "companies as a share of GDP — includes cash M&A and employee shares, "
-                   "excludes financials; dashed segment is a daily estimate.",
+                   "excludes financials.",
         "notes": (
             "**What it shows.** How much equity the US nonfinancial corporate sector is "
             "issuing or retiring, as a share of the economy. Negative means companies are "
@@ -258,24 +213,21 @@ def build_is6() -> bool:
             "are invisible against today's magnitudes.\n\n"
             "**How it's computed.** FRED series `NCBCEBQ027S` (Fed Z.1 Financial "
             "Accounts — Nonfinancial Corporate Business; Corporate Equities; Liability, "
-            "Transactions), quarterly at a seasonally-adjusted annual rate, divided by "
-            "nominal GDP. Each quarterly print is already annualized, so the four-quarter "
-            "mean is the trailing-twelve-month level in the same units — the solid line. "
-            "The lighter points are the prints as published. Between Fed releases the "
-            "solid line is extended daily (dashed) by subtracting the change in Russell "
-            "3000 gross buybacks since the last published quarter-end: rising buybacks "
-            "make net issuance more negative. That operator beat both a flat carry and a "
-            "net-based delta on an 85-quarter backtest." + carried_note + "\n\n"
-            "**Caveats.** Carried-estimate badge on the dashed segment: it is directional, "
-            "not a measurement — the historical error on the carry is roughly ±1 standard "
-            "deviation of $130bn at the quarter horizon, which is a large fraction of a "
-            "typical reading, and observing it daily does not shrink it. **Excludes "
-            "financial-sector companies**, so bank and insurer buybacks are absent; the "
-            "obvious FRED series for adding them counts ETF and closed-end-fund share "
-            "creation as a financial equity liability and would swamp the measure. The Fed "
-            "publishes roughly ten weeks after quarter-end and revises prior quarters. "
-            "This measure and the Russell 3000 cash-flow chart alongside it are **not the "
-            "same thing and should not be netted** — they differ by roughly 3× for "
+            "Transactions) divided by nominal GDP. Plotted exactly as published, with no "
+            "smoothing: each point is one quarter's flow quoted at a seasonally-adjusted "
+            "annual rate, so it answers 'at the pace of that quarter, how much equity "
+            "would leave the market in a year.' History is annual from 1947 to 1951 and "
+            "quarterly from 1952 onward.\n\n"
+            "**Caveats.** Quarter-to-quarter prints are genuinely volatile — recent "
+            "quarters have ranged from about −$1.2tn to +$124bn at an annual rate — so "
+            "read the shape across several quarters rather than any single point. "
+            "**Excludes financial-sector companies**, so bank and insurer buybacks are "
+            "absent; the obvious FRED series for adding them counts ETF and "
+            "closed-end-fund share creation as a financial equity liability and would "
+            "swamp the measure. The Fed publishes roughly ten weeks after quarter-end and "
+            "revises prior quarters, so the latest point is both lagged and provisional; "
+            "the Russell 3000 chart alongside is the timely read. Those two are **not the "
+            "same measure and should not be netted** — they differ by roughly 3× for "
             "reasons that are only partly resolved."
         ),
     })
