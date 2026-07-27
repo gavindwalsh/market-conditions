@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-23",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "RF8",
   "name": "Small-lot call share / semi premium",
@@ -82,10 +82,6 @@
         {
           "date": "2025-06-30",
           "value": 67.066
-        },
-        {
-          "date": "2025-07-23",
-          "value": 66.044
         },
         {
           "date": "2025-07-24",
@@ -1082,6 +1078,10 @@
         {
           "date": "2026-07-23",
           "value": 55.839
+        },
+        {
+          "date": "2026-07-24",
+          "value": 54.885
         }
       ],
       "role": "avos",
@@ -1162,10 +1162,6 @@
         {
           "date": "2025-06-30",
           "value": 0.624
-        },
-        {
-          "date": "2025-07-23",
-          "value": 0.506
         },
         {
           "date": "2025-07-24",
@@ -2162,6 +2158,10 @@
         {
           "date": "2026-07-23",
           "value": 2.187
+        },
+        {
+          "date": "2026-07-24",
+          "value": 2.12
         }
       ],
       "role": "benchmark",
@@ -2171,8 +2171,8 @@
   "source": "Massive OPRA trades",
   "tile": {
     "delta": null,
-    "percentile": 16.38,
-    "value": 55.8
+    "percentile": 14.32,
+    "value": 54.9
   },
   "tooltip": "Call share of small-lot premium (5-day average); second line = small-lot premium in semis.",
   "unit": "% (tile: call share)"

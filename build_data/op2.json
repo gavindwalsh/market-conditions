@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-23",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "OP2",
   "name": "Household equity — nowcast",
@@ -382,6 +382,10 @@
         {
           "date": "2026-07-23",
           "value": 62.787
+        },
+        {
+          "date": "2026-07-24",
+          "value": 62.824
         }
       ],
       "role": "nowcast",

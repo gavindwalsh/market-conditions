@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-23",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "MH7",
   "name": "Cross-asset context",
@@ -754,10 +754,6 @@
         {
           "date": "2025-06-30",
           "value": 90.26
-        },
-        {
-          "date": "2025-07-23",
-          "value": 85.95
         },
         {
           "date": "2025-07-24",
@@ -1758,6 +1754,10 @@
         {
           "date": "2026-07-23",
           "value": 80.08
+        },
+        {
+          "date": "2026-07-24",
+          "value": 76.82
         }
       ],
       "role": "avos",
@@ -2510,10 +2510,6 @@
         {
           "date": "2025-06-30",
           "value": 4.228
-        },
-        {
-          "date": "2025-07-24",
-          "value": 4.396
         },
         {
           "date": "2025-07-25",
@@ -3553,7 +3549,11 @@
         },
         {
           "date": "2026-07-24",
-          "value": 4.657
+          "value": 4.677
+        },
+        {
+          "date": "2026-07-27",
+          "value": 4.649
         }
       ],
       "role": "context",
@@ -4306,10 +4306,6 @@
         {
           "date": "2025-06-30",
           "value": 0.509
-        },
-        {
-          "date": "2025-07-24",
-          "value": 0.479
         },
         {
           "date": "2025-07-25",
@@ -5349,7 +5345,11 @@
         },
         {
           "date": "2026-07-24",
-          "value": 0.343
+          "value": 0.347
+        },
+        {
+          "date": "2026-07-27",
+          "value": 0.326
         }
       ],
       "role": "benchmark",
@@ -5359,8 +5359,8 @@
   "source": "BBG MOVE/UST",
   "tile": {
     "delta": null,
-    "percentile": 58.29,
-    "value": 80.08
+    "percentile": 53.44,
+    "value": 76.82
   },
   "tooltip": "Rates vol (left) with the 10-year yield and curve slope (right) — the rates backdrop for equities.",
   "unit": " (tile: MOVE)"

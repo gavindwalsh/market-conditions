@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-23",
+  "asof": "2026-07-24",
   "cadence": "daily",
   "id": "MH2",
   "name": "Corporate credit (IG/HY OAS)",
@@ -1524,10 +1524,6 @@
           "value": 290.0
         },
         {
-          "date": "2025-07-23",
-          "value": 273.0
-        },
-        {
           "date": "2025-07-24",
           "value": 272.0
         },
@@ -2566,6 +2562,10 @@
         {
           "date": "2026-07-23",
           "value": 276.0
+        },
+        {
+          "date": "2026-07-24",
+          "value": 280.0
         }
       ],
       "role": "avos",
@@ -4280,10 +4280,6 @@
           "value": 83.0
         },
         {
-          "date": "2025-07-23",
-          "value": 77.0
-        },
-        {
           "date": "2025-07-24",
           "value": 77.0
         },
@@ -5322,6 +5318,10 @@
         {
           "date": "2026-07-23",
           "value": 78.0
+        },
+        {
+          "date": "2026-07-24",
+          "value": 79.0
         }
       ],
       "role": "context",
@@ -6844,10 +6844,6 @@
           "value": 207.0
         },
         {
-          "date": "2025-07-23",
-          "value": 196.0
-        },
-        {
           "date": "2025-07-24",
           "value": 195.0
         },
@@ -7886,6 +7882,10 @@
         {
           "date": "2026-07-23",
           "value": 198.0
+        },
+        {
+          "date": "2026-07-24",
+          "value": 201.0
         }
       ],
       "role": "benchmark",
@@ -7895,8 +7895,8 @@
   "source": "Bloomberg LUACOAS / LF98OAS",
   "tile": {
     "delta": null,
-    "percentile": 5.83,
-    "value": 276.0
+    "percentile": 6.86,
+    "value": 280.0
   },
   "tooltip": "Investment-grade and high-yield credit spreads; wider = stress.",
   "unit": " bp (tile: HY OAS)"

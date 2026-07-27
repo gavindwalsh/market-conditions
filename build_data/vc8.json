@@ -1761,7 +1761,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 28.49
+          "value": 28.39
         }
       ],
       "role": "avos",
@@ -3453,7 +3453,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 23.331
+          "value": 23.351
         }
       ],
       "role": "benchmark",
@@ -3463,8 +3463,8 @@
   "source": "BBG VXN + index closes",
   "tile": {
     "delta": null,
-    "percentile": 85.23,
-    "value": 28.49
+    "percentile": 84.89,
+    "value": 28.39
   },
   "tooltip": "VXN (30-day implied vol, skew-inclusive) vs 360-day realized (Bloomberg convention).",
   "unit": "vol pts"

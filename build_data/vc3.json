@@ -1761,7 +1761,7 @@
         },
         {
           "date": "2026-07-24",
-          "value": 0.893
+          "value": 0.906
         }
       ],
       "role": "avos",
@@ -1771,8 +1771,8 @@
   "source": "BBG VIX/VIX3M Index",
   "tile": {
     "delta": null,
-    "percentile": 55.01,
-    "value": 0.893
+    "percentile": 62.14,
+    "value": 0.906
   },
   "tooltip": "VIX/VIX3M above 1 = stress inversion; low = carry-friendly contango.",
   "unit": "×"
