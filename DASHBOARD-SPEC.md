@@ -82,6 +82,23 @@ Field mnemonics/series IDs marked **[verified]** were tested live in the 2026-07
 
 ## 4. Panels & metric registry
 
+> **Amendment 2026-07-27 (CIO review — supersedes the 2026-07-10 block below
+> where they conflict; `config.py` registry is authoritative):**
+> - **Killed:** LV16 (short interest aggregate) — not helpful. Registry row and
+>   compute removed; the BBG `SHORT_INT` pull keeps accruing prints so the card
+>   could return without a fresh backfill. Supersedes the two LV16 items in the
+>   2026-07-10 block.
+> - **OP2 → % of nominal GDP, full history.** Was the last 12 quarters in
+>   dollars; now the whole DFA record (1989 Q3→) divided by FRED `GDP`, so
+>   today's reading is comparable to the 2000 and 2007 peaks. The nowcast rolls
+>   the dollar level with SPX TR and divides by the last published GDP print
+>   (held flat — the current quarter's GDP is unpublished).
+> - **OP10 → % of nominal GDP.** Personal saving (`PMSAVE`, $B SAAR) over FRED
+>   `GDP` ($B SAAR); both annual-rate, quarterly denominator carried forward to
+>   monthly. The pandemic y-axis clip is kept.
+> - **SC5:** added a 1-month (21-session) rolling-average line over the daily
+>   cross-section, which is too jumpy to read a trend off.
+
 > **Amendment 2026-07-10 (CIO chart review, 27 items — supersedes conflicting
 > rows below; `config.py` registry is authoritative):**
 > - **Killed:** SC1, SC2, SC3 (concentration trio), VC4 (skew panel — combined

@@ -82,3 +82,8 @@ roll-artifact prune; OP2/OP6 fixes; stacked bars (LV3/OP6/MH5); MH1 split;
 LVT snapshot table for no-history leverage reads; VC6 = 4 sector IV baskets;
 one-sentence tooltips + status badges + generated APPENDIX.md; legends +
 duplicate-color fix in the renderer.
+
+**2026-07-27: CIO round — 47 metrics live.** LV16 (short interest) killed; OP2
+rebuilt as % of nominal GDP over its full 1989→ DFA history (was 12 quarters in
+dollars); OP10 → % of GDP; SC5 gained a 1-month rolling-average line. See the
+§4 amendment block in DASHBOARD-SPEC.md.

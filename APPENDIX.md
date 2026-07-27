@@ -274,16 +274,6 @@ window and annualization factor.
 
 **Caveats.** On generic-contract roll days the front/second ratio explodes (verified swings of several hundred bp around quarterly expiry), so days within ±2 business days of the March/June/September/December third Friday are dropped, backed by a ±150bp-versus-60-day-median filter.
 
-### LV16 — Short interest aggregate (SPX)
-**Status: current floats**
-*Source: BBG SHORT_INT × Massive prices · cadence: biweekly*
-
-**What it shows.** Aggregate short interest across the S&P 500 as a percent of float, with the median days-to-cover alongside. A rising line means more of the index is sold short; high days-to-cover means those shorts would take longer to buy back.
-
-**How it's computed.** `Σ(short shares × price) ÷ Σ float-cap`, where each name's short shares come from the biweekly FINRA print and the price is the last tape close on or before that print date. Days-to-cover is the median SHORT_INT_RATIO across names. History comes from a Bloomberg `bdh` backfill (November 2023 onward) plus daily snapshot appends.
-
-**Caveats.** Current-floats badge: the float-cap denominator uses the current snapshot applied backward, so older readings carry a survivorship and repricing bias.
-
 ### OP5 — ETF net flows
 *Source: BBG Δshares × NAV · cadence: daily*
 
@@ -320,14 +310,14 @@ window and annualization factor.
 
 **Caveats.** The DFA is released about 11 weeks after quarter-end; OP2 is the daily nowcast that bridges that lag.
 
-### OP2 — Household equity — nowcast
-*Source: FRED DFA × BBG SPTR · cadence: daily*
+### OP2 — Household equity — nowcast (% of GDP)
+*Source: FRED DFA × BBG SPTR · FRED GDP · cadence: daily*
 
-**What it shows.** The OP1 household-equity level brought up to date daily. The official quarterly print is rolled forward with the S&P 500's total return, so you can see roughly where household equity stands today rather than a quarter ago.
+**What it shows.** How large US households' equity holdings are relative to the economy, brought up to date daily. The official quarterly print is rolled forward with the S&P 500's total return, so you can see roughly where household equity stands today rather than a quarter ago. Because the level is scaled by GDP rather than left in dollars, the full history back to 1989 is directly comparable — today's reading can be read against the 2000 and 2007 peaks instead of only against the last few years.
 
-**How it's computed.** The last DFA cohort levels are grown by the S&P 500 total return since quarter-end, holding each cohort's share fixed until the next DFA release. The official prints are drawn solid; the rolled-forward segment is dashed.
+**How it's computed.** The four DFA wealth-cohort equity levels are summed (billions of dollars) and divided by nominal GDP — FRED series GDP, quarterly in billions at a seasonally-adjusted annual rate — times 100. DFA levels are dated to quarter-end and paired with their own quarter's GDP. For the nowcast, the last dollar level is grown by the S&P 500 total return since quarter-end, holding each cohort's share fixed, and divided by the most recent published GDP print. The official prints are drawn solid; the rolled-forward segment is dashed.
 
-**Caveats.** A nowcast, not data — cohort shares are frozen between DFA prints (the next, Q2 2026, is expected 2026-09-11). The official line is trimmed to about 12 quarters (OP1 carries the full history), and no percentile is shown on the nowcast segment.
+**Caveats.** A nowcast, not data — cohort shares are frozen between DFA prints (the next, Q2 2026, is expected 2026-09-11). The current quarter's GDP is not published yet, so the nowcast holds the last GDP print flat; while the economy grows, that slightly overstates the ratio. History starts in 1989 Q3, the first DFA observation.
 
 ### OP3 — Household cash % of financial assets
 *Source: FRED Z.1 B.101 [verified 2026-07-08] · cadence: quarterly*
@@ -347,14 +337,14 @@ window and annualization factor.
 
 **Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they run off-chart rather than flattening the rest of the history.
 
-### OP10 — Personal saving (level)
-*Source: FRED PMSAVE · cadence: monthly*
+### OP10 — Personal saving (% of GDP)
+*Source: FRED PMSAVE · FRED GDP · cadence: monthly*
 
-**What it shows.** The dollar level of personal saving — the same household behavior as the saving rate (OP9), but in dollars rather than as a share of income.
+**What it shows.** How much households are saving relative to the size of the economy — the same household behavior as the saving rate (OP9), but measured against GDP rather than against disposable income. Scaling by GDP keeps the whole history comparable: the dollar level rises with the economy, so a 1960s reading and a 2020s reading cannot be read side by side.
 
-**How it's computed.** The BEA's PMSAVE series — the personal saving level in billions of dollars, quoted at a seasonally-adjusted annual rate, monthly.
+**How it's computed.** The BEA's PMSAVE series — personal saving in billions of dollars at a seasonally-adjusted annual rate, monthly — divided by nominal GDP (FRED series GDP, quarterly, also in billions at a seasonally-adjusted annual rate), times 100. Both are annual-rate figures, so the ratio is directly meaningful; the quarterly GDP print is carried forward onto each month.
 
-**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they run off-chart rather than flattening the rest of the history.
+**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they run off-chart rather than flattening the rest of the history. GDP is quarterly, so the denominator steps at quarter boundaries.
 
 ### OP11 — Debt service ratio
 *Source: FRED TDSP · cadence: quarterly*
@@ -423,9 +413,9 @@ window and annualization factor.
 **Status: survivorship**
 *Source: Massive grouped bars × SPX membership · cadence: daily*
 
-**What it shows.** Realized cross-sectional dispersion — how widely S&P 500 members' same-day returns spread out. It is the realized counterpart to DSPX (SC4): high readings mean big winners and losers on the same day, a stock-picker's tape; low readings mean the index moves as one.
+**What it shows.** Realized cross-sectional dispersion — how widely S&P 500 members' same-day returns spread out. It is the realized counterpart to DSPX (SC4): high readings mean big winners and losers on the same day, a stock-picker's tape; low readings mean the index moves as one. A second line carries the one-month rolling average, since the daily reading is jumpy enough to obscure the trend.
 
-**How it's computed.** Each day, the standard deviation of member daily returns (×100), computed only on days with at least 400 members reporting a return, so a thin cross-section can't distort it.
+**How it's computed.** Each day, the standard deviation of member daily returns (×100), computed only on days with at least 400 members reporting a return, so a thin cross-section can't distort it. The smoothed line is the trailing 21-session (about one month) mean of that daily series, drawn once at least 10 sessions are available.
 
 **Caveats.** Survivorship badge: the calculation uses today's membership applied backward until historical membership lands, so older readings carry that bias while recent ones are exact.
 

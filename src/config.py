@@ -163,13 +163,13 @@ _REGISTRY_ROWS = [
     _m("SC5", "internals", "Realized cross-sectional dispersion", "Massive/BBG-top50", "daily", 2, "2005→"),
     # Panel 2 — Ownership & Passive
     _m("OP1", "ownership", "Household equity by wealth cohort", "FRED DFA", "quarterly", 1, "1989→"),
-    _m("OP2", "ownership", "Household-equity nowcast", "BBG+OP1", "daily", 1, "—", "5.6"),
+    _m("OP2", "ownership", "Household-equity nowcast (% of GDP)", "BBG+OP1+FRED", "daily", 1, "1989→", "5.6"),
     _m("OP3", "ownership", "Household cash % of financial assets", "FRED Z.1", "quarterly", 1, "1990→"),
     _m("OP4", "ownership", "Cash-ratio weekly nowcast", "ICI+FRED", "weekly", 1, "—", "5.6"),
     # OP9-11 — household saving + debt burden (FRED), Households panel.
     # OP12 (FODSP) killed 2026-07-10 — series discontinued by the Fed at 2023-Q3.
     _m("OP9", "ownership", "Personal saving rate", "FRED PSAVERT", "monthly", 1, "1959→"),
-    _m("OP10", "ownership", "Personal saving (level)", "FRED PMSAVE", "monthly", 1, "1959→"),
+    _m("OP10", "ownership", "Personal saving (% of GDP)", "FRED PMSAVE+GDP", "monthly", 1, "1959→"),
     _m("OP11", "ownership", "Debt service ratio", "FRED TDSP", "quarterly", 1, "2005→"),
     _m("OP5", "flows", "ETF net flows", "BBG", "daily", 1, "2015→"),
     _m("OP6", "flows", "ETF flows by category", "BBG", "daily", 1, "2018→"),
@@ -194,14 +194,15 @@ _REGISTRY_ROWS = [
     _m("LV3", "retail", "Volume by DTE bucket", "Massive OPRA", "daily", 3, "at feed"),
     _m("RF9", "retail", "Validation series (vs RTAT10)", "Nasdaq", "daily", 2, "rolling"),
     # Panel 4 — Leverage & Its Price — card order set by CIO 2026-07-24:
-    # LV15, LV13, LV6, LV8, LV16. LV9 + the LVT snapshot table removed (not
-    # helpful). LV5/LV7/LV10/LV14 keep computing (history accruing) but no
-    # longer surface anywhere now that LVT is gone.
+    # LV15, LV13, LV6, LV8. LV9 + the LVT snapshot table removed (not helpful);
+    # LV16 (short interest aggregate) removed 2026-07-27, same reason.
+    # LV5/LV7/LV10/LV14 keep computing (history accruing) but no longer surface
+    # anywhere now that LVT is gone; the BBG short-interest pull likewise keeps
+    # accruing so LV16 could be restored without a fresh backfill.
     _m("LV15", "leverage", "L4 FINRA margin debt (% of GDP)", "FINRA+FRED", "monthly", 1, "1997→"),
     _m("LV13", "leverage", "L3 Leveraged-ETF financing residual", "BBG", "weekly", 1, "2020→", "5.8"),
     _m("LV6", "leverage", "Leveraged-ETF rebalance notional", "BBG+OP7", "daily", 1, "2020→"),
     _m("LV8", "leverage", "L1 ES roll implied financing", "BBG", "daily", 1, "2018→"),
-    _m("LV16", "leverage", "Short interest aggregate", "BBG", "biweekly", 1, "2023-11→"),
     # Registry-only (phase-gated / no chartable data yet) — sit after the cards:
     _m("LV1", "leverage", "0DTE share — SPX complex", "Cboe", "daily", 1, "2022→"),
     _m("LV4", "leverage", "Options/stock notional ratio", "Massive OPRA", "daily", 3, "at feed"),
