@@ -105,22 +105,48 @@ CHART_BOOT = """
       yAxes={type:'value',scale:true,max:yMax,min:yMin,
              splitLine:{lineStyle:{color:'#e2e2e2'}}};
     }
-    /* category (not time) x-axis: market data has no weekend/holiday points, so a
-       time axis leaves blank slots for every non-trading day (visible as bar gaps
-       and warped spacing). Category spaces one slot per trading day present. Build
-       the sorted union of dates across all series so multi-series charts share one
-       axis; series data stays [date,value] pairs, which ECharts maps by category. */
+    /* category (not time) x-axis by DEFAULT: market data has no weekend/holiday
+       points, so a time axis leaves blank slots for every non-trading day (visible
+       as bar gaps and warped spacing). Category spaces one slot per trading day
+       present. Build the sorted union of dates across all series so multi-series
+       charts share one axis; series data stays [date,value] pairs, which ECharts
+       maps by category.
+
+       BUT equal-width slots only tell the truth when every point spans the same
+       amount of time, and the §6 display downsample guarantees they do not: it
+       keeps the last year daily and thins everything older to monthly. On a
+       category axis a 10-year daily chart therefore hands roughly seven tenths of
+       its width to the most recent one tenth of time (measured across VC1-VC10,
+       MH2-MH4, LV6-LV13 and others), and IS6 — quarterly for ten years, then daily
+       for four months — was worse still.
+       NOTE: this whole string is percent-formatted at module level (see the
+       json.dumps at its close), so a literal percent character anywhere in it —
+       comments included — must be doubled or it is read as a format specifier.
+       The prose above spells out fractions in words to sidestep that.
+
+       So: use a TRUE time axis unless something needs category. Category is kept
+       for (a) any chart with a BAR series, where non-trading-day gaps become
+       visible holes and warped bar widths — the original reason for the default —
+       and (b) charts whose x keys are not real dates, e.g. IS9/IS10 plot
+       day-of-year "MM-DD" strings that a time axis cannot parse. "x_axis" on the
+       metric overrides either way ("time" / "category"). */
     var catSet={}; m.series.forEach(function(s){(s.points||[]).forEach(function(p){catSet[p.date]=1;});});
     var cats=Object.keys(catSet).sort();
+    var hasBar=m.series.some(function(s){return s.kind==='bar';});
+    var datesOK=cats.length>0&&cats.every(function(d){return /^\d{4}-\d{2}-\d{2}$/.test(d);});
+    var useTime = m.x_axis==='time' ? true
+                : m.x_axis==='category' ? false
+                : (datesOK && !hasBar);
     ch.setOption({grid:{left:56,right:dual?56:16,top:legend?40:26,bottom:24},
       legend:legend,
-      xAxis:{type:'category',data:cats,axisLine:{lineStyle:{color:'#1E1E1E'}}},
+      xAxis:useTime?{type:'time',axisLine:{lineStyle:{color:'#1E1E1E'}}}
+                   :{type:'category',data:cats,axisLine:{lineStyle:{color:'#1E1E1E'}}},
       yAxis:yAxes,
       tooltip:{trigger:'axis',confine:true},
       dataZoom:[{type:'inside',xAxisIndex:0,filterMode:'filter'}],  /* y re-fits to visible window */
       textStyle:{fontFamily:'Roboto,system-ui,sans-serif'},
       series:series});
-    window.__CHARTS__.push({ch:ch,cats:cats,id:id,el:el});
+    window.__CHARTS__.push({ch:ch,cats:cats,id:id,el:el,time:useTime});
     window.addEventListener('resize',function(){ch.resize();});
   });
   var chartById=function(id){var f=null;window.__CHARTS__.forEach(function(c){if(c.id===id)f=c.ch;});return f;};
@@ -139,6 +165,13 @@ CHART_BOOT = """
       var cats=c.cats||[];
       if(months===null||!cats.length){
         c.ch.dispatchAction({type:'dataZoom',start:0,end:100});
+      } else if(c.time){
+        /* time axis: dataZoom bounds are TIMESTAMPS, not slot indices. Clamp the
+           cutoff to the series start so a short series still shows all of itself,
+           matching the category branch below. */
+        var lastT=+new Date(cats[cats.length-1]);
+        var startT=Math.max(lastT-months*30.44*86400000,+new Date(cats[0]));
+        c.ch.dispatchAction({type:'dataZoom',startValue:startT,endValue:lastT});
       } else {
         var cutoff=+new Date(cats[cats.length-1])-months*30.44*86400000;
         var startIdx=0;

@@ -233,6 +233,10 @@ def build_is6() -> bool:
         "panel": "issuance",
         "source": "FRED NCBCEBQ027S · FRED GDP · BBG RAY buybacks", "cadence": "daily",
         "asof": pd.Timestamp(asof).strftime("%Y-%m-%d"), "unit": " % of GDP",
+        # Mixed cadence by construction — quarterly prints plus a daily carried
+        # segment — so this card depends on the renderer's time x-axis (line-only
+        # charts with date keys); equal-width category slots would hand two-thirds
+        # of the width to the last four months.
         "series": series,
         "tile": {"value": round(tile_val, 2), "delta": None,
                  "percentile": util.trailing_percentile(ttm["ttm_pct"], value=tile_val,
