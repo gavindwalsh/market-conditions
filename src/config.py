@@ -244,10 +244,11 @@ _REGISTRY_ROWS = [
     # as % of GDP, quarterly as published; IS6B = the Russell 3000 cash-flow
     # decomposition, daily 1998-03→ and the timely read. They are NOT the same
     # measure and must not be netted (they differ ~3×; see the appendix entries).
-    # IS6's TTM line + daily BBG-carried extension were dropped later the same day
-    # (CIO) — build_is6's docstring records why the two had to go together.
+    # IS6's TTM smoothing line was dropped later the same day (CIO); the daily
+    # BBG-carried extension STAYS — see build_is6's docstring for the accuracy
+    # caveat now that it anchors to a single quarterly print.
     _m("IS6", "issuance", "Net corporate equity issuance (% of GDP)",
-       "FRED", "quarterly", 1, "1947→", "IS6 spec"),
+       "FRED+BBG", "daily", 1, "1947→", "IS6 spec"),
     _m("IS6B", "issuance", "Corporate cash-equity flow (Russell 3000)",
        "BBG", "daily", 1, "1998-03→", "IS6 spec"),
     _m("IS7", "issuance", "Fund registration filings (pipeline proxy)", "EDGAR", "weekly", 1, "2020→"),
