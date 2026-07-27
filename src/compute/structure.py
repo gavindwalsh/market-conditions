@@ -15,6 +15,7 @@ from .. import store, util
 from .ownership import _display_series
 
 SEMIS_GICS = 453010
+SC5_SMOOTH_SESSIONS = 21  # ~1 month of trading sessions (SC5 rolling-average line)
 
 
 def _member_daily() -> pd.DataFrame | None:
@@ -131,26 +132,38 @@ def build_sc5() -> bool:
         return False
     s = disp.rename("value").reset_index().rename(columns={"index": "date"})
     s["date"] = pd.to_datetime(s["date"])
+    # 1-month (21-session) rolling mean, added 2026-07-27 per CIO: the daily
+    # cross-section is jumpy enough that the trend is hard to read off the raw
+    # line. min_periods=10 so the smooth line starts about half a month in
+    # rather than leaving a long blank lead-in.
+    sm = s.copy()
+    sm["value"] = sm["value"].rolling(SC5_SMOOTH_SESSIONS, min_periods=10).mean()
+    sm = sm.dropna(subset=["value"])
 
     store.write_display("SC5", {
         "id": "SC5", "name": "Realized cross-sectional dispersion", "panel": "other",
         "source": "Massive grouped bars × SPX membership", "cadence": "daily",
         "asof": s["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": "%",
-        "series": [_display_series(s, "Cross-sectional std-dev of member returns")],
+        "series": [_display_series(s, "Cross-sectional std-dev of member returns"),
+                   _display_series(sm, "1-month rolling average", role="benchmark")],
         "tile": {"value": round(float(s["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(s["value"])},
         "provenance": "massive_cache",
         "tooltip": "Spread of same-day returns across S&P 500 members — realized "
-                   "dispersion.",
+                   "dispersion; second line is the 1-month rolling average.",
         "status": {"level": "provisional", "label": "survivorship"},
         "notes": (
             "**What it shows.** Realized cross-sectional dispersion — how widely S&P 500 "
             "members' same-day returns spread out. It is the realized counterpart to "
             "DSPX (SC4): high readings mean big winners and losers on the same day, a "
-            "stock-picker's tape; low readings mean the index moves as one.\n\n"
+            "stock-picker's tape; low readings mean the index moves as one. A second line "
+            "carries the one-month rolling average, since the daily reading is jumpy "
+            "enough to obscure the trend.\n\n"
             "**How it's computed.** Each day, the standard deviation of member daily "
             "returns (×100), computed only on days with at least 400 members reporting a "
-            "return, so a thin cross-section can't distort it.\n\n"
+            "return, so a thin cross-section can't distort it. The smoothed line is the "
+            "trailing 21-session (about one month) mean of that daily series, drawn once "
+            "at least 10 sessions are available.\n\n"
             "**Caveats.** Survivorship badge: the calculation uses today's membership "
             "applied backward until historical membership lands, so older readings carry "
             "that bias while recent ones are exact."

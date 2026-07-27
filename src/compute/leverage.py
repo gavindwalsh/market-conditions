@@ -1,4 +1,4 @@
-"""leverage.py — Panel 4 Phase-1 computes (LV6, LV8, LV11, LV13, LV16).
+"""leverage.py — Panel 4 Phase-1 computes (LV6, LV8, LV11, LV13, LV15).
 
 LV7 (box yield) needs the SPX chain pull — separate work item.
 LV14/LV15 come from free.py / finra.py. LV2-5/9/10/12 are Phase 3.
@@ -310,93 +310,6 @@ def build_lv13() -> bool:
     return True
 
 
-def build_lv16() -> bool:
-    """LV16: aggregate SPX short interest — Σ(short shares × price) / Σ float
-    cap + median days-to-cover (SHORT_INT_RATIO). History from the 2026-07-10
-    bdh backfill (bbg_short_interest_hist, 2023-11→) + daily snapshot appends.
-
-    Fixed 2026-07-10: float_cap is in raw DOLLARS (AAPL ≈ 4.5e12), the old
-    /1e6 assumed $M and made the series print 0.000. Prices: last grouped
-    close on/before each print date. Float caps: CURRENT snapshot applied
-    backward (survivorship/repricing caveat, labeled)."""
-    hist = store.read_latest("bbg_short_interest_hist")
-    snap_si = store.read_all("bbg_short_interest")
-    members = store.read_all("bbg_spx_members")
-    grouped = massive.read_grouped()
-    if members is None or grouped is None or (hist is None and snap_si is None):
-        return False
-    from .structure import _bbg_to_massive
-    # The daily snapshot re-reports the SAME biweekly print every capture day, so
-    # date each snapshot row by its settlement date (short_int_dt) — collapsing
-    # the daily duplicates onto one biweekly point. Rows captured before that
-    # field existed carry no settlement date; drop them (hist covers those
-    # prints) rather than plotting stale short interest at daily capture dates.
-    if snap_si is not None and not snap_si.empty and "short_int_dt" in snap_si.columns:
-        snap_si = snap_si[snap_si["short_int_dt"].notna()].copy()
-        snap_si["date"] = pd.to_datetime(snap_si["short_int_dt"])
-    parts = [x for x in (hist, snap_si) if x is not None and not x.empty]
-    si = pd.concat(parts, ignore_index=True)
-    si["date"] = pd.to_datetime(si["date"])
-    si = si.sort_values("date").drop_duplicates(["date", "ticker"], keep="last")
-
-    g = grouped[["date", "ticker", "close"]].copy()
-    g["date"] = pd.to_datetime(g["date"])
-    closes = g.pivot_table(index="date", columns="ticker", values="close",
-                           aggfunc="last").sort_index().ffill()
-
-    snap = members[members["date"] == members["date"].max()].drop_duplicates("ticker")
-    fc_total = snap.set_index("ticker")["float_cap"].sum()
-
-    rows = []
-    for d, gg in si.groupby("date"):
-        gg = gg.copy()
-        gg["sym"] = gg["ticker"].map(_bbg_to_massive)
-        px_dates = closes.index[closes.index <= d]
-        if len(px_dates) == 0:
-            continue
-        px = closes.loc[px_dates[-1]]
-        gg["px"] = gg["sym"].map(px)
-        si_usd = (gg["short_int"] * gg["px"]).sum()
-        if si_usd <= 0:
-            continue
-        rows.append({"date": d, "si_pct": si_usd / fc_total * 100.0,
-                     "dtc": gg["short_int_ratio"].median()})
-    if not rows:
-        return False
-    df = pd.DataFrame(rows).sort_values("date")
-    store.write_display("LV16", {
-        "id": "LV16", "name": "Short interest aggregate (SPX)", "panel": "leverage",
-        "source": "BBG SHORT_INT × Massive prices", "cadence": "biweekly",
-        "asof": df["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": "% of float (tile)",
-        "series": [_display_series(df[["date", "si_pct"]].rename(columns={"si_pct": "value"}),
-                                   "Short interest % of float cap", unit="%", ds="none"),
-                   _display_series(df[["date", "dtc"]].rename(columns={"dtc": "value"}),
-                                   "Median days-to-cover", role="context", unit="days",
-                                   ds="none")],
-        "tile": {"value": round(float(df["si_pct"].iloc[-1]), 2), "delta": None,
-                 "percentile": util.trailing_percentile(df["si_pct"], min_history=26)},
-        "provenance": "derived",
-        "status": {"level": "provisional", "label": "current floats"},
-        "tooltip": "SPX short interest as % of float (biweekly prints); line = median "
-                   "days-to-cover.",
-        "notes": (
-            "**What it shows.** Aggregate short interest across the S&P 500 as a percent "
-            "of float, with the median days-to-cover alongside. A rising line means more "
-            "of the index is sold short; high days-to-cover means those shorts would take "
-            "longer to buy back.\n\n"
-            "**How it's computed.** `Σ(short shares × price) ÷ Σ float-cap`, where each "
-            "name's short shares come from the biweekly FINRA print and the price is the "
-            "last tape close on or before that print date. Days-to-cover is the median "
-            "SHORT_INT_RATIO across names. History comes from a Bloomberg `bdh` backfill "
-            "(November 2023 onward) plus daily snapshot appends.\n\n"
-            "**Caveats.** Current-floats badge: the float-cap denominator uses the current "
-            "snapshot applied backward, so older readings carry a survivorship and "
-            "repricing bias."
-        ),
-    })
-    return True
-
-
 def build_lv7() -> bool:
     """LV7: SPX box-spread implied yield vs SOFR (§5.4). History accumulates
     one point per tenor per run day (build→ per §4)."""
@@ -537,6 +450,8 @@ def build_lv15() -> bool:
 def build() -> dict[str, bool]:
     # LV7/LV14 keep computing so their history accrues (they no longer surface
     # on the page: the LVT snapshot table was removed 2026-07-24, CIO cleanup).
+    # LV16 (short interest aggregate) removed 2026-07-27, CIO: not helpful. The
+    # BBG short-interest pull stays so the lake keeps accruing prints.
     return {"LV6": build_lv6(), "LV7": build_lv7(), "LV8": build_lv8(),
             "LV11": build_lv11(), "LV13": build_lv13(), "LV14": build_lv14(),
-            "LV15": build_lv15(), "LV16": build_lv16()}
+            "LV15": build_lv15()}

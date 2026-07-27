@@ -122,12 +122,18 @@ def build_op3() -> bool:
 
 
 def build_op2() -> bool:
-    """OP2: household-equity nowcast (§5.6) — last DFA cohort levels rolled
-    forward with SPX total return since quarter-end; cohort shares frozen.
-    Official prints solid, nowcast segment dashed (role='nowcast')."""
-    b50 = store.read_latest("fred_dfa_eq_bottom50")
+    """OP2: household-equity nowcast (§5.6) as a share of nominal GDP — the full
+    DFA history (1989→) divided by FRED GDP, with the last print rolled forward
+    with SPX total return since quarter-end. Official prints solid, nowcast
+    segment dashed (role='nowcast').
+
+    Changed 2026-07-27 (CIO): was the last 12 quarters in dollars. Dollars grow
+    mechanically with the economy, so the level was only readable against its
+    own recent past; scaling by GDP makes the whole 1989→ history comparable and
+    shows where today sits versus the 2000 and 2007 peaks."""
     spx_tr = store.read_latest("bbg_spx_tr")
-    if b50 is None or spx_tr is None:
+    gdp = store.read_latest("fred_gdp")
+    if spx_tr is None or gdp is None or gdp.empty:
         return False
     cohorts = {m: store.read_latest(f"fred_dfa_eq_{m}")
                for m in ("bottom50", "next40", "next9", "top1")}
@@ -137,13 +143,21 @@ def build_op2() -> bool:
     for name, df in cohorts.items():
         d = df[["date", "value"]].rename(columns={"value": name})
         total = d if total is None else total.merge(d, on="date", how="inner")
-    total["value"] = total[list(cohorts)].sum(axis=1)
-    total = total[["date", "value"]].sort_values("date")
-    total["value"] /= 1e6  # $M → $T
+    total["bn"] = total[list(cohorts)].sum(axis=1) / 1e3  # $M → $B (GDP's unit)
+    total = total[["date", "bn"]].sort_values("date")
     total["date"] = pd.to_datetime(total["date"])
     # DFA dates quarter-START convention: the level is as of quarter-END, so
     # shift for display (and the roll anchor reads straight off the last row)
     total["date"] = total["date"] + pd.offsets.QuarterEnd(1)
+
+    # nominal GDP is quarterly, $B SAAR, dated quarter-START; merge_asof backward
+    # onto the quarter-END equity dates pairs each print with its OWN quarter.
+    gdp = gdp[["date", "value"]].rename(columns={"value": "gdp_bn"}).sort_values("date").copy()
+    gdp["date"] = pd.to_datetime(gdp["date"])
+    total = pd.merge_asof(total, gdp, on="date", direction="backward").dropna(subset=["gdp_bn"])
+    total["value"] = total["bn"] / total["gdp_bn"] * 100.0
+    if total.empty:
+        return False
 
     tr = spx_tr.copy()
     tr["date"] = pd.to_datetime(tr["date"])
@@ -155,39 +169,53 @@ def build_op2() -> bool:
         return False
     base_tr = base["value"].iloc[-1]
     fwd = tr[tr["date"] > qend].copy()
-    fwd["value"] = last_row["value"] * fwd["value"] / base_tr
+    # roll the DOLLAR level with SPX TR, then divide by the latest GDP print held
+    # flat (GDP for the current quarter is not published yet).
+    gdp_now = float(gdp["gdp_bn"].iloc[-1])
+    fwd["value"] = last_row["bn"] * fwd["value"] / base_tr / gdp_now * 100.0
     now_val = float(fwd["value"].iloc[-1]) if not fwd.empty else float(last_row["value"])
     asof = (fwd["date"].iloc[-1] if not fwd.empty else qend).strftime("%Y-%m-%d")
     # anchor the dashed nowcast at the last official point so the two segments join
     fwd = pd.concat([pd.DataFrame({"date": [qend], "value": [last_row["value"]]}),
                      fwd[["date", "value"]]], ignore_index=True)
-    official = total.tail(12)  # last ~3yr; OP1 next to it carries the full history
+    official = total[["date", "value"]]
 
     store.write_display("OP2", {
-        "id": "OP2", "name": "Household equity — nowcast", "panel": "ownership",
-        "source": "FRED DFA × BBG SPTR", "cadence": "daily",
+        "id": "OP2", "name": "Household equity — nowcast (% of GDP)", "panel": "ownership",
+        "source": "FRED DFA × BBG SPTR · FRED GDP", "cadence": "daily",
         "asof": asof,
-        "unit": " $T",
+        "unit": " %",
         "series": [_display_series(official, "Household corporate equities (DFA, official)"),
                    {**_display_series(fwd, "Nowcast (SPX-TR rolled)", role="nowcast"),
                     "estimated_from": qend.strftime("%Y-%m-%d")}],
-        "tile": {"value": round(now_val, 1), "delta": None, "percentile": None},
+        "tile": {"value": round(now_val, 1), "delta": None,
+                 "percentile": util.trailing_percentile(
+                     pd.concat([official["value"], pd.Series([now_val])], ignore_index=True),
+                     min_history=MIN_QUARTERLY_OBS)},
         "provenance": "derived",
-        "tooltip": "Official quarterly household equity rolled forward daily with SPX "
-                   "total return (dashed = nowcast).",
+        "tooltip": "Household equity holdings as a share of nominal GDP, rolled forward "
+                   "daily with SPX total return (dashed = nowcast).",
         "notes": (
-            "**What it shows.** The OP1 household-equity level brought up to date daily. "
-            "The official quarterly print is rolled forward with the S&P 500's total "
-            "return, so you can see roughly where household equity stands today rather "
-            "than a quarter ago.\n\n"
-            "**How it's computed.** The last DFA cohort levels are grown by the S&P 500 "
-            "total return since quarter-end, holding each cohort's share fixed until the "
-            "next DFA release. The official prints are drawn solid; the rolled-forward "
-            "segment is dashed.\n\n"
+            "**What it shows.** How large US households' equity holdings are relative to "
+            "the economy, brought up to date daily. The official quarterly print is rolled "
+            "forward with the S&P 500's total return, so you can see roughly where "
+            "household equity stands today rather than a quarter ago. Because the level is "
+            "scaled by GDP rather than left in dollars, the full history back to 1989 is "
+            "directly comparable — today's reading can be read against the 2000 and 2007 "
+            "peaks instead of only against the last few years.\n\n"
+            "**How it's computed.** The four DFA wealth-cohort equity levels are summed "
+            "(billions of dollars) and divided by nominal GDP — FRED series GDP, quarterly "
+            "in billions at a seasonally-adjusted annual rate — times 100. DFA levels are "
+            "dated to quarter-end and paired with their own quarter's GDP. For the nowcast, "
+            "the last dollar level is grown by the S&P 500 total return since quarter-end, "
+            "holding each cohort's share fixed, and divided by the most recent published "
+            "GDP print. The official prints are drawn solid; the rolled-forward segment is "
+            "dashed.\n\n"
             "**Caveats.** A nowcast, not data — cohort shares are frozen between DFA "
-            "prints (the next, Q2 2026, is expected 2026-09-11). The official line is "
-            "trimmed to about 12 quarters (OP1 carries the full history), and no "
-            "percentile is shown on the nowcast segment."
+            "prints (the next, Q2 2026, is expected 2026-09-11). The current quarter's GDP "
+            "is not published yet, so the nowcast holds the last GDP print flat; while the "
+            "economy grows, that slightly overstates the ratio. History starts in 1989 Q3, "
+            "the first DFA observation."
         ),
     })
     return True
@@ -336,16 +364,31 @@ def build_op567() -> dict[str, bool]:
 def _build_fred_line(mid: str, mnemonic: str, name: str, unit: str, cadence: str,
                      source: str, tooltip: str, note: str, fmt: int = 1,
                      min_hist: int = MIN_QUARTERLY_OBS, status: dict | None = None,
-                     clip_pandemic: bool = False) -> bool:
+                     clip_pandemic: bool = False, pct_of: str | None = None) -> bool:
     """One FRED series → one-line chart (Households panel). Monthly/quarterly
     levels or ratios; percentile ranks the latest print vs its own history.
     clip_pandemic caps the y-axis to the pre/post-COVID range so the 2020-21
-    stimulus spikes run off-chart instead of flattening the rest of the series."""
+    stimulus spikes run off-chart instead of flattening the rest of the series.
+    pct_of names a second FRED mnemonic to divide by (×100) — used to scale
+    dollar levels by nominal GDP; a lower-cadence denominator is carried forward
+    onto the numerator's dates, so the ratio steps at the denominator's
+    boundaries."""
     df = store.read_latest(f"fred_{mnemonic}")
     if df is None or df.empty:
         return False
     s = df[["date", "value"]].sort_values("date").copy()
     s["date"] = pd.to_datetime(s["date"])
+    if pct_of:
+        den = store.read_latest(f"fred_{pct_of}")
+        if den is None or den.empty:
+            return False
+        den = den[["date", "value"]].rename(columns={"value": "_den"}).sort_values("date").copy()
+        den["date"] = pd.to_datetime(den["date"])
+        s = pd.merge_asof(s, den, on="date", direction="backward").dropna(subset=["_den"])
+        if s.empty:
+            return False
+        s["value"] = s["value"] / s["_den"] * 100.0
+        s = s[["date", "value"]]
     payload = {
         "id": mid, "name": name, "panel": "ownership",
         "source": source, "cadence": cadence,
@@ -380,19 +423,30 @@ def build_households() -> dict[str, bool]:
             "**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they "
             "run off-chart rather than flattening the rest of the history.",
             fmt=1, min_hist=120, clip_pandemic=True),
+        # OP10: shown as a share of GDP since 2026-07-27 (CIO) — the dollar level
+        # grows mechanically with the economy, so decades-apart readings weren't
+        # comparable. OP9 already gives the share-of-income view; GDP is the
+        # whole-economy denominator, which is the different read worth having.
         "OP10": _build_fred_line(
-            "OP10", "pmsave", "Personal saving (level)", " $B", "monthly", "FRED PMSAVE",
-            "Total personal saving in dollars (monthly, annual-rate). The 2020-21 "
+            "OP10", "pmsave", "Personal saving (% of GDP)", " %", "monthly",
+            "FRED PMSAVE · FRED GDP",
+            "Total personal saving as a share of nominal GDP (monthly). The 2020-21 "
             "stimulus spikes run off the top so the rest is legible.",
-            "**What it shows.** The dollar level of personal saving — the same household "
-            "behavior as the saving rate (OP9), but in dollars rather than as a share of "
-            "income.\n\n"
-            "**How it's computed.** The BEA's PMSAVE series — the personal saving level in "
-            "billions of dollars, quoted at a seasonally-adjusted annual rate, "
-            "monthly.\n\n"
+            "**What it shows.** How much households are saving relative to the size of the "
+            "economy — the same household behavior as the saving rate (OP9), but measured "
+            "against GDP rather than against disposable income. Scaling by GDP keeps the "
+            "whole history comparable: the dollar level rises with the economy, so a "
+            "1960s reading and a 2020s reading cannot be read side by side.\n\n"
+            "**How it's computed.** The BEA's PMSAVE series — personal saving in billions "
+            "of dollars at a seasonally-adjusted annual rate, monthly — divided by nominal "
+            "GDP (FRED series GDP, quarterly, also in billions at a seasonally-adjusted "
+            "annual rate), times 100. Both are annual-rate figures, so the ratio is "
+            "directly meaningful; the quarterly GDP print is carried forward onto each "
+            "month.\n\n"
             "**Caveats.** The y-axis is capped below the 2020–21 stimulus spikes so they "
-            "run off-chart rather than flattening the rest of the history.",
-            fmt=0, min_hist=120, clip_pandemic=True),
+            "run off-chart rather than flattening the rest of the history. GDP is "
+            "quarterly, so the denominator steps at quarter boundaries.",
+            fmt=1, min_hist=120, clip_pandemic=True, pct_of="gdp"),
         "OP11": _build_fred_line(
             "OP11", "tdsp", "Debt service ratio", "%", "quarterly", "FRED TDSP",
             "Household debt-service payments as a share of disposable income.",

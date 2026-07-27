@@ -183,10 +183,14 @@ def pull_iv_histories() -> int:
 
 
 def pull_short_interest_history(start: str = "2023-11-01") -> int:
-    """LV16 backfill: biweekly SHORT_INT + SHORT_INT_RATIO prints per member via
-    bdh (verified live 2026-07-10: bdh serves the biweekly history). One-time —
-    ~500 sequential per-ticker calls; the daily pull_short_interest snapshot
-    keeps the table current afterwards."""
+    """Short-interest backfill: biweekly SHORT_INT + SHORT_INT_RATIO prints per
+    member via bdh (verified live 2026-07-10: bdh serves the biweekly history).
+    One-time — ~500 sequential per-ticker calls; the daily pull_short_interest
+    snapshot keeps the table current afterwards.
+
+    Fed LV16 until that card was removed 2026-07-27 (CIO: not helpful). Kept so
+    the lake keeps accruing prints — no consumer today, no re-backfill needed if
+    short interest returns to the page."""
     from .. import store
     from datetime import datetime as _dt
     tickers = index_members()
@@ -214,13 +218,16 @@ def pull_short_interest_history(start: str = "2023-11-01") -> int:
 
 
 def pull_short_interest(tickers: list[str]) -> pd.DataFrame:
-    """LV16: per-member short interest snapshot (biweekly print; accumulate).
+    """Per-member short interest snapshot (biweekly print; accumulate).
 
-    Stamps short_int_dt with the print's SETTLEMENT date so LV16 can plot each
-    point on its true biweekly date rather than the daily capture date (the
+    Stamps short_int_dt with the print's SETTLEMENT date so a consumer can plot
+    each point on its true biweekly date rather than the daily capture date (the
     daily bdp otherwise re-reports the same print every day). The FINRA
     settlement calendar is market-wide, so we read it once from the latest
-    SHORT_INT bdh date on a liquid reference name."""
+    SHORT_INT bdh date on a liquid reference name.
+
+    Fed LV16 until that card was removed 2026-07-27 (CIO: not helpful); the pull
+    stays so the biweekly history keeps accruing."""
     from datetime import timedelta
 
     from .. import store
