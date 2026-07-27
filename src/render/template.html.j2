@@ -6,8 +6,10 @@
 <header class="masthead">
   {% if wordmark_data_uri %}<img class="wordmark" src="{{ wordmark_data_uri }}" alt="avos"/>{% else %}<span class="wordmark" style="font-family:Georgia,serif;font-size:22px">avos</span>{% endif %}
   <h1>US Market Conditions</h1>
+  {# 10Y is the default (see setRange + the init call in the boot script): the
+     long-history charts are unreadable at full range, and one click restores All. #}
   <div class="range-btns">
-    <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(null,this)">All</button>
+    <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(120,this)">10Y</button><button onclick="setRange(null,this)">All</button>
   </div>
   <a class="appendix-link" href="/{{ app_slug }}/appendix" target="_blank" rel="noopener">Appendix ↗</a>
   <div class="asof">Run {{ run_date }} ET · Phase {{ phase }}<br/>Data as-of block below each tile</div>
@@ -88,7 +90,7 @@
       <span class="fs-title"></span>
       <div class="fs-controls">
         <div class="range-btns fs-range">
-          <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(null,this)">All</button>
+          <button onclick="setRange(3,this)">3M</button><button onclick="setRange(6,this)">6M</button><button onclick="setRange(12,this)">1Y</button><button onclick="setRange(36,this)">3Y</button><button class="active" onclick="setRange(120,this)">10Y</button><button onclick="setRange(null,this)">All</button>
         </div>
         <button class="fs-close" aria-label="Close chart" title="Close (Esc)">✕</button>
       </div>

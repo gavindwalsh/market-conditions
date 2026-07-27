@@ -482,6 +482,27 @@ window and annualization factor.
 
 **Caveats.** A rebased relative-strength ratio — read moves against the anchor date, not the absolute number.
 
+### IS6 — US net corporate equity issuance (% of GDP)
+**Status: carried estimate**
+*Source: FRED NCBCEBQ027S · FRED GDP · BBG RAY buybacks · cadence: daily*
+
+**What it shows.** How much equity the US nonfinancial corporate sector is issuing or retiring, as a share of the economy. Negative means companies are buying back more than they sell — equity is being withdrawn from the market. This is the definitive level: it is the only measure on the dashboard that captures **cash M&A retirement** (a company bought for cash retires its shares) and **shares issued to employees** through RSU vesting and option exercise. It is scaled by GDP rather than shown in dollars because the published history reaches 1947, and on a dollar axis the first fifty years are invisible against today's magnitudes.
+
+**How it's computed.** FRED series `NCBCEBQ027S` (Fed Z.1 Financial Accounts — Nonfinancial Corporate Business; Corporate Equities; Liability, Transactions), quarterly at a seasonally-adjusted annual rate, divided by nominal GDP. Each quarterly print is already annualized, so the four-quarter mean is the trailing-twelve-month level in the same units — the solid line. The lighter points are the prints as published. Between Fed releases the solid line is extended daily (dashed) by subtracting the change in Russell 3000 gross buybacks since the last published quarter-end: rising buybacks make net issuance more negative. That operator beat both a flat carry and a net-based delta on an 85-quarter backtest. Carried 115 days past the 2026-03-31 quarter-end.
+
+**Caveats.** Carried-estimate badge on the dashed segment: it is directional, not a measurement — the historical error on the carry is roughly ±1 standard deviation of $130bn at the quarter horizon, which is a large fraction of a typical reading, and observing it daily does not shrink it. **Excludes financial-sector companies**, so bank and insurer buybacks are absent; the obvious FRED series for adding them counts ETF and closed-end-fund share creation as a financial equity liability and would swamp the measure. The Fed publishes roughly ten weeks after quarter-end and revises prior quarters. This measure and the Russell 3000 cash-flow chart alongside it are **not the same thing and should not be netted** — they differ by roughly 3× for reasons that are only partly resolved.
+
+### IS6B — Corporate cash-equity flow (Russell 3000)
+*Source: BBG RAY CF_DECR/INCR_CAP_STOCK · cadence: daily*
+
+**What it shows.** What Russell 3000 companies spent buying back their own stock, against what they raised selling stock, straight from company cash-flow statements. Buybacks plot below the axis as a cash outflow, issuance above it, and the net line between them. Trailing twelve months at every point, updated daily as companies file — so it steps during earnings season and is flat between.
+
+Everything is shown as a **share of market capitalization** rather than in dollars, and that choice matters: buybacks are at a record dollar level ($1.30tn trailing twelve months, against $282bn of stock sold) and simultaneously near the low end of their range as a share of the market they have to absorb. Reading the dollars alone would report a record corporate bid at a moment when the bid is historically thin relative to the market it is bidding for.
+
+**How it's computed.** `CF_DECR_CAP_STOCK` (gross buybacks) and `CF_INCR_CAP_STOCK` (gross equity issued for cash) on `RAY Index`, daily from March 1998. These return index points, so each is divided by the index price to give a share of market cap. That ratio is deliberately **not** derived from the dollar figures: Bloomberg does not expose the Russell divisor, so dollars require reconstructing it as `CUR_MKT_CAP ÷ PX_LAST` (it drifted from about $20.4bn per index point in 1998 to $18.1bn in 2026), whereas index points ÷ index price cancels the divisor algebraically and carries none of its error.
+
+**Caveats.** **This is not net issuance.** It excludes **cash M&A**: when a company is acquired for cash it simply leaves the index, so the single largest form of share retirement is invisible here. It also excludes **shares issued to employees** through RSU vesting, which create shares but no cash flow. The issuance line combines follow-on offerings, at-the-market programs and option-exercise proceeds and cannot be broken out further. **Financials are included**, unlike the Fed measure alongside it. The dollar figures quoted above are likely biased about 5-7% high because the reconstructed divisor is full-cap while the true index divisor is float-adjusted; the plotted percent-of-market-cap series is immune to this, which is why it is the basis shown. A step means a large company reported, not that money moved that day — the lag is filing lag, four to six weeks after quarter-end. Steps in late June may be Russell reconstitution rather than corporate behaviour.
+
 ### IS7 — Fund registration filings (485APOS + N-1A)
 *Source: SEC EDGAR 485APOS + N-1A · cadence: weekly*
 

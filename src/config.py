@@ -239,7 +239,15 @@ _REGISTRY_ROWS = [
     _m("IS3", "issuance", "Pricing outcomes", "BBG", "weekly", 1, "2020→"),
     _m("IS4", "issuance", "Aftermarket appetite (IPO ETF vs SPY)", "Massive", "daily", 1, "2023-11→"),
     _m("IS5", "issuance", "Lockup calendar", "BBG", "weekly", 1, "build→"),
-    _m("IS6", "issuance", "Net equity supply", "BBG", "monthly", 1, "2015→"),
+    # IS6/IS6B — net corporate equity issuance, per IS6-NET-ISSUANCE-SPEC rev 5
+    # (2026-07-27), scope reduced to two charts. IS6 = the Fed's definitive level
+    # as % of GDP, carried forward daily with BBG buybacks; IS6B = the Russell
+    # 3000 cash-flow decomposition, daily 1998-03→. They are NOT the same measure
+    # and must not be netted (they differ ~3×; see the appendix entries).
+    _m("IS6", "issuance", "Net corporate equity issuance (% of GDP)",
+       "FRED+BBG", "daily", 1, "1947→", "IS6 spec"),
+    _m("IS6B", "issuance", "Corporate cash-equity flow (Russell 3000)",
+       "BBG", "daily", 1, "1998-03→", "IS6 spec"),
     _m("IS7", "issuance", "Fund registration filings (pipeline proxy)", "EDGAR", "weekly", 1, "2020→"),
     _m("IS8", "issuance", "Adoption velocity", "OP7", "weekly", 1, "2022→"),
     # IS9/IS10 — IPO issuance pace: 2026 YTD vs prior years, cumulative $ and

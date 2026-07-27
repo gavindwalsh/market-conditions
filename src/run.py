@@ -65,6 +65,7 @@ def pull_all():
     _safe("bbg:etf", bbg.pull_etf_universe)
     _safe("bbg:iv", bbg.pull_iv_histories)
     _safe("bbg:box", bbg.pull_box_yield)
+    _safe("bbg:ray_cf", bbg.pull_ray_cashflow)   # IS6/IS6B Russell 3000 cash flows
     _safe("bbg:si", lambda: bbg.pull_short_interest(_member_tickers()))
     from .pull import free
     _safe("free", free.pull)

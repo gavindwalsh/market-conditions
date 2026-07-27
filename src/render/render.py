@@ -126,7 +126,12 @@ CHART_BOOT = """
   var chartById=function(id){var f=null;window.__CHARTS__.forEach(function(c){if(c.id===id)f=c.ch;});return f;};
   /* header range buttons: months back from each chart's own latest point; null = All.
      On a category axis dataZoom bounds are indices, so translate "N months back"
-     into the first trading-day slot at/after that calendar cutoff. */
+     into the first trading-day slot at/after that calendar cutoff.
+
+     The window is per-chart, measured from that chart's OWN last point, so a
+     series shorter than the requested window simply shows all of itself:
+     cats[0] is already at/after the cutoff, startIdx stays 0. That is what makes
+     a 10Y default safe across a panel mixing 1947-> and 2023-> histories. */
   window.setRange=function(months,btn){
     document.querySelectorAll('.range-btns button').forEach(function(b){b.classList.remove('active');});
     if(btn) btn.classList.add('active');
@@ -142,6 +147,14 @@ CHART_BOOT = """
       }
     });
   };
+  /* Apply the default range on load. The template marks the 10Y button active for
+     the pre-JS paint, but the charts themselves boot at full range, so without
+     this call the highlighted button would lie about what is on screen. Pass the
+     button element: setRange clears every .active first, so calling it without one
+     would leave no range highlighted at all. */
+  var DEFAULT_RANGE_MONTHS=120;   /* 10Y — keep in step with the template's active button */
+  window.setRange(DEFAULT_RANGE_MONTHS,
+                  document.querySelector('.masthead .range-btns button.active'));
   /* fullscreen overlay: move the chosen chart's element into the shared panel
      and resize the (same) instance; move it back on close. Esc / scrim / ✕ close. */
   var ov=document.getElementById('fs-overlay');
