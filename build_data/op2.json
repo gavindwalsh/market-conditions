@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-24",
+  "asof": "2026-07-27",
   "cadence": "daily",
   "id": "OP2",
   "name": "Household equity — nowcast (% of GDP)",
@@ -926,6 +926,10 @@
         {
           "date": "2026-07-24",
           "value": 197.152
+        },
+        {
+          "date": "2026-07-27",
+          "value": 197.185
         }
       ],
       "role": "nowcast",

@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-24",
+  "asof": "2026-07-27",
   "cadence": "daily",
   "id": "RF3",
   "name": "Retail concentration",
@@ -567,6 +567,10 @@
         {
           "date": "2026-07-24",
           "value": 29.846
+        },
+        {
+          "date": "2026-07-27",
+          "value": 31.377
         }
       ],
       "role": "avos",
@@ -1131,6 +1135,10 @@
         {
           "date": "2026-07-24",
           "value": 11.742
+        },
+        {
+          "date": "2026-07-27",
+          "value": 10.558
         }
       ],
       "role": "context",
@@ -1695,6 +1703,10 @@
         {
           "date": "2026-07-24",
           "value": 12.726
+        },
+        {
+          "date": "2026-07-27",
+          "value": 14.734
         }
       ],
       "role": "context",
@@ -1709,7 +1721,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 11.74
+    "value": 10.56
   },
   "tooltip": "Where retail dollars concentrate — bars = est. retail $ in the top-10 names, lines = shares of all retail $.",
   "unit": "% (tile: top-10 share)"

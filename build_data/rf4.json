@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-24",
+  "asof": "2026-07-27",
   "cadence": "daily",
   "id": "RF4",
   "name": "Buy-the-dip sensitivity",
@@ -318,6 +318,10 @@
         {
           "date": "2026-07-24",
           "value": 6.486
+        },
+        {
+          "date": "2026-07-27",
+          "value": 6.485
         }
       ],
       "role": "avos",
@@ -802,6 +806,10 @@
         {
           "date": "2026-07-24",
           "value": 4.938
+        },
+        {
+          "date": "2026-07-27",
+          "value": 5.186
         }
       ],
       "role": "context",
@@ -816,7 +824,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 6.49
+    "value": 6.48
   },
   "tooltip": "Net retail $B bought per 1% SPX decline — higher = retail buys dips harder.",
   "unit": " $B/1%"

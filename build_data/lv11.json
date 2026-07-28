@@ -1,5 +1,5 @@
 {
-  "asof": "2026-06-24",
+  "asof": "2026-06-25",
   "cadence": "daily",
   "id": "LV11",
   "name": "Variance risk premium",
@@ -750,10 +750,6 @@
         {
           "date": "2025-05-30",
           "value": 8.82
-        },
-        {
-          "date": "2025-06-24",
-          "value": 10.76
         },
         {
           "date": "2025-06-25",
@@ -1758,6 +1754,10 @@
         {
           "date": "2026-06-24",
           "value": 8.484
+        },
+        {
+          "date": "2026-06-25",
+          "value": 8.745
         }
       ],
       "role": "avos",
@@ -2506,10 +2506,6 @@
         {
           "date": "2025-05-30",
           "value": 8.183
-        },
-        {
-          "date": "2025-06-24",
-          "value": 11.151
         },
         {
           "date": "2025-06-25",
@@ -3514,6 +3510,10 @@
         {
           "date": "2026-06-24",
           "value": 7.714
+        },
+        {
+          "date": "2026-06-25",
+          "value": 8.695
         }
       ],
       "role": "context",
@@ -3523,8 +3523,8 @@
   "source": "BBG VIX/VXN vs realized",
   "tile": {
     "delta": null,
-    "percentile": 83.91,
-    "value": 8.48
+    "percentile": 84.93,
+    "value": 8.74
   },
   "tooltip": "Implied vol minus what was subsequently realized — the toll option buyers paid; ends ~1 month ago by construction.",
   "unit": " vol pts"
