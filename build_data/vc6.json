@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-27",
+  "asof": "2026-07-28",
   "cadence": "daily",
   "id": "VC6",
   "name": "3M IV by sector basket",
@@ -466,10 +466,6 @@
         {
           "date": "2025-06-30",
           "value": 36.77
-        },
-        {
-          "date": "2025-07-25",
-          "value": 35.007
         },
         {
           "date": "2025-07-28",
@@ -1474,6 +1470,10 @@
         {
           "date": "2026-07-27",
           "value": 63.955
+        },
+        {
+          "date": "2026-07-28",
+          "value": 64.119
         }
       ],
       "role": "context",
@@ -1938,10 +1938,6 @@
         {
           "date": "2025-06-30",
           "value": 31.034
-        },
-        {
-          "date": "2025-07-25",
-          "value": 29.079
         },
         {
           "date": "2025-07-28",
@@ -2946,6 +2942,10 @@
         {
           "date": "2026-07-27",
           "value": 43.243
+        },
+        {
+          "date": "2026-07-28",
+          "value": 43.543
         }
       ],
       "role": "context",
@@ -3410,10 +3410,6 @@
         {
           "date": "2025-06-30",
           "value": 30.441
-        },
-        {
-          "date": "2025-07-25",
-          "value": 31.069
         },
         {
           "date": "2025-07-28",
@@ -4418,6 +4414,10 @@
         {
           "date": "2026-07-27",
           "value": 30.904
+        },
+        {
+          "date": "2026-07-28",
+          "value": 30.953
         }
       ],
       "role": "context",
@@ -4882,10 +4882,6 @@
         {
           "date": "2025-06-30",
           "value": 21.587
-        },
-        {
-          "date": "2025-07-25",
-          "value": 20.343
         },
         {
           "date": "2025-07-28",
@@ -5890,6 +5886,10 @@
         {
           "date": "2026-07-27",
           "value": 24.068
+        },
+        {
+          "date": "2026-07-28",
+          "value": 23.856
         }
       ],
       "role": "context",
@@ -5900,7 +5900,7 @@
   "tile": {
     "delta": null,
     "percentile": 98.66,
-    "value": 64.0
+    "value": 64.1
   },
   "tooltip": "Equal-weight single-name 3M implied vol by sector basket — same construction, comparable levels.",
   "unit": " vol pts"
