@@ -1,5 +1,5 @@
 {
-  "asof": "2026-05-01",
+  "asof": "2026-06-01",
   "cadence": "monthly",
   "id": "OP10",
   "name": "Personal saving (% of GDP)",
@@ -3241,11 +3241,15 @@
         },
         {
           "date": "2026-04-01",
-          "value": 2.195
+          "value": 2.179
         },
         {
           "date": "2026-05-01",
-          "value": 2.21
+          "value": 2.096
+        },
+        {
+          "date": "2026-06-01",
+          "value": 2.028
         }
       ],
       "role": "avos",
@@ -3255,8 +3259,8 @@
   "source": "FRED PMSAVE · FRED GDP",
   "tile": {
     "delta": null,
-    "percentile": 5.38,
-    "value": 2.2
+    "percentile": 4.01,
+    "value": 2.0
   },
   "tooltip": "Total personal saving as a share of nominal GDP (monthly). The 2020-21 stimulus spikes run off the top so the rest is legible.",
   "unit": " %",

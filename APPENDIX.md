@@ -356,7 +356,7 @@ window and annualization factor.
 **Caveats.** Quarterly and released with a lag.
 
 ### MH2 — Corporate credit (IG/HY OAS)
-*Source: Bloomberg LUACOAS / LF98OAS · cadence: daily*
+*Source: FRED ICE BofA (fallback) · cadence: daily*
 
 **What it shows.** Corporate credit spreads — the extra yield investors demand over Treasuries to hold investment-grade and high-yield bonds — plus the gap between them. Wider spreads mean the market is pricing more credit risk, a classic stress signal that often leads equity weakness.
 

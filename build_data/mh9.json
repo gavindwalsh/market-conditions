@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-28",
+  "asof": "2026-07-29",
   "cadence": "daily",
   "id": "MH9",
   "name": "Off-exchange + odd-lot share",
@@ -575,6 +575,10 @@
         {
           "date": "2026-07-28",
           "value": 42.479
+        },
+        {
+          "date": "2026-07-29",
+          "value": 40.345
         }
       ],
       "role": "avos",
@@ -1147,6 +1151,10 @@
         {
           "date": "2026-07-28",
           "value": 71.048
+        },
+        {
+          "date": "2026-07-29",
+          "value": 70.576
         }
       ],
       "role": "context",
@@ -1157,7 +1165,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 42.48
+    "value": 40.34
   },
   "tooltip": "Share of volume printed off-exchange (bars, left) and share of trades under 100 shares (line, right).",
   "unit": "%"

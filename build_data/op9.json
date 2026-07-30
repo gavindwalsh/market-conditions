@@ -1,5 +1,5 @@
 {
-  "asof": "2026-05-01",
+  "asof": "2026-06-01",
   "cadence": "monthly",
   "id": "OP9",
   "name": "Personal saving rate",
@@ -3245,7 +3245,11 @@
         },
         {
           "date": "2026-05-01",
-          "value": 3.0
+          "value": 2.8
+        },
+        {
+          "date": "2026-06-01",
+          "value": 2.7
         }
       ],
       "role": "avos",
@@ -3255,8 +3259,8 @@
   "source": "FRED PSAVERT",
   "tile": {
     "delta": null,
-    "percentile": 4.94,
-    "value": 3.0
+    "percentile": 3.7,
+    "value": 2.7
   },
   "tooltip": "Personal saving as a share of disposable personal income (monthly). The 2020-21 stimulus spikes run off the top so the rest is legible.",
   "unit": "%",
