@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-29",
+  "asof": "2026-07-30",
   "cadence": "daily",
   "id": "RF1",
   "name": "Retail net flow — daily (est. total)",
@@ -579,6 +579,10 @@
         {
           "date": "2026-07-29",
           "value": 33.397
+        },
+        {
+          "date": "2026-07-30",
+          "value": -65.485
         }
       ],
       "role": "avos",
@@ -593,7 +597,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 33.4
+    "value": -65.49
   },
   "tooltip": "Estimated total retail net buying per day — classifier floor ×3 until the RF9 calibration lands.",
   "unit": " $B/day"

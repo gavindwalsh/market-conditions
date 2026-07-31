@@ -1417,15 +1417,15 @@
         },
         {
           "date": "2026-04-01",
-          "value": 4.093
+          "value": 4.016
         },
         {
           "date": "2026-05-01",
-          "value": 4.442
+          "value": 4.359
         },
         {
           "date": "2026-06-01",
-          "value": 4.714
+          "value": 4.625
         }
       ],
       "role": "avos",
@@ -1436,7 +1436,7 @@
   "tile": {
     "delta": null,
     "percentile": 99.86,
-    "value": 4.71
+    "value": 4.63
   },
   "tooltip": "Debit balances in securities margin accounts as a share of nominal GDP — the stock of investor leverage, scaled to the economy.",
   "unit": " %"

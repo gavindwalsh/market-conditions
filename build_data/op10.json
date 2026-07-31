@@ -3241,15 +3241,15 @@
         },
         {
           "date": "2026-04-01",
-          "value": 2.179
+          "value": 2.138
         },
         {
           "date": "2026-05-01",
-          "value": 2.096
+          "value": 2.056
         },
         {
           "date": "2026-06-01",
-          "value": 2.028
+          "value": 1.99
         }
       ],
       "role": "avos",
@@ -3259,7 +3259,7 @@
   "source": "FRED PMSAVE · FRED GDP",
   "tile": {
     "delta": null,
-    "percentile": 4.01,
+    "percentile": 3.89,
     "value": 2.0
   },
   "tooltip": "Total personal saving as a share of nominal GDP (monthly). The 2020-21 stimulus spikes run off the top so the rest is legible.",

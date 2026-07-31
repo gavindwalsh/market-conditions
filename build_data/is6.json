@@ -1,9 +1,9 @@
 {
-  "asof": "2026-07-28",
+  "asof": "2026-07-30",
   "cadence": "daily",
   "id": "IS6",
   "name": "US net corporate equity issuance (% of GDP)",
-  "notes": "**What it shows.** How much equity the US nonfinancial corporate sector is issuing or retiring, as a share of the economy. Negative means companies are buying back more than they sell — equity is being withdrawn from the market. This is the definitive level: it is the only measure on the dashboard that captures **cash M&A retirement** (a company bought for cash retires its shares) and **shares issued to employees** through RSU vesting and option exercise. It is scaled by GDP rather than shown in dollars because the published history reaches 1947, and on a dollar axis the first fifty years are invisible against today's magnitudes.\n\n**How it's computed.** FRED series `NCBCEBQ027S` (Fed Z.1 Financial Accounts — Nonfinancial Corporate Business; Corporate Equities; Liability, Transactions) divided by nominal GDP. The solid line is plotted exactly as published, with no smoothing: each point is one quarter's flow quoted at a seasonally-adjusted annual rate, so it answers 'at the pace of that quarter, how much equity would leave the market in a year.' History is annual from 1947 to 1951 and quarterly from 1952 onward.\n\nThe Fed publishes about ten weeks after quarter-end, so the **dashed segment extends the last published print daily** using Bloomberg: it adds the change in Russell 3000 gross buybacks since that quarter-end, since rising buybacks make net issuance more negative. The buyback change is measured in index points priced at the anchor date's divisor, so the line steps when large filers report and sits still between earnings seasons rather than drifting with market cap. As of this build it is carried 119 days past the 2026-03-31 quarter-end.\n\n**Caveats.** Carried-estimate badge on the dashed segment: it is **directional, not a measurement.** The carry has historically added skill when applied to a four-quarter average, but against a single quarter's print — which is what it extends here — it does no better than simply holding the last print flat, because one quarter's annualized flow is volatile and the buyback adjustment is a twelve-month quantity. Read it as the direction the next print is likely to move, and use the Russell 3000 chart alongside for a measured daily read. Quarter-to-quarter prints are genuinely volatile in their own right — recent quarters have ranged from about −$1.2tn to +$124bn at an annual rate — so read the shape across several quarters, not any single point. **Excludes financial-sector companies**, so bank and insurer buybacks are absent; the obvious FRED series for adding them counts ETF and closed-end-fund share creation as a financial equity liability and would swamp the measure. The Fed also revises prior quarters. This measure and the Russell 3000 chart are **not the same measure and should not be netted** — they differ by roughly 3× for reasons that are only partly resolved.",
+  "notes": "**What it shows.** How much equity the US nonfinancial corporate sector is issuing or retiring, as a share of the economy. Negative means companies are buying back more than they sell — equity is being withdrawn from the market. This is the definitive level: it is the only measure on the dashboard that captures **cash M&A retirement** (a company bought for cash retires its shares) and **shares issued to employees** through RSU vesting and option exercise. It is scaled by GDP rather than shown in dollars because the published history reaches 1947, and on a dollar axis the first fifty years are invisible against today's magnitudes.\n\n**How it's computed.** FRED series `NCBCEBQ027S` (Fed Z.1 Financial Accounts — Nonfinancial Corporate Business; Corporate Equities; Liability, Transactions) divided by nominal GDP. The solid line is plotted exactly as published, with no smoothing: each point is one quarter's flow quoted at a seasonally-adjusted annual rate, so it answers 'at the pace of that quarter, how much equity would leave the market in a year.' History is annual from 1947 to 1951 and quarterly from 1952 onward.\n\nThe Fed publishes about ten weeks after quarter-end, so the **dashed segment extends the last published print daily** using Bloomberg: it adds the change in Russell 3000 gross buybacks since that quarter-end, since rising buybacks make net issuance more negative. The buyback change is measured in index points priced at the anchor date's divisor, so the line steps when large filers report and sits still between earnings seasons rather than drifting with market cap. As of this build it is carried 121 days past the 2026-03-31 quarter-end.\n\n**Caveats.** Carried-estimate badge on the dashed segment: it is **directional, not a measurement.** The carry has historically added skill when applied to a four-quarter average, but against a single quarter's print — which is what it extends here — it does no better than simply holding the last print flat, because one quarter's annualized flow is volatile and the buyback adjustment is a twelve-month quantity. Read it as the direction the next print is likely to move, and use the Russell 3000 chart alongside for a measured daily read. Quarter-to-quarter prints are genuinely volatile in their own right — recent quarters have ranged from about −$1.2tn to +$124bn at an annual rate — so read the shape across several quarters, not any single point. **Excludes financial-sector companies**, so bank and insurer buybacks are absent; the obvious FRED series for adding them counts ETF and closed-end-fund share creation as a financial equity liability and would swamp the measure. The Fed also revises prior quarters. This measure and the Russell 3000 chart are **not the same measure and should not be netted** — they differ by roughly 3× for reasons that are only partly resolved.",
   "panel": "issuance",
   "provenance": "derived",
   "series": [
@@ -1233,327 +1233,335 @@
         },
         {
           "date": "2026-04-01",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-04-02",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-04-06",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-04-07",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-04-08",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-04-09",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-10",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-13",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-14",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-15",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-16",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-17",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-20",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-21",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-22",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-23",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-24",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-27",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-28",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-29",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-04-30",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-05-01",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-05-04",
-          "value": 0.391
+          "value": 0.384
         },
         {
           "date": "2026-05-05",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-06",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-07",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-08",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-11",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-12",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-13",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-14",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-15",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-18",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-19",
-          "value": 0.391
+          "value": 0.383
         },
         {
           "date": "2026-05-20",
-          "value": 0.199
+          "value": 0.196
         },
         {
           "date": "2026-05-21",
-          "value": 0.218
+          "value": 0.214
         },
         {
           "date": "2026-05-22",
-          "value": 0.212
+          "value": 0.208
         },
         {
           "date": "2026-05-26",
-          "value": 0.212
+          "value": 0.208
         },
         {
           "date": "2026-05-27",
-          "value": 0.093
+          "value": 0.092
         },
         {
           "date": "2026-05-28",
-          "value": 0.104
-        },
-        {
-          "date": "2026-05-29",
           "value": 0.102
         },
         {
+          "date": "2026-05-29",
+          "value": 0.1
+        },
+        {
           "date": "2026-06-01",
-          "value": 0.101
+          "value": 0.1
         },
         {
           "date": "2026-06-02",
-          "value": 0.106
+          "value": 0.105
         },
         {
           "date": "2026-06-03",
-          "value": 0.184
+          "value": 0.181
         },
         {
           "date": "2026-06-04",
-          "value": 0.182
+          "value": 0.179
         },
         {
           "date": "2026-06-05",
-          "value": 0.181
+          "value": 0.178
         },
         {
           "date": "2026-06-08",
-          "value": 0.181
+          "value": 0.178
         },
         {
           "date": "2026-06-09",
-          "value": 0.182
+          "value": 0.179
         },
         {
           "date": "2026-06-10",
-          "value": 0.182
+          "value": 0.179
         },
         {
           "date": "2026-06-11",
-          "value": 0.182
+          "value": 0.179
         },
         {
           "date": "2026-06-12",
-          "value": 0.18
+          "value": 0.177
         },
         {
           "date": "2026-06-15",
-          "value": 0.181
+          "value": 0.178
         },
         {
           "date": "2026-06-16",
-          "value": 0.181
+          "value": 0.178
         },
         {
           "date": "2026-06-17",
-          "value": 0.181
+          "value": 0.178
         },
         {
           "date": "2026-06-18",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-06-22",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-06-23",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-06-24",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-06-25",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-06-26",
-          "value": 0.174
+          "value": 0.171
         },
         {
           "date": "2026-06-29",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-06-30",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-01",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-02",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-06",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-07",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-08",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-09",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-10",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-13",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-14",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-15",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-16",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-17",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-20",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-21",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-22",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-23",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-24",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-27",
-          "value": 0.175
+          "value": 0.172
         },
         {
           "date": "2026-07-28",
-          "value": 0.175
+          "value": 0.172
+        },
+        {
+          "date": "2026-07-29",
+          "value": 0.172
+        },
+        {
+          "date": "2026-07-30",
+          "value": 0.172
         }
       ],
       "role": "nowcast",
