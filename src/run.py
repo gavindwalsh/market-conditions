@@ -61,12 +61,23 @@ def _member_tickers() -> list[str]:
 def pull_all():
     """Attempt every enabled source for the current PHASE. Order: heavy first."""
     from .pull import bbg, edgar, fred  # finra, free, massive wired as they land
+    from .pull import ipo as ipo_pull
+
+    # The IPO forward-pipeline research is ~12 min of waiting on the Claude API
+    # and its web searches — no Terminal, no lake contention (own table), almost
+    # no CPU. Kick it off first on a worker thread so it overlaps the heavy
+    # Massive/BBG work instead of adding to the run; joined before compute below.
+    from concurrent.futures import ThreadPoolExecutor
+    pipeline_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="ipo-pipeline")
+    pipeline_job = pipeline_pool.submit(_safe, "ipo:pipeline", ipo_pull.pull_pipeline)
+
     _safe("bbg", bbg.pull)       # heaviest (member snapshot ~503 tickers)
     _safe("bbg:etf", bbg.pull_etf_universe)
     _safe("bbg:iv", bbg.pull_iv_histories)
     _safe("bbg:box", bbg.pull_box_yield)
     _safe("bbg:ray_cf", bbg.pull_ray_cashflow)   # IS6/IS6B Russell 3000 cash flows
     _safe("bbg:si", lambda: bbg.pull_short_interest(_member_tickers()))
+    _safe("bbg:ipo", ipo_pull.pull_priced_bbg)   # IS9/IS10 + tracker priced lane
     from .pull import free
     _safe("free", free.pull)
     _safe("edgar", edgar.pull)   # backfill is ~27 files, cached after first run
@@ -101,6 +112,13 @@ def pull_all():
         else:
             store.log_run("massive:opra", "skip", f"{bday} already in lake")
         _safe("massive:snapshots", _pull_snapshot_universe)
+
+    # join the background lane — compute reads its lake table, so it must be done.
+    # _safe already swallowed any failure, so this only waits, never raises.
+    if not pipeline_job.done():
+        store.log_run("ipo:pipeline", "wait", "waiting on the research lane to finish")
+    pipeline_job.result()
+    pipeline_pool.shutdown()
 
 
 def compute_all():

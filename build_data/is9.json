@@ -3,7 +3,7 @@
   "cadence": "daily",
   "id": "IS9",
   "name": "IPO issuance pace — cumulative $ (YTD vs prior years)",
-  "notes": "**What it shows.** The pace of IPO issuance this year set against prior years — cumulative operating-company IPO proceeds by day of the year, in real 2026 dollars. This year runs through today while the comparison years show the full calendar, so you can read at a glance whether the current year is running ahead of or behind past cycles.\n\n**How it's computed.** A Ritter-comparable operating-company universe — excluding SPACs, ADRs, REITs, closed-end funds, banks, and unit offerings, with an offer price of at least $5. Each year is anchored to the Jay Ritter IPO roster, and proceeds are offer price × shares from Bloomberg. Prior-year dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so every curve is in real 2026 dollars, and every deal is included — mega-deals such as SpaceX (~$75B) show as real steps rather than being smoothed away.\n\n**Caveats.** The *real 2026 $* badge marks the inflation adjustment; older Ritter-anchored years carry an estimated tail for deals the roster leaves incomplete. 2000 is Ritter-anchored ($64.8B nominal across 390 operating-cos), of which $10.1B across 75 tail deals is estimated.",
+  "notes": "**What it shows.** The pace of IPO issuance this year set against prior years — cumulative operating-company IPO proceeds by day of the year, in real 2026 dollars. This year runs through today while the comparison years show the full calendar, so you can read at a glance whether the current year is running ahead of or behind past cycles.\n\n**How it's computed.** A Ritter-comparable operating-company universe — excluding SPACs, ADRs, REITs, closed-end funds, banks, and unit offerings, with an offer price of at least $5. Each year is anchored to the Jay Ritter IPO roster, and proceeds are offer price × shares from Bloomberg — this year's deals refresh live from the Terminal on every run, so the curve picks up a new listing the day after it prices. Prior-year dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so every curve is in real 2026 dollars, and every deal is included — mega-deals such as SpaceX (~$75B) show as real steps rather than being smoothed away.\n\n**Caveats.** The *real 2026 $* badge marks the inflation adjustment; older Ritter-anchored years carry an estimated tail for deals the roster leaves incomplete. 2000 is Ritter-anchored ($64.8B nominal across 390 operating-cos), of which $10.1B across 75 tail deals is estimated.",
   "panel": "issuance",
   "provenance": "ipo_pace",
   "series": [
@@ -1172,163 +1172,199 @@
         },
         {
           "date": "01-29",
-          "value": 2.571
+          "value": 1.942
         },
         {
           "date": "02-04",
-          "value": 2.827
+          "value": 2.198
         },
         {
           "date": "02-05",
-          "value": 5.051
+          "value": 4.522
         },
         {
           "date": "02-06",
-          "value": 5.399
+          "value": 4.87
         },
         {
           "date": "02-10",
-          "value": 5.424
+          "value": 4.895
         },
         {
           "date": "02-11",
-          "value": 6.177
+          "value": 5.648
         },
         {
           "date": "02-12",
-          "value": 6.377
+          "value": 5.848
         },
         {
           "date": "02-18",
-          "value": 6.502
+          "value": 5.973
         },
         {
           "date": "02-20",
-          "value": 6.538
+          "value": 6.009
+        },
+        {
+          "date": "02-26",
+          "value": 6.259
         },
         {
           "date": "02-27",
-          "value": 6.938
+          "value": 6.659
+        },
+        {
+          "date": "03-04",
+          "value": 6.859
         },
         {
           "date": "03-06",
-          "value": 7.498
+          "value": 7.419
         },
         {
           "date": "03-12",
-          "value": 8.378
+          "value": 8.299
         },
         {
           "date": "03-17",
-          "value": 8.393
+          "value": 8.314
         },
         {
           "date": "03-20",
-          "value": 9.233
+          "value": 9.154
         },
         {
           "date": "04-01",
-          "value": 9.443
+          "value": 9.364
         },
         {
           "date": "04-16",
-          "value": 12.81
+          "value": 12.731
         },
         {
           "date": "04-17",
-          "value": 13.946
+          "value": 13.867
         },
         {
           "date": "04-22",
-          "value": 14.226
+          "value": 14.147
         },
         {
           "date": "04-23",
-          "value": 14.346
+          "value": 14.267
         },
         {
           "date": "04-24",
-          "value": 15.364
+          "value": 15.285
+        },
+        {
+          "date": "04-29",
+          "value": 17.311
         },
         {
           "date": "04-30",
-          "value": 15.724
+          "value": 17.671
         },
         {
           "date": "05-01",
-          "value": 16.288
+          "value": 18.235
         },
         {
           "date": "05-06",
-          "value": 16.351
+          "value": 18.298
         },
         {
           "date": "05-07",
-          "value": 16.767
+          "value": 18.714
         },
         {
           "date": "05-08",
-          "value": 17.196
+          "value": 19.143
         },
         {
           "date": "05-13",
-          "value": 19.565
+          "value": 21.512
         },
         {
           "date": "05-14",
-          "value": 27.185
+          "value": 29.132
         },
         {
           "date": "05-15",
-          "value": 27.2
+          "value": 29.147
         },
         {
           "date": "05-20",
-          "value": 27.621
-        },
-        {
-          "date": "06-03",
-          "value": 28.271
+          "value": 29.643
         },
         {
           "date": "06-04",
-          "value": 33.088
+          "value": 34.46
         },
         {
           "date": "06-09",
-          "value": 33.321
+          "value": 34.693
         },
         {
           "date": "06-10",
-          "value": 34.591
+          "value": 35.963
         },
         {
           "date": "06-11",
-          "value": 34.733
+          "value": 36.105
         },
         {
-          "date": "06-12",
-          "value": 109.733
+          "date": "06-17",
+          "value": 36.355
         },
         {
           "date": "06-18",
-          "value": 110.242
+          "value": 37.064
+        },
+        {
+          "date": "06-23",
+          "value": 37.376
         },
         {
           "date": "06-25",
-          "value": 111.162
+          "value": 38.545
         },
         {
           "date": "06-26",
-          "value": 111.375
+          "value": 38.758
         },
         {
           "date": "07-01",
-          "value": 113.542
+          "value": 40.926
+        },
+        {
+          "date": "07-02",
+          "value": 41.101
+        },
+        {
+          "date": "07-13",
+          "value": 41.176
         },
         {
           "date": "07-16",
-          "value": 114.742
+          "value": 42.376
+        },
+        {
+          "date": "07-24",
+          "value": 42.704
+        },
+        {
+          "date": "07-29",
+          "value": 42.738
+        },
+        {
+          "date": "07-30",
+          "value": 43.949
+        },
+        {
+          "date": "07-31",
+          "value": 44.141
         }
       ],
       "role": "avos",
@@ -1343,7 +1379,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 114.742
+    "value": 44.141
   },
   "tooltip": "Cumulative operating-company IPO proceeds by day-of-year, in real 2026 dollars — this year (through today) vs prior years full-year.",
   "unit": " $B"

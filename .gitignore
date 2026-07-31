@@ -5,6 +5,8 @@
 .massive_s3_keys
 .finra_api_key
 .nasdaq_api_key
+.claude_api_key
+.anthropic_api_key
 *.key
 
 # Data lake (Tier 3 material — never committed, §2 / §A8)

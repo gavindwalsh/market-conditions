@@ -65,7 +65,7 @@
         },
         {
           "date": "2026-07-31",
-          "value": 855.945
+          "value": 360.719
         }
       ],
       "role": "context",
@@ -129,7 +129,7 @@
         },
         {
           "date": "2026-07-31",
-          "value": 68.338
+          "value": 236.067
         }
       ],
       "role": "avos",
@@ -140,7 +140,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 68.0
+    "value": 236.0
   },
   "tooltip": "Equity-implied borrow rate from SPX box spreads, vs SOFR.",
   "unit": " bp (tile: 3M)"
