@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-30",
+  "asof": "2026-07-31",
   "cadence": "daily",
   "id": "OP2",
   "name": "Household equity — nowcast (% of GDP)",
@@ -942,6 +942,10 @@
         {
           "date": "2026-07-30",
           "value": 194.126
+        },
+        {
+          "date": "2026-07-31",
+          "value": 195.498
         }
       ],
       "role": "nowcast",
@@ -952,7 +956,7 @@
   "tile": {
     "delta": null,
     "percentile": 99.66,
-    "value": 194.1
+    "value": 195.5
   },
   "tooltip": "Household equity holdings as a share of nominal GDP, rolled forward daily with SPX total return (dashed = nowcast).",
   "unit": " %"

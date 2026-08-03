@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-31",
+  "asof": "2026-08-03",
   "cadence": "daily",
   "id": "VC3",
   "name": "Vol term structure (VIX/VIX3M)",
@@ -1761,7 +1761,11 @@
         },
         {
           "date": "2026-07-31",
-          "value": 0.844
+          "value": 0.841
+        },
+        {
+          "date": "2026-08-03",
+          "value": 0.83
         }
       ],
       "role": "avos",
@@ -1771,8 +1775,8 @@
   "source": "BBG VIX/VIX3M Index",
   "tile": {
     "delta": null,
-    "percentile": 25.34,
-    "value": 0.844
+    "percentile": 17.81,
+    "value": 0.83
   },
   "tooltip": "VIX/VIX3M above 1 = stress inversion; low = carry-friendly contango.",
   "unit": "×"

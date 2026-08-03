@@ -1,5 +1,5 @@
 {
-  "asof": "2026-06-30",
+  "asof": "2026-07-31",
   "cadence": "monthly",
   "id": "IS2",
   "name": "Filing rate (S-1/F-1)",
@@ -323,6 +323,10 @@
         {
           "date": "2026-06-30",
           "value": 125.0
+        },
+        {
+          "date": "2026-07-31",
+          "value": 133.0
         }
       ],
       "role": "avos",
@@ -332,8 +336,8 @@
   "source": "SEC EDGAR form index",
   "tile": {
     "delta": null,
-    "percentile": 67.31,
-    "value": 125.0
+    "percentile": 75.32,
+    "value": 133.0
   },
   "tooltip": "New S-1/F-1 registration filings per month — the IPO pipeline forming.",
   "unit": " filings/mo"
