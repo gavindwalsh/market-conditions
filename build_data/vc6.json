@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-31",
+  "asof": "2026-08-03",
   "cadence": "daily",
   "id": "VC6",
   "name": "3M IV by sector basket",
@@ -1474,6 +1474,10 @@
         {
           "date": "2026-07-31",
           "value": 61.714
+        },
+        {
+          "date": "2026-08-03",
+          "value": 61.222
         }
       ],
       "role": "context",
@@ -2946,6 +2950,10 @@
         {
           "date": "2026-07-31",
           "value": 41.352
+        },
+        {
+          "date": "2026-08-03",
+          "value": 42.127
         }
       ],
       "role": "context",
@@ -4418,6 +4426,10 @@
         {
           "date": "2026-07-31",
           "value": 30.68
+        },
+        {
+          "date": "2026-08-03",
+          "value": 30.93
         }
       ],
       "role": "context",
@@ -5890,6 +5902,10 @@
         {
           "date": "2026-07-31",
           "value": 24.525
+        },
+        {
+          "date": "2026-08-03",
+          "value": 24.464
         }
       ],
       "role": "context",
@@ -5899,8 +5915,8 @@
   "source": "BBG per-name 3M ATM IV",
   "tile": {
     "delta": null,
-    "percentile": 97.99,
-    "value": 61.7
+    "percentile": 97.91,
+    "value": 61.2
   },
   "tooltip": "Equal-weight single-name 3M implied vol by sector basket — same construction, comparable levels.",
   "unit": " vol pts"

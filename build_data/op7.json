@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-31",
+  "asof": "2026-08-03",
   "cadence": "daily",
   "id": "OP7",
   "name": "Leveraged ETF AUM",
@@ -1522,6 +1522,10 @@
         {
           "date": "2026-07-31",
           "value": 91.653
+        },
+        {
+          "date": "2026-08-03",
+          "value": 94.982
         }
       ],
       "role": "avos",
@@ -2678,6 +2682,10 @@
         {
           "date": "2026-07-31",
           "value": 9.453
+        },
+        {
+          "date": "2026-08-03",
+          "value": 9.85
         }
       ],
       "role": "context",
@@ -2687,8 +2695,8 @@
   "source": "BBG FUND_TOTAL_ASSETS",
   "tile": {
     "delta": null,
-    "percentile": 97.85,
-    "value": 91.7
+    "percentile": 98.13,
+    "value": 95.0
   },
   "tooltip": "Assets in the leveraged-ETF complex; second line = the single-stock slice.",
   "unit": " $B"

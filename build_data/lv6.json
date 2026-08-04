@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-31",
+  "asof": "2026-08-03",
   "cadence": "daily",
   "id": "LV6",
   "name": "Leveraged-ETF rebalance notional",
@@ -1522,6 +1522,10 @@
         {
           "date": "2026-07-31",
           "value": 4.524
+        },
+        {
+          "date": "2026-08-03",
+          "value": 4.686
         }
       ],
       "role": "avos",
@@ -3042,6 +3046,10 @@
         {
           "date": "2026-07-31",
           "value": 8.412
+        },
+        {
+          "date": "2026-08-03",
+          "value": 8.924
         }
       ],
       "role": "context",
@@ -3051,8 +3059,8 @@
   "source": "BBG AUM × Massive moves",
   "tile": {
     "delta": null,
-    "percentile": 98.03,
-    "value": 4.5
+    "percentile": 98.2,
+    "value": 4.7
   },
   "tooltip": "Rebalance capacity per 1% index move (structural); second line = realized forced end-of-day flow magnitude, 5-day average.",
   "unit": " $B (tile: per-1% capacity)"

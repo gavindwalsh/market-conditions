@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-30",
+  "asof": "2026-07-31",
   "cadence": "daily",
   "id": "MH3",
   "name": "Household credit — market-priced (MBS CC spread)",
@@ -514,10 +514,6 @@
         {
           "date": "2025-06-30",
           "value": 146.359
-        },
-        {
-          "date": "2025-07-30",
-          "value": 145.317
         },
         {
           "date": "2025-07-31",
@@ -1518,6 +1514,10 @@
         {
           "date": "2026-07-30",
           "value": 114.019
+        },
+        {
+          "date": "2026-07-31",
+          "value": 114.803
         }
       ],
       "role": "avos",
@@ -1527,8 +1527,8 @@
   "source": "BBG MTGEFNCL − FRED 5/10y blend",
   "tile": {
     "delta": null,
-    "percentile": 65.54,
-    "value": 114.0
+    "percentile": 65.97,
+    "value": 115.0
   },
   "tooltip": "Market price of mortgage credit/prepay risk.",
   "unit": " bp"

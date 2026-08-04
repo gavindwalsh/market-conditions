@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-31",
+  "asof": "2026-08-03",
   "cadence": "daily",
   "id": "IS6B",
   "name": "Corporate cash-equity flow (Russell 3000)",
@@ -2153,7 +2153,7 @@
         },
         {
           "date": "2026-05-28",
-          "value": -1.706
+          "value": -1.705
         },
         {
           "date": "2026-05-29",
@@ -2330,6 +2330,10 @@
         {
           "date": "2026-07-31",
           "value": -1.687
+        },
+        {
+          "date": "2026-08-03",
+          "value": -1.662
         }
       ],
       "role": "avos",
@@ -4509,7 +4513,7 @@
         },
         {
           "date": "2026-06-08",
-          "value": 0.367
+          "value": 0.366
         },
         {
           "date": "2026-06-09",
@@ -4658,6 +4662,10 @@
         {
           "date": "2026-07-31",
           "value": 0.365
+        },
+        {
+          "date": "2026-08-03",
+          "value": 0.36
         }
       ],
       "role": "context",
@@ -6797,7 +6805,7 @@
         },
         {
           "date": "2026-05-22",
-          "value": -1.309
+          "value": -1.308
         },
         {
           "date": "2026-05-26",
@@ -6893,7 +6901,7 @@
         },
         {
           "date": "2026-06-29",
-          "value": -1.327
+          "value": -1.326
         },
         {
           "date": "2026-06-30",
@@ -6986,6 +6994,10 @@
         {
           "date": "2026-07-31",
           "value": -1.322
+        },
+        {
+          "date": "2026-08-03",
+          "value": -1.302
         }
       ],
       "role": "benchmark",
@@ -6995,8 +7007,8 @@
   "source": "BBG RAY CF_DECR/INCR_CAP_STOCK",
   "tile": {
     "delta": null,
-    "percentile": 10.88,
-    "value": 1.69
+    "percentile": 9.01,
+    "value": 1.66
   },
   "tooltip": "Russell 3000 buybacks vs equity sold for cash, share of market cap (trailing 12m) — not net issuance: excludes cash M&A and employee share issuance.",
   "unit": " % of mkt cap"

@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-03",
+  "asof": "2026-08-04",
   "cadence": "daily",
   "id": "IS9",
   "name": "IPO issuance pace — cumulative $ (YTD vs prior years)",
@@ -1365,6 +1365,10 @@
         {
           "date": "07-31",
           "value": 44.141
+        },
+        {
+          "date": "08-04",
+          "value": 44.246
         }
       ],
       "role": "avos",
@@ -1379,7 +1383,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 44.141
+    "value": 44.246
   },
   "tooltip": "Cumulative operating-company IPO proceeds by day-of-year, in real 2026 dollars — this year (through today) vs prior years full-year.",
   "unit": " $B"
