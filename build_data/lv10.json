@@ -81,7 +81,7 @@
         },
         {
           "date": "2026-08-05",
-          "value": 0.293
+          "value": -0.348
         }
       ],
       "role": "avos",
@@ -96,7 +96,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 0.29
+    "value": -0.35
   },
   "tooltip": "Positive = upside call wings bid vs ATM (call-demand regime).",
   "unit": " vol pts"
