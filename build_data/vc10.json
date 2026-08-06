@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-04",
+  "asof": "2026-08-05",
   "cadence": "daily",
   "id": "VC10",
   "name": "NDX 10% OTM call/put IV",
@@ -758,10 +758,6 @@
         {
           "date": "2025-07-31",
           "value": 25.858
-        },
-        {
-          "date": "2025-08-04",
-          "value": 26.091
         },
         {
           "date": "2025-08-05",
@@ -1766,6 +1762,10 @@
         {
           "date": "2026-08-04",
           "value": 27.677
+        },
+        {
+          "date": "2026-08-05",
+          "value": 27.45
         }
       ],
       "role": "avos",
@@ -2522,10 +2522,6 @@
         {
           "date": "2025-07-31",
           "value": 15.29
-        },
-        {
-          "date": "2025-08-04",
-          "value": 14.075
         },
         {
           "date": "2025-08-05",
@@ -3530,6 +3526,10 @@
         {
           "date": "2026-08-04",
           "value": 22.181
+        },
+        {
+          "date": "2026-08-05",
+          "value": 19.273
         }
       ],
       "role": "context",
@@ -5225,7 +5225,7 @@
         },
         {
           "date": "2026-08-05",
-          "value": 23.549
+          "value": 23.561
         }
       ],
       "role": "benchmark",
@@ -5235,8 +5235,8 @@
   "source": "BBG moneyness IV + index closes",
   "tile": {
     "delta": null,
-    "percentile": 65.58,
-    "value": 27.68
+    "percentile": 64.37,
+    "value": 27.45
   },
   "tooltip": "Downside and upside 10% OTM wing vol vs realized — the gap between wings is the skew.",
   "unit": "vol pts"

@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-04",
+  "asof": "2026-08-05",
   "cadence": "daily",
   "id": "SC5",
   "name": "Realized cross-sectional dispersion",
@@ -470,10 +470,6 @@
         {
           "date": "2025-07-31",
           "value": 3.363
-        },
-        {
-          "date": "2025-08-04",
-          "value": 1.995
         },
         {
           "date": "2025-08-05",
@@ -1478,6 +1474,10 @@
         {
           "date": "2026-08-04",
           "value": 3.454
+        },
+        {
+          "date": "2026-08-05",
+          "value": 2.343
         }
       ],
       "role": "avos",
@@ -1946,10 +1946,6 @@
         {
           "date": "2025-07-31",
           "value": 1.871
-        },
-        {
-          "date": "2025-08-04",
-          "value": 1.884
         },
         {
           "date": "2025-08-05",
@@ -2954,6 +2950,10 @@
         {
           "date": "2026-08-04",
           "value": 2.503
+        },
+        {
+          "date": "2026-08-05",
+          "value": 2.503
         }
       ],
       "role": "benchmark",
@@ -2967,8 +2967,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 98.63,
-    "value": 3.45
+    "percentile": 88.63,
+    "value": 2.34
   },
   "tooltip": "Spread of same-day returns across S&P 500 members — realized dispersion; second line is the 1-month rolling average.",
   "unit": "%"

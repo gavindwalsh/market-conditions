@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-04",
+  "asof": "2026-08-05",
   "cadence": "weekly estimate",
   "id": "LV13",
   "name": "L3: Leveraged-ETF financing residual",
@@ -362,10 +362,6 @@
         {
           "date": "2025-07-31",
           "value": 153.57
-        },
-        {
-          "date": "2025-08-04",
-          "value": 178.702
         },
         {
           "date": "2025-08-05",
@@ -1370,6 +1366,10 @@
         {
           "date": "2026-08-04",
           "value": 187.482
+        },
+        {
+          "date": "2026-08-05",
+          "value": 174.303
         }
       ],
       "role": "avos",
@@ -1383,8 +1383,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 88.86,
-    "value": 187.0
+    "percentile": 83.09,
+    "value": 174.0
   },
   "tooltip": "Financing spread embedded in leveraged-ETF NAV drag, vs SOFR — the cost levered funds actually pay.",
   "unit": " bp vs SOFR"

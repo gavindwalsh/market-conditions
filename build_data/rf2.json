@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-04",
+  "asof": "2026-08-05",
   "cadence": "weekly",
   "id": "RF2",
   "name": "Retail participation — weekly (est. total)",
@@ -597,6 +597,10 @@
         {
           "date": "2026-07-31",
           "value": 21.721
+        },
+        {
+          "date": "2026-08-07",
+          "value": 20.78
         }
       ],
       "role": "nowcast",

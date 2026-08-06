@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-04",
+  "asof": "2026-08-05",
   "cadence": "daily",
   "id": "IS6B",
   "name": "Corporate cash-equity flow (Russell 3000)",
@@ -1328,10 +1328,6 @@
           "value": -1.825
         },
         {
-          "date": "2025-08-04",
-          "value": -1.828
-        },
-        {
           "date": "2025-08-05",
           "value": -1.836
         },
@@ -2149,7 +2145,7 @@
         },
         {
           "date": "2026-05-28",
-          "value": -1.705
+          "value": -1.706
         },
         {
           "date": "2026-05-29",
@@ -2301,39 +2297,43 @@
         },
         {
           "date": "2026-07-23",
-          "value": -1.706
+          "value": -1.707
         },
         {
           "date": "2026-07-24",
-          "value": -1.705
+          "value": -1.707
         },
         {
           "date": "2026-07-27",
-          "value": -1.703
+          "value": -1.705
         },
         {
           "date": "2026-07-28",
-          "value": -1.699
+          "value": -1.701
         },
         {
           "date": "2026-07-29",
-          "value": -1.726
+          "value": -1.727
         },
         {
           "date": "2026-07-30",
-          "value": -1.698
+          "value": -1.7
         },
         {
           "date": "2026-07-31",
-          "value": -1.687
+          "value": -1.689
         },
         {
           "date": "2026-08-03",
-          "value": -1.662
+          "value": -1.664
         },
         {
           "date": "2026-08-04",
-          "value": -1.632
+          "value": -1.634
+        },
+        {
+          "date": "2026-08-05",
+          "value": -1.638
         }
       ],
       "role": "avos",
@@ -3660,10 +3660,6 @@
           "value": 0.391
         },
         {
-          "date": "2025-08-04",
-          "value": 0.391
-        },
-        {
           "date": "2025-08-05",
           "value": 0.393
         },
@@ -4461,7 +4457,7 @@
         },
         {
           "date": "2026-05-20",
-          "value": 0.38
+          "value": 0.381
         },
         {
           "date": "2026-05-21",
@@ -4609,7 +4605,7 @@
         },
         {
           "date": "2026-07-15",
-          "value": 0.361
+          "value": 0.362
         },
         {
           "date": "2026-07-16",
@@ -4665,6 +4661,10 @@
         },
         {
           "date": "2026-08-04",
+          "value": 0.354
+        },
+        {
+          "date": "2026-08-05",
           "value": 0.354
         }
       ],
@@ -5992,10 +5992,6 @@
           "value": -1.434
         },
         {
-          "date": "2025-08-04",
-          "value": -1.437
-        },
-        {
           "date": "2025-08-05",
           "value": -1.443
         },
@@ -6965,39 +6961,43 @@
         },
         {
           "date": "2026-07-23",
-          "value": -1.336
+          "value": -1.338
         },
         {
           "date": "2026-07-24",
-          "value": -1.336
+          "value": -1.338
         },
         {
           "date": "2026-07-27",
-          "value": -1.334
+          "value": -1.336
         },
         {
           "date": "2026-07-28",
-          "value": -1.331
+          "value": -1.333
         },
         {
           "date": "2026-07-29",
-          "value": -1.352
+          "value": -1.354
         },
         {
           "date": "2026-07-30",
-          "value": -1.33
+          "value": -1.332
         },
         {
           "date": "2026-07-31",
-          "value": -1.322
+          "value": -1.324
         },
         {
           "date": "2026-08-03",
-          "value": -1.302
+          "value": -1.304
         },
         {
           "date": "2026-08-04",
-          "value": -1.279
+          "value": -1.28
+        },
+        {
+          "date": "2026-08-05",
+          "value": -1.284
         }
       ],
       "role": "benchmark",
@@ -7007,8 +7007,8 @@
   "source": "BBG RAY CF_DECR/INCR_CAP_STOCK",
   "tile": {
     "delta": null,
-    "percentile": 7.92,
-    "value": 1.63
+    "percentile": 8.17,
+    "value": 1.64
   },
   "tooltip": "Russell 3000 buybacks vs equity sold for cash, share of market cap (trailing 12m) — not net issuance: excludes cash M&A and employee share issuance.",
   "unit": " % of mkt cap"

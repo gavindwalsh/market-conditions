@@ -1765,7 +1765,7 @@
         },
         {
           "date": "2026-08-05",
-          "value": 7.56
+          "value": 7.08
         }
       ],
       "role": "avos",
@@ -3529,7 +3529,7 @@
         },
         {
           "date": "2026-08-05",
-          "value": 9.5
+          "value": 9.33
         }
       ],
       "role": "context",
@@ -3539,8 +3539,8 @@
   "source": "BBG COR1M/COR3M Index",
   "tile": {
     "delta": null,
-    "percentile": 1.34,
-    "value": 7.56
+    "percentile": 1.14,
+    "value": 7.08
   },
   "tooltip": "Implied correlation — low means single-name moves dominate the index (dispersion regime).",
   "unit": ""

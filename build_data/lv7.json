@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-05",
+  "asof": "2026-08-06",
   "cadence": "daily",
   "id": "LV7",
   "name": "L1: Box-spread implied yield vs SOFR",
@@ -78,6 +78,10 @@
         {
           "date": "2026-08-05",
           "value": -183.427
+        },
+        {
+          "date": "2026-08-06",
+          "value": 73.703
         }
       ],
       "role": "context",
@@ -154,6 +158,10 @@
         {
           "date": "2026-08-05",
           "value": 123.595
+        },
+        {
+          "date": "2026-08-06",
+          "value": 40.995
         }
       ],
       "role": "avos",
@@ -164,7 +172,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 124.0
+    "value": 41.0
   },
   "tooltip": "Equity-implied borrow rate from SPX box spreads, vs SOFR.",
   "unit": " bp (tile: 3M)"
