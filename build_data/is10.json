@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-06",
+  "asof": "2026-08-07",
   "cadence": "daily",
   "id": "IS10",
   "name": "IPO issuance pace — cumulative deal count (YTD vs prior years)",
@@ -1376,7 +1376,11 @@
         },
         {
           "date": "08-06",
-          "value": 89
+          "value": 90
+        },
+        {
+          "date": "08-07",
+          "value": 92
         }
       ],
       "role": "avos",
@@ -1387,7 +1391,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 89
+    "value": 92
   },
   "tooltip": "Cumulative operating-company IPO count by day-of-year — this year (through today) vs prior years shown full-year.",
   "unit": " deals"

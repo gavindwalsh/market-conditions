@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-05",
+  "asof": "2026-08-06",
   "cadence": "daily",
   "id": "MH1B",
   "name": "Leadership (RSP/SPY, NDX/SPX)",
@@ -470,10 +470,6 @@
         {
           "date": "2025-07-31",
           "value": 77.054
-        },
-        {
-          "date": "2025-08-05",
-          "value": 77.407
         },
         {
           "date": "2025-08-06",
@@ -1478,6 +1474,10 @@
         {
           "date": "2026-08-05",
           "value": 75.708
+        },
+        {
+          "date": "2026-08-06",
+          "value": 75.432
         }
       ],
       "role": "context",
@@ -1946,10 +1946,6 @@
         {
           "date": "2025-07-31",
           "value": 163.887
-        },
-        {
-          "date": "2025-08-05",
-          "value": 163.515
         },
         {
           "date": "2025-08-06",
@@ -2954,6 +2950,10 @@
         {
           "date": "2026-08-05",
           "value": 170.84
+        },
+        {
+          "date": "2026-08-06",
+          "value": 170.477
         }
       ],
       "role": "context",
@@ -2963,8 +2963,8 @@
   "source": "Massive grouped bars + BBG",
   "tile": {
     "delta": null,
-    "percentile": 4.98,
-    "value": 75.7
+    "percentile": 3.92,
+    "value": 75.4
   },
   "tooltip": "Equal-weight vs cap-weight and NDX vs SPX, rebased to 100 — falling RSP/SPY = mega-cap leadership.",
   "unit": "rebased (tile: RSP/SPY)"
