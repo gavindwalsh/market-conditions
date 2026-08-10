@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-07",
+  "asof": "2026-08-10",
   "cadence": "daily",
   "id": "IS9",
   "name": "IPO issuance pace — cumulative $ (YTD vs prior years)",
@@ -1320,67 +1320,67 @@
         },
         {
           "date": "06-18",
-          "value": 37.064
+          "value": 36.864
         },
         {
           "date": "06-23",
-          "value": 37.376
+          "value": 37.176
         },
         {
           "date": "06-25",
-          "value": 38.545
+          "value": 38.345
         },
         {
           "date": "06-26",
-          "value": 38.758
+          "value": 38.558
         },
         {
           "date": "07-01",
-          "value": 40.926
+          "value": 40.726
         },
         {
           "date": "07-02",
-          "value": 41.101
+          "value": 40.901
         },
         {
           "date": "07-13",
-          "value": 41.176
+          "value": 40.976
         },
         {
           "date": "07-16",
-          "value": 42.376
+          "value": 42.176
         },
         {
           "date": "07-24",
-          "value": 42.704
+          "value": 42.504
         },
         {
           "date": "07-29",
-          "value": 42.738
+          "value": 42.538
         },
         {
           "date": "07-30",
-          "value": 43.949
+          "value": 43.749
         },
         {
           "date": "07-31",
-          "value": 44.141
+          "value": 43.941
         },
         {
           "date": "08-04",
-          "value": 44.246
+          "value": 44.046
         },
         {
           "date": "08-05",
-          "value": 44.535
+          "value": 44.335
         },
         {
           "date": "08-06",
-          "value": 44.932
+          "value": 44.717
         },
         {
           "date": "08-07",
-          "value": 45.428
+          "value": 45.228
         }
       ],
       "role": "avos",
@@ -1395,7 +1395,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 45.428
+    "value": 45.228
   },
   "tooltip": "Cumulative operating-company IPO proceeds by day-of-year, in real 2026 dollars — this year (through today) vs prior years full-year.",
   "unit": " $B"

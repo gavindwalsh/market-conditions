@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-06",
+  "asof": "2026-08-07",
   "cadence": "daily",
   "id": "IS6B",
   "name": "Corporate cash-equity flow (Russell 3000)",
@@ -1328,10 +1328,6 @@
           "value": -1.825
         },
         {
-          "date": "2025-08-06",
-          "value": -1.824
-        },
-        {
           "date": "2025-08-07",
           "value": -1.825
         },
@@ -2334,6 +2330,10 @@
         {
           "date": "2026-08-06",
           "value": -1.642
+        },
+        {
+          "date": "2026-08-07",
+          "value": -1.629
         }
       ],
       "role": "avos",
@@ -3660,10 +3660,6 @@
           "value": 0.391
         },
         {
-          "date": "2025-08-06",
-          "value": 0.391
-        },
-        {
           "date": "2025-08-07",
           "value": 0.391
         },
@@ -4481,7 +4477,7 @@
         },
         {
           "date": "2026-06-01",
-          "value": 0.367
+          "value": 0.366
         },
         {
           "date": "2026-06-02",
@@ -4513,7 +4509,7 @@
         },
         {
           "date": "2026-06-11",
-          "value": 0.368
+          "value": 0.367
         },
         {
           "date": "2026-06-12",
@@ -4553,7 +4549,7 @@
         },
         {
           "date": "2026-06-26",
-          "value": 0.37
+          "value": 0.369
         },
         {
           "date": "2026-06-29",
@@ -4561,7 +4557,7 @@
         },
         {
           "date": "2026-06-30",
-          "value": 0.364
+          "value": 0.363
         },
         {
           "date": "2026-07-01",
@@ -4569,7 +4565,7 @@
         },
         {
           "date": "2026-07-02",
-          "value": 0.365
+          "value": 0.364
         },
         {
           "date": "2026-07-06",
@@ -4666,6 +4662,10 @@
         {
           "date": "2026-08-06",
           "value": 0.355
+        },
+        {
+          "date": "2026-08-07",
+          "value": 0.352
         }
       ],
       "role": "context",
@@ -5992,10 +5992,6 @@
           "value": -1.434
         },
         {
-          "date": "2025-08-06",
-          "value": -1.433
-        },
-        {
           "date": "2025-08-07",
           "value": -1.434
         },
@@ -6821,7 +6817,7 @@
         },
         {
           "date": "2026-06-03",
-          "value": -1.315
+          "value": -1.316
         },
         {
           "date": "2026-06-04",
@@ -6973,7 +6969,7 @@
         },
         {
           "date": "2026-07-29",
-          "value": -1.354
+          "value": -1.355
         },
         {
           "date": "2026-07-30",
@@ -6998,6 +6994,10 @@
         {
           "date": "2026-08-06",
           "value": -1.287
+        },
+        {
+          "date": "2026-08-07",
+          "value": -1.277
         }
       ],
       "role": "benchmark",
@@ -7007,8 +7007,8 @@
   "source": "BBG RAY CF_DECR/INCR_CAP_STOCK",
   "tile": {
     "delta": null,
-    "percentile": 8.41,
-    "value": 1.64
+    "percentile": 7.76,
+    "value": 1.63
   },
   "tooltip": "Russell 3000 buybacks vs equity sold for cash, share of market cap (trailing 12m) — not net issuance: excludes cash M&A and employee share issuance.",
   "unit": " % of mkt cap"

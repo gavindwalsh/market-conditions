@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-06",
+  "asof": "2026-08-07",
   "cadence": "daily",
   "id": "VC6",
   "name": "3M IV by sector basket",
@@ -470,10 +470,6 @@
         {
           "date": "2025-07-31",
           "value": 36.573
-        },
-        {
-          "date": "2025-08-06",
-          "value": 36.156
         },
         {
           "date": "2025-08-07",
@@ -1478,6 +1474,10 @@
         {
           "date": "2026-08-06",
           "value": 59.356
+        },
+        {
+          "date": "2026-08-07",
+          "value": 56.672
         }
       ],
       "role": "context",
@@ -1946,10 +1946,6 @@
         {
           "date": "2025-07-31",
           "value": 30.089
-        },
-        {
-          "date": "2025-08-06",
-          "value": 29.986
         },
         {
           "date": "2025-08-07",
@@ -2954,6 +2950,10 @@
         {
           "date": "2026-08-06",
           "value": 41.51
+        },
+        {
+          "date": "2026-08-07",
+          "value": 40.621
         }
       ],
       "role": "context",
@@ -3422,10 +3422,6 @@
         {
           "date": "2025-07-31",
           "value": 29.545
-        },
-        {
-          "date": "2025-08-06",
-          "value": 29.496
         },
         {
           "date": "2025-08-07",
@@ -4430,6 +4426,10 @@
         {
           "date": "2026-08-06",
           "value": 29.812
+        },
+        {
+          "date": "2026-08-07",
+          "value": 29.434
         }
       ],
       "role": "context",
@@ -4898,10 +4898,6 @@
         {
           "date": "2025-07-31",
           "value": 20.944
-        },
-        {
-          "date": "2025-08-06",
-          "value": 20.915
         },
         {
           "date": "2025-08-07",
@@ -5906,6 +5902,10 @@
         {
           "date": "2026-08-06",
           "value": 24.125
+        },
+        {
+          "date": "2026-08-07",
+          "value": 23.745
         }
       ],
       "role": "context",
@@ -5915,8 +5915,8 @@
   "source": "BBG per-name 3M ATM IV",
   "tile": {
     "delta": null,
-    "percentile": 97.65,
-    "value": 59.4
+    "percentile": 97.05,
+    "value": 56.7
   },
   "tooltip": "Equal-weight single-name 3M implied vol by sector basket — same construction, comparable levels.",
   "unit": " vol pts"

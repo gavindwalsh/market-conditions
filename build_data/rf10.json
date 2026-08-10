@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-06",
+  "asof": "2026-08-07",
   "cadence": "weekly",
   "id": "RF10",
   "name": "Retail dollar volume — weekly (est. total)",
@@ -591,7 +591,7 @@
         },
         {
           "date": "2026-08-07",
-          "value": 1148.039
+          "value": 1424.617
         }
       ],
       "role": "nowcast",
@@ -605,8 +605,8 @@
   },
   "tile": {
     "delta": null,
-    "percentile": 84.27,
-    "value": 1529.0
+    "percentile": 77.27,
+    "value": 1424.6
   },
   "tooltip": "Estimated total retail dollars traded per week — gross activity, not net (see RF1 for net). FINRA-anchored history spliced with the recent Massive tape.",
   "unit": "$B"
