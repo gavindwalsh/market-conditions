@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-07",
+  "asof": "2026-08-10",
   "cadence": "daily",
   "id": "RF7",
   "name": "Small-lot options premium (proxy)",
@@ -86,10 +86,6 @@
         {
           "date": "2025-07-31",
           "value": 7.413
-        },
-        {
-          "date": "2025-08-07",
-          "value": 8.279
         },
         {
           "date": "2025-08-08",
@@ -1086,6 +1082,10 @@
         {
           "date": "2026-08-07",
           "value": 15.844
+        },
+        {
+          "date": "2026-08-10",
+          "value": 15.257
         }
       ],
       "role": "avos",
@@ -1170,10 +1170,6 @@
         {
           "date": "2025-07-31",
           "value": 24.056
-        },
-        {
-          "date": "2025-08-07",
-          "value": 26.449
         },
         {
           "date": "2025-08-08",
@@ -2170,6 +2166,10 @@
         {
           "date": "2026-08-07",
           "value": 34.042
+        },
+        {
+          "date": "2026-08-10",
+          "value": 33.873
         }
       ],
       "role": "context",
@@ -2179,8 +2179,8 @@
   "source": "Massive OPRA trades",
   "tile": {
     "delta": null,
-    "percentile": 93.76,
-    "value": 15.84
+    "percentile": 93.0,
+    "value": 15.26
   },
   "tooltip": "Small-lot (<10 contract) option premium per day (retail proxy), smoothed on a 5-day trailing average.",
   "unit": " $B (tile)"

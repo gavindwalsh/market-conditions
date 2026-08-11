@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-07",
+  "asof": "2026-08-10",
   "cadence": "daily",
   "id": "LV3",
   "name": "Volume by DTE bucket",
@@ -555,6 +555,10 @@
         {
           "date": "2026-08-07",
           "value": 34.013
+        },
+        {
+          "date": "2026-08-14",
+          "value": 34.284
         }
       ],
       "role": "context",
@@ -1109,6 +1113,10 @@
         {
           "date": "2026-08-07",
           "value": 22.313
+        },
+        {
+          "date": "2026-08-14",
+          "value": 24.164
         }
       ],
       "role": "context",
@@ -1663,6 +1671,10 @@
         {
           "date": "2026-08-07",
           "value": 21.961
+        },
+        {
+          "date": "2026-08-14",
+          "value": 16.516
         }
       ],
       "role": "context",
@@ -2217,6 +2229,10 @@
         {
           "date": "2026-08-07",
           "value": 21.713
+        },
+        {
+          "date": "2026-08-14",
+          "value": 25.036
         }
       ],
       "role": "context",
@@ -2228,7 +2244,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 44.9
+    "value": 34.3
   },
   "tooltip": "Composition of option volume by days-to-expiry — weekly average, stacks to 100%.",
   "unit": "% (tile: 0DTE)"

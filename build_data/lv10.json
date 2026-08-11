@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-10",
+  "asof": "2026-08-11",
   "cadence": "daily",
   "id": "LV10",
   "name": "L2: Call-wing richness",
@@ -94,6 +94,10 @@
         {
           "date": "2026-08-10",
           "value": -0.027
+        },
+        {
+          "date": "2026-08-11",
+          "value": 1.052
         }
       ],
       "role": "avos",
@@ -108,7 +112,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": -0.03
+    "value": 1.05
   },
   "tooltip": "Positive = upside call wings bid vs ATM (call-demand regime).",
   "unit": " vol pts"

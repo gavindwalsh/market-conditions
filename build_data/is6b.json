@@ -1,9 +1,9 @@
 {
-  "asof": "2026-08-07",
+  "asof": "2026-08-10",
   "cadence": "daily",
   "id": "IS6B",
   "name": "Corporate cash-equity flow (Russell 3000)",
-  "notes": "**What it shows.** What Russell 3000 companies spent buying back their own stock, against what they raised selling stock, straight from company cash-flow statements. Buybacks plot below the axis as a cash outflow, issuance above it, and the net line between them. Trailing twelve months at every point, updated daily as companies file — so it steps during earnings season and is flat between.\n\nEverything is shown as a **share of market capitalization** rather than in dollars, and that choice matters: buybacks are at a record dollar level ($1.30tn trailing twelve months, against $282bn of stock sold) and simultaneously near the low end of their range as a share of the market they have to absorb. Reading the dollars alone would report a record corporate bid at a moment when the bid is historically thin relative to the market it is bidding for.\n\n**How it's computed.** `CF_DECR_CAP_STOCK` (gross buybacks) and `CF_INCR_CAP_STOCK` (gross equity issued for cash) on `RAY Index`, daily from March 1998. These return index points, so each is divided by the index price to give a share of market cap. That ratio is deliberately **not** derived from the dollar figures: Bloomberg does not expose the Russell divisor, so dollars require reconstructing it as `CUR_MKT_CAP ÷ PX_LAST` (it drifted from about $20.4bn per index point in 1998 to $18.1bn in 2026), whereas index points ÷ index price cancels the divisor algebraically and carries none of its error.\n\n**Caveats.** **This is not net issuance.** It excludes **cash M&A**: when a company is acquired for cash it simply leaves the index, so the single largest form of share retirement is invisible here. It also excludes **shares issued to employees** through RSU vesting, which create shares but no cash flow. The issuance line combines follow-on offerings, at-the-market programs and option-exercise proceeds and cannot be broken out further. **Financials are included**, unlike the Fed measure alongside it. The dollar figures quoted above are likely biased about 5-7% high because the reconstructed divisor is full-cap while the true index divisor is float-adjusted; the plotted percent-of-market-cap series is immune to this, which is why it is the basis shown. A step means a large company reported, not that money moved that day — the lag is filing lag, four to six weeks after quarter-end. Steps in late June may be Russell reconstitution rather than corporate behaviour.",
+  "notes": "**What it shows.** What Russell 3000 companies spent buying back their own stock, against what they raised selling stock, straight from company cash-flow statements. Buybacks plot below the axis as a cash outflow, issuance above it, and the net line between them. Trailing twelve months at every point, updated daily as companies file — so it steps during earnings season and is flat between.\n\nEverything is shown as a **share of market capitalization** rather than in dollars, and that choice matters: buybacks are at a record dollar level ($1.31tn trailing twelve months, against $282bn of stock sold) and simultaneously near the low end of their range as a share of the market they have to absorb. Reading the dollars alone would report a record corporate bid at a moment when the bid is historically thin relative to the market it is bidding for.\n\n**How it's computed.** `CF_DECR_CAP_STOCK` (gross buybacks) and `CF_INCR_CAP_STOCK` (gross equity issued for cash) on `RAY Index`, daily from March 1998. These return index points, so each is divided by the index price to give a share of market cap. That ratio is deliberately **not** derived from the dollar figures: Bloomberg does not expose the Russell divisor, so dollars require reconstructing it as `CUR_MKT_CAP ÷ PX_LAST` (it drifted from about $20.4bn per index point in 1998 to $18.1bn in 2026), whereas index points ÷ index price cancels the divisor algebraically and carries none of its error.\n\n**Caveats.** **This is not net issuance.** It excludes **cash M&A**: when a company is acquired for cash it simply leaves the index, so the single largest form of share retirement is invisible here. It also excludes **shares issued to employees** through RSU vesting, which create shares but no cash flow. The issuance line combines follow-on offerings, at-the-market programs and option-exercise proceeds and cannot be broken out further. **Financials are included**, unlike the Fed measure alongside it. The dollar figures quoted above are likely biased about 5-7% high because the reconstructed divisor is full-cap while the true index divisor is float-adjusted; the plotted percent-of-market-cap series is immune to this, which is why it is the basis shown. A step means a large company reported, not that money moved that day — the lag is filing lag, four to six weeks after quarter-end. Steps in late June may be Russell reconstitution rather than corporate behaviour.",
   "panel": "issuance",
   "provenance": "bloomberg_cache",
   "series": [
@@ -1328,10 +1328,6 @@
           "value": -1.825
         },
         {
-          "date": "2025-08-07",
-          "value": -1.825
-        },
-        {
           "date": "2025-08-08",
           "value": -1.814
         },
@@ -2157,7 +2153,7 @@
         },
         {
           "date": "2026-06-04",
-          "value": -1.667
+          "value": -1.668
         },
         {
           "date": "2026-06-05",
@@ -2334,6 +2330,10 @@
         {
           "date": "2026-08-07",
           "value": -1.629
+        },
+        {
+          "date": "2026-08-10",
+          "value": -1.631
         }
       ],
       "role": "avos",
@@ -3660,10 +3660,6 @@
           "value": 0.391
         },
         {
-          "date": "2025-08-07",
-          "value": 0.391
-        },
-        {
           "date": "2025-08-08",
           "value": 0.388
         },
@@ -4665,6 +4661,10 @@
         },
         {
           "date": "2026-08-07",
+          "value": 0.352
+        },
+        {
+          "date": "2026-08-10",
           "value": 0.352
         }
       ],
@@ -5992,10 +5992,6 @@
           "value": -1.434
         },
         {
-          "date": "2025-08-07",
-          "value": -1.434
-        },
-        {
           "date": "2025-08-08",
           "value": -1.425
         },
@@ -6998,6 +6994,10 @@
         {
           "date": "2026-08-07",
           "value": -1.277
+        },
+        {
+          "date": "2026-08-10",
+          "value": -1.278
         }
       ],
       "role": "benchmark",
@@ -7007,7 +7007,7 @@
   "source": "BBG RAY CF_DECR/INCR_CAP_STOCK",
   "tile": {
     "delta": null,
-    "percentile": 7.76,
+    "percentile": 7.83,
     "value": 1.63
   },
   "tooltip": "Russell 3000 buybacks vs equity sold for cash, share of market cap (trailing 12m) — not net issuance: excludes cash M&A and employee share issuance.",

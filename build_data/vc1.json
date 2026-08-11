@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-07",
+  "asof": "2026-08-10",
   "cadence": "daily",
   "id": "VC1",
   "name": "Implied correlation",
@@ -758,10 +758,6 @@
         {
           "date": "2025-07-31",
           "value": 11.79
-        },
-        {
-          "date": "2025-08-07",
-          "value": 13.65
         },
         {
           "date": "2025-08-08",
@@ -1766,6 +1762,10 @@
         {
           "date": "2026-08-07",
           "value": 7.38
+        },
+        {
+          "date": "2026-08-10",
+          "value": 8.07
         }
       ],
       "role": "avos",
@@ -2522,10 +2522,6 @@
         {
           "date": "2025-07-31",
           "value": 16.95
-        },
-        {
-          "date": "2025-08-07",
-          "value": 16.9
         },
         {
           "date": "2025-08-08",
@@ -3530,6 +3526,10 @@
         {
           "date": "2026-08-07",
           "value": 10.48
+        },
+        {
+          "date": "2026-08-10",
+          "value": 11.14
         }
       ],
       "role": "context",
@@ -3539,8 +3539,8 @@
   "source": "BBG COR1M/COR3M Index",
   "tile": {
     "delta": null,
-    "percentile": 1.26,
-    "value": 7.38
+    "percentile": 2.0,
+    "value": 8.07
   },
   "tooltip": "Implied correlation — low means single-name moves dominate the index (dispersion regime).",
   "unit": ""
