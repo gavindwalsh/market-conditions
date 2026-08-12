@@ -1,13 +1,13 @@
 {
-  "asof": "2026-08-11",
+  "asof": "2026-08-12",
   "cadence": "daily",
   "extremes": {
-    "IWM": -0.8,
-    "LITE": -0.0,
-    "MSFT": 2.1,
-    "QQQ": 4.2,
-    "SOXL": -0.0,
-    "SPY": 12.7
+    "IWM": -0.2,
+    "MSFT": 2.0,
+    "QQQ": 6.5,
+    "SGOV": 0.0,
+    "SOXL": 0.0,
+    "SPY": 11.7
   },
   "id": "LV5",
   "name": "Dealer GEX (OI-convention)",
@@ -106,6 +106,10 @@
         {
           "date": "2026-08-11",
           "value": 27.046
+        },
+        {
+          "date": "2026-08-12",
+          "value": 27.784
         }
       ],
       "role": "avos",
@@ -120,7 +124,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 27.0
+    "value": 27.8
   },
   "tooltip": "Dealer gamma exposure estimate — changes are the signal, not levels.",
   "unit": " $B/1%"

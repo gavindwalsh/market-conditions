@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-10",
+  "asof": "2026-08-11",
   "cadence": "daily",
   "id": "IS4",
   "name": "Aftermarket appetite (IPO ETF vs SPY)",
@@ -470,10 +470,6 @@
         {
           "date": "2025-07-31",
           "value": 95.082
-        },
-        {
-          "date": "2025-08-08",
-          "value": 100.633
         },
         {
           "date": "2025-08-11",
@@ -1478,6 +1474,10 @@
         {
           "date": "2026-08-10",
           "value": 93.116
+        },
+        {
+          "date": "2026-08-11",
+          "value": 93.147
         }
       ],
       "role": "avos",
@@ -1487,7 +1487,7 @@
   "source": "Massive grouped bars",
   "tile": {
     "delta": null,
-    "percentile": 13.46,
+    "percentile": 13.53,
     "value": 93.1
   },
   "tooltip": "Recent-IPO basket vs SPY — rising = aftermarket appetite for new issues.",
