@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-12",
+  "asof": "2026-08-13",
   "cadence": "daily",
   "id": "VC7",
   "name": "SPX implied (VIX) vs realized vol",
@@ -758,10 +758,6 @@
         {
           "date": "2025-07-31",
           "value": 16.72
-        },
-        {
-          "date": "2025-08-12",
-          "value": 14.73
         },
         {
           "date": "2025-08-13",
@@ -1793,7 +1789,11 @@
         },
         {
           "date": "2026-08-12",
-          "value": 15.37
+          "value": 14.55
+        },
+        {
+          "date": "2026-08-13",
+          "value": 14.46
         }
       ],
       "role": "avos",
@@ -2482,10 +2482,6 @@
         {
           "date": "2025-07-31",
           "value": 17.582
-        },
-        {
-          "date": "2025-08-11",
-          "value": 17.687
         },
         {
           "date": "2025-08-12",
@@ -3490,6 +3486,10 @@
         {
           "date": "2026-08-11",
           "value": 17.532
+        },
+        {
+          "date": "2026-08-12",
+          "value": 17.46
         }
       ],
       "role": "benchmark",
@@ -3499,8 +3499,8 @@
   "source": "BBG VIX + index closes",
   "tile": {
     "delta": null,
-    "percentile": 37.32,
-    "value": 15.37
+    "percentile": 30.08,
+    "value": 14.46
   },
   "tooltip": "VIX (30-day implied vol, skew-inclusive) vs 360-day realized (Bloomberg convention).",
   "unit": "vol pts"

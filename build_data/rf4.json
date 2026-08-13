@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-11",
+  "asof": "2026-08-12",
   "cadence": "daily",
   "id": "RF4",
   "name": "Buy-the-dip sensitivity",
@@ -366,6 +366,10 @@
         {
           "date": "2026-08-11",
           "value": 7.575
+        },
+        {
+          "date": "2026-08-12",
+          "value": 7.584
         }
       ],
       "role": "avos",
@@ -898,6 +902,10 @@
         {
           "date": "2026-08-11",
           "value": 8.318
+        },
+        {
+          "date": "2026-08-12",
+          "value": 8.484
         }
       ],
       "role": "context",

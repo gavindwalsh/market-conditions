@@ -1,9 +1,9 @@
 {
-  "asof": "2026-08-11",
+  "asof": "2026-08-12",
   "cadence": "daily",
   "id": "IS6B",
   "name": "Corporate cash-equity flow (Russell 3000)",
-  "notes": "**What it shows.** What Russell 3000 companies spent buying back their own stock, against what they raised selling stock, straight from company cash-flow statements. Buybacks plot below the axis as a cash outflow, issuance above it, and the net line between them. Trailing twelve months at every point, updated daily as companies file — so it steps during earnings season and is flat between.\n\nEverything is shown as a **share of market capitalization** rather than in dollars, and that choice matters: buybacks are at a record dollar level ($1.31tn trailing twelve months, against $282bn of stock sold) and simultaneously near the low end of their range as a share of the market they have to absorb. Reading the dollars alone would report a record corporate bid at a moment when the bid is historically thin relative to the market it is bidding for.\n\n**How it's computed.** `CF_DECR_CAP_STOCK` (gross buybacks) and `CF_INCR_CAP_STOCK` (gross equity issued for cash) on `RAY Index`, daily from March 1998. These return index points, so each is divided by the index price to give a share of market cap. That ratio is deliberately **not** derived from the dollar figures: Bloomberg does not expose the Russell divisor, so dollars require reconstructing it as `CUR_MKT_CAP ÷ PX_LAST` (it drifted from about $20.4bn per index point in 1998 to $18.1bn in 2026), whereas index points ÷ index price cancels the divisor algebraically and carries none of its error.\n\n**Caveats.** **This is not net issuance.** It excludes **cash M&A**: when a company is acquired for cash it simply leaves the index, so the single largest form of share retirement is invisible here. It also excludes **shares issued to employees** through RSU vesting, which create shares but no cash flow. The issuance line combines follow-on offerings, at-the-market programs and option-exercise proceeds and cannot be broken out further. **Financials are included**, unlike the Fed measure alongside it. The dollar figures quoted above are likely biased about 5-7% high because the reconstructed divisor is full-cap while the true index divisor is float-adjusted; the plotted percent-of-market-cap series is immune to this, which is why it is the basis shown. A step means a large company reported, not that money moved that day — the lag is filing lag, four to six weeks after quarter-end. Steps in late June may be Russell reconstitution rather than corporate behaviour.",
+  "notes": "**What it shows.** What Russell 3000 companies spent buying back their own stock, against what they raised selling stock, straight from company cash-flow statements. Buybacks plot below the axis as a cash outflow, issuance above it, and the net line between them. Trailing twelve months at every point, updated daily as companies file — so it steps during earnings season and is flat between.\n\nEverything is shown as a **share of market capitalization** rather than in dollars, and that choice matters: buybacks are at a record dollar level ($1.31tn trailing twelve months, against $283bn of stock sold) and simultaneously near the low end of their range as a share of the market they have to absorb. Reading the dollars alone would report a record corporate bid at a moment when the bid is historically thin relative to the market it is bidding for.\n\n**How it's computed.** `CF_DECR_CAP_STOCK` (gross buybacks) and `CF_INCR_CAP_STOCK` (gross equity issued for cash) on `RAY Index`, daily from March 1998. These return index points, so each is divided by the index price to give a share of market cap. That ratio is deliberately **not** derived from the dollar figures: Bloomberg does not expose the Russell divisor, so dollars require reconstructing it as `CUR_MKT_CAP ÷ PX_LAST` (it drifted from about $20.4bn per index point in 1998 to $18.1bn in 2026), whereas index points ÷ index price cancels the divisor algebraically and carries none of its error.\n\n**Caveats.** **This is not net issuance.** It excludes **cash M&A**: when a company is acquired for cash it simply leaves the index, so the single largest form of share retirement is invisible here. It also excludes **shares issued to employees** through RSU vesting, which create shares but no cash flow. The issuance line combines follow-on offerings, at-the-market programs and option-exercise proceeds and cannot be broken out further. **Financials are included**, unlike the Fed measure alongside it. The dollar figures quoted above are likely biased about 5-7% high because the reconstructed divisor is full-cap while the true index divisor is float-adjusted; the plotted percent-of-market-cap series is immune to this, which is why it is the basis shown. A step means a large company reported, not that money moved that day — the lag is filing lag, four to six weeks after quarter-end. Steps in late June may be Russell reconstitution rather than corporate behaviour.",
   "panel": "issuance",
   "provenance": "bloomberg_cache",
   "series": [
@@ -1328,10 +1328,6 @@
           "value": -1.825
         },
         {
-          "date": "2025-08-11",
-          "value": -1.818
-        },
-        {
           "date": "2025-08-12",
           "value": -1.796
         },
@@ -2149,11 +2145,11 @@
         },
         {
           "date": "2026-06-04",
-          "value": -1.668
+          "value": -1.667
         },
         {
           "date": "2026-06-05",
-          "value": -1.714
+          "value": -1.713
         },
         {
           "date": "2026-06-08",
@@ -2285,11 +2281,11 @@
         },
         {
           "date": "2026-07-24",
-          "value": -1.708
+          "value": -1.707
         },
         {
           "date": "2026-07-27",
-          "value": -1.706
+          "value": -1.705
         },
         {
           "date": "2026-07-28",
@@ -2313,7 +2309,7 @@
         },
         {
           "date": "2026-08-04",
-          "value": -1.635
+          "value": -1.634
         },
         {
           "date": "2026-08-05",
@@ -2329,11 +2325,15 @@
         },
         {
           "date": "2026-08-10",
-          "value": -1.631
+          "value": -1.63
         },
         {
           "date": "2026-08-11",
           "value": -1.635
+        },
+        {
+          "date": "2026-08-12",
+          "value": -1.63
         }
       ],
       "role": "avos",
@@ -3660,10 +3660,6 @@
           "value": 0.391
         },
         {
-          "date": "2025-08-11",
-          "value": 0.389
-        },
-        {
           "date": "2025-08-12",
           "value": 0.385
         },
@@ -4441,7 +4437,7 @@
         },
         {
           "date": "2026-05-20",
-          "value": 0.38
+          "value": 0.381
         },
         {
           "date": "2026-05-21",
@@ -4469,7 +4465,7 @@
         },
         {
           "date": "2026-06-01",
-          "value": 0.366
+          "value": 0.367
         },
         {
           "date": "2026-06-02",
@@ -4493,7 +4489,7 @@
         },
         {
           "date": "2026-06-09",
-          "value": 0.368
+          "value": 0.369
         },
         {
           "date": "2026-06-10",
@@ -4501,7 +4497,7 @@
         },
         {
           "date": "2026-06-11",
-          "value": 0.367
+          "value": 0.368
         },
         {
           "date": "2026-06-12",
@@ -4541,7 +4537,7 @@
         },
         {
           "date": "2026-06-26",
-          "value": 0.369
+          "value": 0.37
         },
         {
           "date": "2026-06-29",
@@ -4549,15 +4545,15 @@
         },
         {
           "date": "2026-06-30",
-          "value": 0.363
+          "value": 0.364
         },
         {
           "date": "2026-07-01",
-          "value": 0.364
+          "value": 0.365
         },
         {
           "date": "2026-07-02",
-          "value": 0.364
+          "value": 0.365
         },
         {
           "date": "2026-07-06",
@@ -4589,7 +4585,7 @@
         },
         {
           "date": "2026-07-15",
-          "value": 0.361
+          "value": 0.362
         },
         {
           "date": "2026-07-16",
@@ -4637,7 +4633,7 @@
         },
         {
           "date": "2026-07-31",
-          "value": 0.365
+          "value": 0.366
         },
         {
           "date": "2026-08-03",
@@ -4645,7 +4641,7 @@
         },
         {
           "date": "2026-08-04",
-          "value": 0.353
+          "value": 0.354
         },
         {
           "date": "2026-08-05",
@@ -4661,10 +4657,14 @@
         },
         {
           "date": "2026-08-10",
-          "value": 0.352
+          "value": 0.353
         },
         {
           "date": "2026-08-11",
+          "value": 0.354
+        },
+        {
+          "date": "2026-08-12",
           "value": 0.353
         }
       ],
@@ -5992,10 +5992,6 @@
           "value": -1.434
         },
         {
-          "date": "2025-08-11",
-          "value": -1.429
-        },
-        {
           "date": "2025-08-12",
           "value": -1.411
         },
@@ -6801,7 +6797,7 @@
         },
         {
           "date": "2026-06-01",
-          "value": -1.334
+          "value": -1.333
         },
         {
           "date": "2026-06-02",
@@ -6809,7 +6805,7 @@
         },
         {
           "date": "2026-06-03",
-          "value": -1.316
+          "value": -1.315
         },
         {
           "date": "2026-06-04",
@@ -6817,11 +6813,11 @@
         },
         {
           "date": "2026-06-05",
-          "value": -1.346
+          "value": -1.345
         },
         {
           "date": "2026-06-08",
-          "value": -1.342
+          "value": -1.341
         },
         {
           "date": "2026-06-09",
@@ -6869,7 +6865,7 @@
         },
         {
           "date": "2026-06-25",
-          "value": -1.345
+          "value": -1.344
         },
         {
           "date": "2026-06-26",
@@ -6921,7 +6917,7 @@
         },
         {
           "date": "2026-07-15",
-          "value": -1.309
+          "value": -1.308
         },
         {
           "date": "2026-07-16",
@@ -6929,7 +6925,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": -1.328
+          "value": -1.327
         },
         {
           "date": "2026-07-20",
@@ -6961,7 +6957,7 @@
         },
         {
           "date": "2026-07-29",
-          "value": -1.355
+          "value": -1.354
         },
         {
           "date": "2026-07-30",
@@ -6998,6 +6994,10 @@
         {
           "date": "2026-08-11",
           "value": -1.281
+        },
+        {
+          "date": "2026-08-12",
+          "value": -1.277
         }
       ],
       "role": "benchmark",
@@ -7007,7 +7007,7 @@
   "source": "BBG RAY CF_DECR/INCR_CAP_STOCK",
   "tile": {
     "delta": null,
-    "percentile": 8.07,
+    "percentile": 7.8,
     "value": 1.63
   },
   "tooltip": "Russell 3000 buybacks vs equity sold for cash, share of market cap (trailing 12m) — not net issuance: excludes cash M&A and employee share issuance.",

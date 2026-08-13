@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-11",
+  "asof": "2026-08-12",
   "cadence": "daily",
   "id": "MH2",
   "name": "Corporate credit (IG/HY OAS)",
@@ -1528,10 +1528,6 @@
           "value": 278.0
         },
         {
-          "date": "2025-08-11",
-          "value": 286.0
-        },
-        {
           "date": "2025-08-12",
           "value": 284.0
         },
@@ -2569,6 +2565,10 @@
         },
         {
           "date": "2026-08-11",
+          "value": 267.0
+        },
+        {
+          "date": "2026-08-12",
           "value": 267.0
         }
       ],
@@ -4288,10 +4288,6 @@
           "value": 76.0
         },
         {
-          "date": "2025-08-11",
-          "value": 78.0
-        },
-        {
           "date": "2025-08-12",
           "value": 77.0
         },
@@ -5329,6 +5325,10 @@
         },
         {
           "date": "2026-08-11",
+          "value": 78.0
+        },
+        {
+          "date": "2026-08-12",
           "value": 78.0
         }
       ],
@@ -6856,10 +6856,6 @@
           "value": 202.0
         },
         {
-          "date": "2025-08-11",
-          "value": 208.0
-        },
-        {
           "date": "2025-08-12",
           "value": 207.0
         },
@@ -7898,6 +7894,10 @@
         {
           "date": "2026-08-11",
           "value": 189.0
+        },
+        {
+          "date": "2026-08-12",
+          "value": 189.0
         }
       ],
       "role": "benchmark",
@@ -7907,7 +7907,7 @@
   "source": "Bloomberg LUACOAS / LF98OAS",
   "tile": {
     "delta": null,
-    "percentile": 3.74,
+    "percentile": 3.75,
     "value": 267.0
   },
   "tooltip": "Investment-grade and high-yield credit spreads; wider = stress.",
