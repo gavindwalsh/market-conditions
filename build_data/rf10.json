@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-12",
+  "asof": "2026-08-13",
   "cadence": "weekly",
   "id": "RF10",
   "name": "Retail dollar volume — weekly (est. total)",
@@ -595,7 +595,7 @@
         },
         {
           "date": "2026-08-14",
-          "value": 695.084
+          "value": 943.056
         }
       ],
       "role": "nowcast",

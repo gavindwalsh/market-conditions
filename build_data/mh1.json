@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-12",
+  "asof": "2026-08-13",
   "cadence": "daily",
   "id": "MH1",
   "name": "Breadth (% above moving averages)",
@@ -462,10 +462,6 @@
         {
           "date": "2025-07-31",
           "value": 57.863
-        },
-        {
-          "date": "2025-08-12",
-          "value": 62.374
         },
         {
           "date": "2025-08-13",
@@ -1470,6 +1466,10 @@
         {
           "date": "2026-08-12",
           "value": 64.414
+        },
+        {
+          "date": "2026-08-13",
+          "value": 68.191
         }
       ],
       "role": "avos",
@@ -1902,10 +1902,6 @@
         {
           "date": "2025-07-31",
           "value": 58.871
-        },
-        {
-          "date": "2025-08-12",
-          "value": 60.563
         },
         {
           "date": "2025-08-13",
@@ -2910,6 +2906,10 @@
         {
           "date": "2026-08-12",
           "value": 67.992
+        },
+        {
+          "date": "2026-08-13",
+          "value": 71.968
         }
       ],
       "role": "context",
@@ -2919,8 +2919,8 @@
   "source": "Massive grouped bars × membership",
   "tile": {
     "delta": null,
-    "percentile": 54.72,
-    "value": 64.4
+    "percentile": 63.97,
+    "value": 68.2
   },
   "tooltip": "Share of S&P 500 members above their 50- and 200-day averages.",
   "unit": "% (tile: >50dma)"

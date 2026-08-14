@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-13",
+  "asof": "2026-08-14",
   "cadence": "daily",
   "id": "IS10",
   "name": "IPO issuance pace — cumulative deal count (YTD vs prior years)",
@@ -1159,236 +1159,228 @@
           "value": 2
         },
         {
-          "date": "01-13",
+          "date": "01-22",
           "value": 3
         },
         {
-          "date": "01-22",
+          "date": "01-23",
           "value": 4
         },
         {
-          "date": "01-23",
-          "value": 5
-        },
-        {
           "date": "01-29",
-          "value": 7
+          "value": 6
         },
         {
           "date": "02-04",
-          "value": 8
+          "value": 7
         },
         {
           "date": "02-05",
-          "value": 12
+          "value": 11
         },
         {
           "date": "02-06",
-          "value": 14
+          "value": 13
         },
         {
           "date": "02-10",
-          "value": 15
+          "value": 14
         },
         {
           "date": "02-11",
-          "value": 17
+          "value": 16
         },
         {
           "date": "02-12",
-          "value": 18
+          "value": 17
         },
         {
           "date": "02-18",
-          "value": 19
+          "value": 18
         },
         {
           "date": "02-20",
-          "value": 21
+          "value": 20
         },
         {
           "date": "02-26",
-          "value": 22
+          "value": 21
         },
         {
           "date": "02-27",
-          "value": 23
+          "value": 22
         },
         {
           "date": "03-04",
-          "value": 24
+          "value": 23
         },
         {
           "date": "03-06",
-          "value": 25
+          "value": 24
         },
         {
           "date": "03-12",
-          "value": 26
+          "value": 25
         },
         {
           "date": "03-17",
-          "value": 27
+          "value": 26
         },
         {
           "date": "03-20",
-          "value": 28
+          "value": 27
         },
         {
           "date": "04-01",
-          "value": 29
+          "value": 28
         },
         {
           "date": "04-16",
-          "value": 31
+          "value": 30
         },
         {
           "date": "04-17",
-          "value": 34
+          "value": 33
         },
         {
           "date": "04-22",
-          "value": 35
+          "value": 34
         },
         {
           "date": "04-23",
-          "value": 36
+          "value": 35
         },
         {
           "date": "04-24",
-          "value": 37
+          "value": 36
         },
         {
           "date": "04-29",
-          "value": 38
+          "value": 37
         },
         {
           "date": "04-30",
-          "value": 40
+          "value": 39
         },
         {
           "date": "05-01",
-          "value": 42
+          "value": 41
         },
         {
           "date": "05-06",
-          "value": 43
+          "value": 42
         },
         {
           "date": "05-07",
-          "value": 44
+          "value": 43
         },
         {
           "date": "05-08",
-          "value": 46
+          "value": 45
         },
         {
           "date": "05-13",
-          "value": 48
+          "value": 47
         },
         {
           "date": "05-14",
-          "value": 51
+          "value": 50
         },
         {
           "date": "05-15",
-          "value": 52
+          "value": 51
         },
         {
           "date": "05-20",
-          "value": 54
+          "value": 53
         },
         {
           "date": "06-04",
-          "value": 58
+          "value": 57
         },
         {
           "date": "06-09",
-          "value": 60
+          "value": 59
         },
         {
           "date": "06-10",
-          "value": 62
+          "value": 61
         },
         {
           "date": "06-11",
-          "value": 63
+          "value": 62
         },
         {
           "date": "06-17",
-          "value": 64
+          "value": 63
         },
         {
           "date": "06-18",
-          "value": 67
-        },
-        {
-          "date": "06-23",
-          "value": 68
+          "value": 66
         },
         {
           "date": "06-25",
-          "value": 70
+          "value": 68
         },
         {
           "date": "06-26",
-          "value": 71
+          "value": 69
         },
         {
           "date": "07-01",
-          "value": 74
+          "value": 72
         },
         {
           "date": "07-02",
-          "value": 75
+          "value": 73
         },
         {
           "date": "07-13",
-          "value": 76
+          "value": 74
         },
         {
           "date": "07-16",
-          "value": 78
+          "value": 76
         },
         {
           "date": "07-24",
-          "value": 80
+          "value": 78
         },
         {
           "date": "07-29",
-          "value": 82
+          "value": 80
         },
         {
           "date": "07-30",
-          "value": 84
+          "value": 82
         },
         {
           "date": "07-31",
-          "value": 85
+          "value": 83
         },
         {
           "date": "08-04",
-          "value": 86
+          "value": 84
         },
         {
           "date": "08-05",
-          "value": 87
+          "value": 85
         },
         {
           "date": "08-06",
-          "value": 88
+          "value": 86
         },
         {
           "date": "08-07",
-          "value": 91
+          "value": 89
         },
         {
           "date": "08-12",
-          "value": 94
+          "value": 92
         },
         {
           "date": "08-13",
-          "value": 95
+          "value": 93
         }
       ],
       "role": "avos",
@@ -1399,7 +1391,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 95
+    "value": 93
   },
   "tooltip": "Cumulative operating-company IPO count by day-of-year — this year (through today) vs prior years shown full-year.",
   "unit": " deals"

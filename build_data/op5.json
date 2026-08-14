@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-12",
+  "asof": "2026-08-13",
   "cadence": "daily (T+1)",
   "id": "OP5",
   "name": "ETF net flows",
@@ -3666,6 +3666,10 @@
         {
           "date": "2026-08-12",
           "value": 218.68
+        },
+        {
+          "date": "2026-08-13",
+          "value": 223.928
         }
       ],
       "role": "avos",
@@ -3675,8 +3679,8 @@
   "source": "BBG Δshares × NAV",
   "tile": {
     "delta": null,
-    "percentile": 77.94,
-    "value": 22.6
+    "percentile": 74.79,
+    "value": 20.4
   },
   "tooltip": "Cumulative ETF net flows year-to-date, overlaid by year.",
   "unit": " $B (tile: 20d sum)"

@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-13",
+  "asof": "2026-08-14",
   "cadence": "daily",
   "id": "IS9",
   "name": "IPO issuance pace — cumulative $ (YTD vs prior years)",
@@ -1159,236 +1159,228 @@
           "value": 0.338
         },
         {
-          "date": "01-13",
-          "value": 0.348
-        },
-        {
           "date": "01-22",
-          "value": 0.56
+          "value": 0.55
         },
         {
           "date": "01-23",
-          "value": 1.308
+          "value": 1.298
         },
         {
           "date": "01-29",
-          "value": 1.942
+          "value": 1.932
         },
         {
           "date": "02-04",
-          "value": 2.198
+          "value": 2.188
         },
         {
           "date": "02-05",
-          "value": 4.522
+          "value": 4.512
         },
         {
           "date": "02-06",
-          "value": 4.87
+          "value": 4.86
         },
         {
           "date": "02-10",
-          "value": 4.895
+          "value": 4.885
         },
         {
           "date": "02-11",
-          "value": 5.648
+          "value": 5.638
         },
         {
           "date": "02-12",
-          "value": 5.848
+          "value": 5.838
         },
         {
           "date": "02-18",
-          "value": 5.973
+          "value": 5.963
         },
         {
           "date": "02-20",
-          "value": 6.009
+          "value": 5.999
         },
         {
           "date": "02-26",
-          "value": 6.259
+          "value": 6.249
         },
         {
           "date": "02-27",
-          "value": 6.659
+          "value": 6.649
         },
         {
           "date": "03-04",
-          "value": 6.859
+          "value": 6.849
         },
         {
           "date": "03-06",
-          "value": 7.419
+          "value": 7.409
         },
         {
           "date": "03-12",
-          "value": 8.299
+          "value": 8.289
         },
         {
           "date": "03-17",
-          "value": 8.314
+          "value": 8.304
         },
         {
           "date": "03-20",
-          "value": 9.154
+          "value": 9.144
         },
         {
           "date": "04-01",
-          "value": 9.364
+          "value": 9.354
         },
         {
           "date": "04-16",
-          "value": 12.731
+          "value": 12.721
         },
         {
           "date": "04-17",
-          "value": 13.867
+          "value": 13.857
         },
         {
           "date": "04-22",
-          "value": 14.147
+          "value": 14.137
         },
         {
           "date": "04-23",
-          "value": 14.267
+          "value": 14.257
         },
         {
           "date": "04-24",
-          "value": 15.285
+          "value": 15.275
         },
         {
           "date": "04-29",
-          "value": 17.311
+          "value": 17.301
         },
         {
           "date": "04-30",
-          "value": 17.671
+          "value": 17.661
         },
         {
           "date": "05-01",
-          "value": 18.235
+          "value": 18.225
         },
         {
           "date": "05-06",
-          "value": 18.298
+          "value": 18.288
         },
         {
           "date": "05-07",
-          "value": 18.714
+          "value": 18.704
         },
         {
           "date": "05-08",
-          "value": 19.143
+          "value": 19.133
         },
         {
           "date": "05-13",
-          "value": 21.512
+          "value": 21.502
         },
         {
           "date": "05-14",
-          "value": 29.132
+          "value": 29.122
         },
         {
           "date": "05-15",
-          "value": 29.147
+          "value": 29.137
         },
         {
           "date": "05-20",
-          "value": 29.643
+          "value": 29.633
         },
         {
           "date": "06-04",
-          "value": 34.46
+          "value": 34.45
         },
         {
           "date": "06-09",
-          "value": 34.693
+          "value": 34.683
         },
         {
           "date": "06-10",
-          "value": 35.963
+          "value": 35.953
         },
         {
           "date": "06-11",
-          "value": 36.105
+          "value": 36.095
         },
         {
           "date": "06-17",
-          "value": 36.355
+          "value": 36.345
         },
         {
           "date": "06-18",
-          "value": 36.864
-        },
-        {
-          "date": "06-23",
-          "value": 37.176
+          "value": 36.854
         },
         {
           "date": "06-25",
-          "value": 38.345
+          "value": 38.023
         },
         {
           "date": "06-26",
-          "value": 38.558
+          "value": 38.236
         },
         {
           "date": "07-01",
-          "value": 40.726
+          "value": 40.404
         },
         {
           "date": "07-02",
-          "value": 40.901
+          "value": 40.579
         },
         {
           "date": "07-13",
-          "value": 40.976
+          "value": 40.654
         },
         {
           "date": "07-16",
-          "value": 42.176
+          "value": 41.854
         },
         {
           "date": "07-24",
-          "value": 42.504
+          "value": 42.182
         },
         {
           "date": "07-29",
-          "value": 42.538
+          "value": 42.216
         },
         {
           "date": "07-30",
-          "value": 43.749
+          "value": 43.427
         },
         {
           "date": "07-31",
-          "value": 43.941
+          "value": 43.619
         },
         {
           "date": "08-04",
-          "value": 44.046
+          "value": 43.724
         },
         {
           "date": "08-05",
-          "value": 44.335
+          "value": 44.013
         },
         {
           "date": "08-06",
-          "value": 44.717
+          "value": 44.395
         },
         {
           "date": "08-07",
-          "value": 45.228
+          "value": 44.906
         },
         {
           "date": "08-12",
-          "value": 45.419
+          "value": 45.097
         },
         {
           "date": "08-13",
-          "value": 45.68
+          "value": 45.358
         }
       ],
       "role": "avos",
@@ -1403,7 +1395,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 45.68
+    "value": 45.358
   },
   "tooltip": "Cumulative operating-company IPO proceeds by day-of-year, in real 2026 dollars — this year (through today) vs prior years full-year.",
   "unit": " $B"

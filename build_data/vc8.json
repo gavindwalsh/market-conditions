@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-12",
+  "asof": "2026-08-13",
   "cadence": "daily",
   "id": "VC8",
   "name": "NDX implied (VXN) vs realized vol",
@@ -758,10 +758,6 @@
         {
           "date": "2025-07-31",
           "value": 19.23
-        },
-        {
-          "date": "2025-08-12",
-          "value": 16.84
         },
         {
           "date": "2025-08-13",
@@ -1766,6 +1762,10 @@
         {
           "date": "2026-08-12",
           "value": 20.97
+        },
+        {
+          "date": "2026-08-13",
+          "value": 21.23
         }
       ],
       "role": "avos",
@@ -2454,14 +2454,6 @@
         {
           "date": "2025-07-31",
           "value": 22.926
-        },
-        {
-          "date": "2025-08-12",
-          "value": 23.005
-        },
-        {
-          "date": "2025-08-13",
-          "value": 23.0
         },
         {
           "date": "2025-08-14",
@@ -3462,6 +3454,14 @@
         {
           "date": "2026-08-12",
           "value": 23.316
+        },
+        {
+          "date": "2026-08-13",
+          "value": 23.327
+        },
+        {
+          "date": "2026-08-14",
+          "value": 23.076
         }
       ],
       "role": "benchmark",
@@ -3471,8 +3471,8 @@
   "source": "BBG VXN + index closes",
   "tile": {
     "delta": null,
-    "percentile": 58.39,
-    "value": 20.97
+    "percentile": 59.51,
+    "value": 21.23
   },
   "tooltip": "VXN (30-day implied vol, skew-inclusive) vs 360-day realized (Bloomberg convention).",
   "unit": "vol pts"
