@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-13",
+  "asof": "2026-08-14",
   "cadence": "weekly",
   "id": "RF2",
   "name": "Retail participation — weekly (est. total)",
@@ -584,6 +584,10 @@
         {
           "date": "2026-07-24",
           "value": 27.452
+        },
+        {
+          "date": "2026-07-31",
+          "value": 21.659
         }
       ],
       "role": "context",
@@ -595,16 +599,12 @@
       "name": "Our estimate (extension)",
       "points": [
         {
-          "date": "2026-07-31",
-          "value": 21.721
-        },
-        {
           "date": "2026-08-07",
           "value": 21.287
         },
         {
           "date": "2026-08-14",
-          "value": 20.862
+          "value": 21.137
         }
       ],
       "role": "nowcast",
@@ -619,7 +619,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 21.3
+    "value": 21.1
   },
   "tooltip": "Retail share of tape volume — solid bars are the FINRA-anchored official trend, lighter bars our estimate covering FINRA's publication lag.",
   "unit": "%"

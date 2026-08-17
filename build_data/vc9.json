@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-13",
+  "asof": "2026-08-14",
   "cadence": "daily",
   "id": "VC9",
   "name": "SPX 10% OTM call/put IV",
@@ -758,10 +758,6 @@
         {
           "date": "2025-07-31",
           "value": 23.742
-        },
-        {
-          "date": "2025-08-13",
-          "value": 21.944
         },
         {
           "date": "2025-08-14",
@@ -1766,6 +1762,10 @@
         {
           "date": "2026-08-13",
           "value": 22.358
+        },
+        {
+          "date": "2026-08-14",
+          "value": 22.388
         }
       ],
       "role": "avos",
@@ -2522,10 +2522,6 @@
         {
           "date": "2025-07-31",
           "value": 11.419
-        },
-        {
-          "date": "2025-08-13",
-          "value": 12.46
         },
         {
           "date": "2025-08-14",
@@ -3530,6 +3526,10 @@
         {
           "date": "2026-08-13",
           "value": 13.407
+        },
+        {
+          "date": "2026-08-14",
+          "value": 12.803
         }
       ],
       "role": "context",
@@ -4218,14 +4218,6 @@
         {
           "date": "2025-07-31",
           "value": 17.582
-        },
-        {
-          "date": "2025-08-13",
-          "value": 17.683
-        },
-        {
-          "date": "2025-08-14",
-          "value": 17.664
         },
         {
           "date": "2025-08-15",
@@ -5226,6 +5218,14 @@
         {
           "date": "2026-08-13",
           "value": 17.462
+        },
+        {
+          "date": "2026-08-14",
+          "value": 17.297
+        },
+        {
+          "date": "2026-08-17",
+          "value": 17.283
         }
       ],
       "role": "benchmark",
@@ -5235,8 +5235,8 @@
   "source": "BBG moneyness IV + index closes",
   "tile": {
     "delta": null,
-    "percentile": 38.64,
-    "value": 22.36
+    "percentile": 38.87,
+    "value": 22.39
   },
   "tooltip": "Downside and upside 10% OTM wing vol vs realized — the gap between wings is the skew.",
   "unit": "vol pts"

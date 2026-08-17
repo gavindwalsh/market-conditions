@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-14",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "IS10",
   "name": "IPO issuance pace — cumulative deal count (YTD vs prior years)",
@@ -1320,67 +1320,67 @@
         },
         {
           "date": "06-25",
-          "value": 68
+          "value": 67
         },
         {
           "date": "06-26",
-          "value": 69
+          "value": 68
         },
         {
           "date": "07-01",
-          "value": 72
+          "value": 71
         },
         {
           "date": "07-02",
-          "value": 73
+          "value": 72
         },
         {
           "date": "07-13",
-          "value": 74
+          "value": 73
         },
         {
           "date": "07-16",
-          "value": 76
+          "value": 75
         },
         {
           "date": "07-24",
-          "value": 78
+          "value": 77
         },
         {
           "date": "07-29",
-          "value": 80
+          "value": 79
         },
         {
           "date": "07-30",
-          "value": 82
+          "value": 81
         },
         {
           "date": "07-31",
-          "value": 83
+          "value": 82
         },
         {
           "date": "08-04",
-          "value": 84
+          "value": 83
         },
         {
           "date": "08-05",
-          "value": 85
+          "value": 84
         },
         {
           "date": "08-06",
-          "value": 86
+          "value": 85
         },
         {
           "date": "08-07",
-          "value": 89
+          "value": 88
         },
         {
           "date": "08-12",
-          "value": 92
+          "value": 91
         },
         {
           "date": "08-13",
-          "value": 93
+          "value": 92
         }
       ],
       "role": "avos",
@@ -1391,7 +1391,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 93
+    "value": 92
   },
   "tooltip": "Cumulative operating-company IPO count by day-of-year — this year (through today) vs prior years shown full-year.",
   "unit": " deals"

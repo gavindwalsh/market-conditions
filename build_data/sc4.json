@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-13",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "SC4",
   "name": "Implied dispersion (DSPX)",
@@ -546,14 +546,6 @@
         {
           "date": "2025-07-31",
           "value": 30.93
-        },
-        {
-          "date": "2025-08-13",
-          "value": 29.73
-        },
-        {
-          "date": "2025-08-14",
-          "value": 29.63
         },
         {
           "date": "2025-08-15",
@@ -1554,6 +1546,14 @@
         {
           "date": "2026-08-13",
           "value": 34.79
+        },
+        {
+          "date": "2026-08-14",
+          "value": 33.45
+        },
+        {
+          "date": "2026-08-17",
+          "value": 34.61
         }
       ],
       "role": "avos",
@@ -1563,8 +1563,8 @@
   "source": "BBG DSPX Index",
   "tile": {
     "delta": null,
-    "percentile": 92.46,
-    "value": 34.79
+    "percentile": 92.14,
+    "value": 34.61
   },
   "tooltip": "Cboe implied dispersion — how much single names are expected to move independently of the index.",
   "unit": ""
