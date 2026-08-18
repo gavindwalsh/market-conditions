@@ -7,8 +7,11 @@ current year, on the Ritter-comparable operating-company universe (CIO
 roster; dollar figures come from Bloomberg (the saved EQS export, plus a live
 per-ticker gap-fill for roster deals the export missed — pull.ipo).
 
-Mega-deals (> $20B, e.g. SpaceX ~$75B in 2026) are held in a separate series so
-one deal doesn't flatten the rest (spec §2.6 / Part 1 §7.4).
+Mega-deals are NOT split out. Every deal sits in the one curve, so SpaceX
+(~$75B, 2026) shows as a real step — which is what build_pace's own docstring
+below and the rendered appendix both say. This paragraph used to claim mega-deals
+were "held in a separate series"; no such series has ever existed and it
+contradicted both. Corrected 2026-08-18.
 
 Day-of-year alignment maps each pricing date onto a common reference calendar
 (leap year 2000) by month-day; Feb 29 folds into Feb 28. All years are truncated
