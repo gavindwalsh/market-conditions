@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-30",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "LV3",
   "name": "Volume by DTE bucket",
@@ -550,7 +550,19 @@
         },
         {
           "date": "2026-07-31",
-          "value": 31.654
+          "value": 34.564
+        },
+        {
+          "date": "2026-08-07",
+          "value": 34.013
+        },
+        {
+          "date": "2026-08-14",
+          "value": 32.129
+        },
+        {
+          "date": "2026-08-21",
+          "value": 32.978
         }
       ],
       "role": "context",
@@ -1100,7 +1112,19 @@
         },
         {
           "date": "2026-07-31",
-          "value": 27.752
+          "value": 23.983
+        },
+        {
+          "date": "2026-08-07",
+          "value": 22.313
+        },
+        {
+          "date": "2026-08-14",
+          "value": 22.129
+        },
+        {
+          "date": "2026-08-21",
+          "value": 28.795
         }
       ],
       "role": "context",
@@ -1650,7 +1674,19 @@
         },
         {
           "date": "2026-07-31",
-          "value": 21.11
+          "value": 22.291
+        },
+        {
+          "date": "2026-08-07",
+          "value": 21.961
+        },
+        {
+          "date": "2026-08-14",
+          "value": 20.226
+        },
+        {
+          "date": "2026-08-21",
+          "value": 10.553
         }
       ],
       "role": "context",
@@ -2200,7 +2236,19 @@
         },
         {
           "date": "2026-07-31",
-          "value": 19.484
+          "value": 19.162
+        },
+        {
+          "date": "2026-08-07",
+          "value": 21.713
+        },
+        {
+          "date": "2026-08-14",
+          "value": 25.515
+        },
+        {
+          "date": "2026-08-21",
+          "value": 27.674
         }
       ],
       "role": "context",
@@ -2212,7 +2260,7 @@
   "tile": {
     "delta": null,
     "percentile": null,
-    "value": 25.3
+    "value": 33.0
   },
   "tooltip": "Composition of option volume by days-to-expiry — weekly average, stacks to 100%.",
   "unit": "% (tile: 0DTE)"

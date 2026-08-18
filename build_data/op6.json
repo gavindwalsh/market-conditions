@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-24",
+  "asof": "2026-08-14",
   "cadence": "weekly",
   "id": "OP6",
   "name": "ETF flows by category",
@@ -12,18 +12,6 @@
       "kind": "bar",
       "name": "broad ($B/wk)",
       "points": [
-        {
-          "date": "2023-08-04",
-          "value": -4.889
-        },
-        {
-          "date": "2023-08-11",
-          "value": 0.439
-        },
-        {
-          "date": "2023-08-18",
-          "value": -4.434
-        },
         {
           "date": "2023-08-25",
           "value": -0.574
@@ -635,6 +623,18 @@
         {
           "date": "2026-07-24",
           "value": 5.072
+        },
+        {
+          "date": "2026-07-31",
+          "value": -3.498
+        },
+        {
+          "date": "2026-08-07",
+          "value": 17.25
+        },
+        {
+          "date": "2026-08-14",
+          "value": 10.869
         }
       ],
       "role": "context",
@@ -646,18 +646,6 @@
       "kind": "bar",
       "name": "crypto ($B/wk)",
       "points": [
-        {
-          "date": "2023-08-04",
-          "value": -0.001
-        },
-        {
-          "date": "2023-08-11",
-          "value": 0.003
-        },
-        {
-          "date": "2023-08-18",
-          "value": -0.005
-        },
         {
           "date": "2023-08-25",
           "value": -0.015
@@ -1269,6 +1257,18 @@
         {
           "date": "2026-07-24",
           "value": -0.049
+        },
+        {
+          "date": "2026-07-31",
+          "value": 0.018
+        },
+        {
+          "date": "2026-08-07",
+          "value": 1.038
+        },
+        {
+          "date": "2026-08-14",
+          "value": -0.371
         }
       ],
       "role": "context",
@@ -1280,18 +1280,6 @@
       "kind": "bar",
       "name": "leveraged ($B/wk)",
       "points": [
-        {
-          "date": "2023-08-04",
-          "value": -0.088
-        },
-        {
-          "date": "2023-08-11",
-          "value": -0.039
-        },
-        {
-          "date": "2023-08-18",
-          "value": -0.149
-        },
         {
           "date": "2023-08-25",
           "value": 0.031
@@ -1903,6 +1891,18 @@
         {
           "date": "2026-07-24",
           "value": 0.855
+        },
+        {
+          "date": "2026-07-31",
+          "value": 2.966
+        },
+        {
+          "date": "2026-08-07",
+          "value": -0.466
+        },
+        {
+          "date": "2026-08-14",
+          "value": 0.033
         }
       ],
       "role": "context",
@@ -1914,18 +1914,6 @@
       "kind": "bar",
       "name": "options-income ($B/wk)",
       "points": [
-        {
-          "date": "2023-08-04",
-          "value": 0.2
-        },
-        {
-          "date": "2023-08-11",
-          "value": 0.131
-        },
-        {
-          "date": "2023-08-18",
-          "value": 0.17
-        },
         {
           "date": "2023-08-25",
           "value": 0.401
@@ -2537,6 +2525,18 @@
         {
           "date": "2026-07-24",
           "value": 0.471
+        },
+        {
+          "date": "2026-07-31",
+          "value": 0.741
+        },
+        {
+          "date": "2026-08-07",
+          "value": 0.234
+        },
+        {
+          "date": "2026-08-14",
+          "value": 0.3
         }
       ],
       "role": "context",
@@ -2548,18 +2548,6 @@
       "kind": "bar",
       "name": "sector ($B/wk)",
       "points": [
-        {
-          "date": "2023-08-04",
-          "value": -1.414
-        },
-        {
-          "date": "2023-08-11",
-          "value": -0.517
-        },
-        {
-          "date": "2023-08-18",
-          "value": -1.306
-        },
         {
           "date": "2023-08-25",
           "value": -0.865
@@ -3171,6 +3159,18 @@
         {
           "date": "2026-07-24",
           "value": -7.449
+        },
+        {
+          "date": "2026-07-31",
+          "value": 10.236
+        },
+        {
+          "date": "2026-08-07",
+          "value": -3.109
+        },
+        {
+          "date": "2026-08-14",
+          "value": -4.977
         }
       ],
       "role": "context",
@@ -3181,8 +3181,8 @@
   "source": "BBG Δshares × NAV",
   "tile": {
     "delta": null,
-    "percentile": 84.29,
-    "value": 0.86
+    "percentile": 59.94,
+    "value": 0.03
   },
   "tooltip": "Weekly net ETF flows stacked by category — positives up, redemptions down.",
   "unit": " $B/wk (tile: leveraged)"

@@ -1,5 +1,5 @@
 {
-  "asof": "2026-07-30",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "IS4",
   "name": "Aftermarket appetite (IPO ETF vs SPY)",
@@ -468,52 +468,8 @@
           "value": 94.969
         },
         {
-          "date": "2025-07-30",
-          "value": 94.973
-        },
-        {
           "date": "2025-07-31",
           "value": 95.082
-        },
-        {
-          "date": "2025-08-01",
-          "value": 95.978
-        },
-        {
-          "date": "2025-08-04",
-          "value": 98.302
-        },
-        {
-          "date": "2025-08-05",
-          "value": 97.43
-        },
-        {
-          "date": "2025-08-06",
-          "value": 100.796
-        },
-        {
-          "date": "2025-08-07",
-          "value": 100.88
-        },
-        {
-          "date": "2025-08-08",
-          "value": 100.633
-        },
-        {
-          "date": "2025-08-11",
-          "value": 101.161
-        },
-        {
-          "date": "2025-08-12",
-          "value": 102.878
-        },
-        {
-          "date": "2025-08-13",
-          "value": 102.284
-        },
-        {
-          "date": "2025-08-14",
-          "value": 101.08
         },
         {
           "date": "2025-08-15",
@@ -1474,6 +1430,54 @@
         {
           "date": "2026-07-30",
           "value": 91.98
+        },
+        {
+          "date": "2026-07-31",
+          "value": 89.4
+        },
+        {
+          "date": "2026-08-03",
+          "value": 91.557
+        },
+        {
+          "date": "2026-08-04",
+          "value": 94.286
+        },
+        {
+          "date": "2026-08-05",
+          "value": 92.439
+        },
+        {
+          "date": "2026-08-06",
+          "value": 91.929
+        },
+        {
+          "date": "2026-08-07",
+          "value": 93.662
+        },
+        {
+          "date": "2026-08-10",
+          "value": 93.116
+        },
+        {
+          "date": "2026-08-11",
+          "value": 93.147
+        },
+        {
+          "date": "2026-08-12",
+          "value": 95.209
+        },
+        {
+          "date": "2026-08-13",
+          "value": 95.942
+        },
+        {
+          "date": "2026-08-14",
+          "value": 95.863
+        },
+        {
+          "date": "2026-08-17",
+          "value": 95.981
         }
       ],
       "role": "avos",
@@ -1483,8 +1487,8 @@
   "source": "Massive grouped bars",
   "tile": {
     "delta": null,
-    "percentile": 10.81,
-    "value": 92.0
+    "percentile": 20.94,
+    "value": 96.0
   },
   "tooltip": "Recent-IPO basket vs SPY — rising = aftermarket appetite for new issues.",
   "unit": " (rebased)"

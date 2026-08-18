@@ -1,5 +1,5 @@
 {
-  "asof": "2026-03-31",
+  "asof": "2026-06-30",
   "cadence": "quarterly",
   "id": "MH5",
   "name": "Household credit — balances by product",
@@ -383,6 +383,10 @@
         {
           "date": "2026-03-31",
           "value": 13.191
+        },
+        {
+          "date": "2026-06-30",
+          "value": 13.117
         }
       ],
       "role": "context",
@@ -765,6 +769,10 @@
         {
           "date": "2026-03-31",
           "value": 1.685
+        },
+        {
+          "date": "2026-06-30",
+          "value": 1.713
         }
       ],
       "role": "context",
@@ -1147,6 +1155,10 @@
         {
           "date": "2026-03-31",
           "value": 1.658
+        },
+        {
+          "date": "2026-06-30",
+          "value": 1.651
         }
       ],
       "role": "context",
@@ -1528,7 +1540,11 @@
         },
         {
           "date": "2026-03-31",
-          "value": 1.252
+          "value": 1.242
+        },
+        {
+          "date": "2026-06-30",
+          "value": 1.263
         }
       ],
       "role": "context",
@@ -1911,6 +1927,10 @@
         {
           "date": "2026-03-31",
           "value": 0.562
+        },
+        {
+          "date": "2026-06-30",
+          "value": 0.568
         }
       ],
       "role": "context",
@@ -2293,6 +2313,10 @@
         {
           "date": "2026-03-31",
           "value": 0.446
+        },
+        {
+          "date": "2026-06-30",
+          "value": 0.459
         }
       ],
       "role": "context",
@@ -2303,8 +2327,8 @@
   "source": "NY Fed HHDC",
   "tile": {
     "delta": null,
-    "percentile": 99.46,
-    "value": 18.79
+    "percentile": 97.34,
+    "value": 18.77
   },
   "tooltip": "Household debt balances by product — the stack totals to the headline number.",
   "unit": " $T (tile: total)"

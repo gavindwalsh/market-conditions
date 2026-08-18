@@ -12,6 +12,8 @@ requests>=2.31        # FRED / FINRA / EDGAR REST
 truststore>=0.9       # use Windows cert store — required behind the iboss
                       # TLS-intercepting proxy (sec.gov etc.); see pull/_net.py
 openpyxl>=3.1         # NY Fed HHDC / ICI XLSX, source-map xlsx
+anthropic>=0.102      # IPO forward-pipeline research (web-search tool; pull/ipo.py)
+                      # key: gitignored repo-root .anthropic_api_key
 
 # --- Scrape-last-resort only (§3: API first) ---
 beautifulsoup4>=4.12  # Cboe / AAII / NAAIM fallback parsing when no API exists

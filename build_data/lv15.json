@@ -1,5 +1,5 @@
 {
-  "asof": "2026-06-01",
+  "asof": "2026-07-01",
   "cadence": "monthly",
   "id": "LV15",
   "name": "L4: FINRA margin debt (% of GDP)",
@@ -1426,6 +1426,10 @@
         {
           "date": "2026-06-01",
           "value": 4.625
+        },
+        {
+          "date": "2026-07-01",
+          "value": 4.364
         }
       ],
       "role": "avos",
@@ -1435,8 +1439,8 @@
   "source": "FINRA margin statistics · FRED GDP",
   "tile": {
     "delta": null,
-    "percentile": 99.86,
-    "value": 4.63
+    "percentile": 99.58,
+    "value": 4.36
   },
   "tooltip": "Debit balances in securities margin accounts as a share of nominal GDP — the stock of investor leverage, scaled to the economy.",
   "unit": " %"

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 from datetime import datetime
 
 BASE = os.environ.get("WORKSPACE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,13 +73,18 @@ def load_all_display() -> dict[str, dict]:
 
 
 # ---- run log (§2 failure handling) -----------------------------------------
+_LOG_LOCK = threading.Lock()   # run.py pulls the slow IPO lane on a worker thread
+
+
 def log_run(source: str, status: str, detail: str = "", **extra):
-    """Append one per-source status line to run_log.jsonl."""
+    """Append one per-source status line to run_log.jsonl. Thread-safe: the lock
+    keeps two concurrent pulls from interleaving a half-written line."""
     _ensure_dirs()
     rec = {"ts": datetime.now().isoformat(timespec="seconds"),
            "source": source, "status": status, "detail": detail, **extra}
-    with open(RUN_LOG, "a", encoding="utf-8") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    line = json.dumps(rec, ensure_ascii=False) + "\n"
+    with _LOG_LOCK, open(RUN_LOG, "a", encoding="utf-8") as f:
+        f.write(line)
 
 
 # ---- Layer 1: lake (lazy DuckDB) -------------------------------------------

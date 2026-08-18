@@ -16,6 +16,7 @@ at the current day-of-year so the comparison is like-for-like "through today".
 """
 from __future__ import annotations
 
+import os as _os
 from datetime import date
 
 import pandas as pd
@@ -52,22 +53,28 @@ def _historical_deals(year: int, roster: pd.DataFrame):
     return kept, calib
 
 
-def _current_year_deals():
-    """2026 priced lane. Live Bloomberg BEQS when available; else the cached
-    tracker Master tab (Status=Priced). Ritter-comparable ≈ Vehicle Type
-    'Operating Co'."""
+def _priced_rows() -> pd.DataFrame:
+    """Current-year priced deals in tracker Master schema. The live BEQS pull
+    (lake table ipo_priced, refreshed by run.pull_all) wins; the cached tracker
+    workbook is the fallback when the Terminal was unavailable."""
     from ..pull import ipo as pull_ipo
-    # NOTE: live BEQS normalization (pull_priced_bbg) shares the historical
-    # cleaner on the real Terminal run; until that's wired we read the cached
-    # tracker Master tab, which already carries priced-deal proceeds.
+    live = pull_ipo.latest_priced()
+    if live is not None and not live.empty:
+        return live.copy()
     m = pull_ipo.read_tracker_master()
-    if True:
-        p = m[m["Status"].astype(str).str.strip() == "Priced"].copy()
-        p["ipo_dt"] = pd.to_datetime(p["Key Date"], errors="coerce")
-        p["proceeds_mm"] = pd.to_numeric(p["Raise ($mm)"], errors="coerce")
-        p = p[p["ipo_dt"].notna() & p["proceeds_mm"].notna()].copy()
-        p["ritter_comparable"] = p["Vehicle Type"].astype(str).str.strip() == "Operating Co"
-        return p[["ipo_dt", "proceeds_mm", "ritter_comparable"]]
+    m.columns = [str(c).strip() for c in m.columns]
+    return m[m["Status"].astype(str).str.strip() == "Priced"].copy()
+
+
+def _current_year_deals():
+    """Current-year priced lane for the pace charts. Ritter-comparable ≈ Vehicle
+    Type 'Operating Co' (the BEQS name-pattern classification, pull.ipo)."""
+    p = _priced_rows()
+    p["ipo_dt"] = pd.to_datetime(p["Key Date"], errors="coerce")
+    p["proceeds_mm"] = pd.to_numeric(p["Raise ($mm)"], errors="coerce")
+    p = p[p["ipo_dt"].notna() & p["proceeds_mm"].notna()].copy()
+    p["ritter_comparable"] = p["Vehicle Type"].astype(str).str.strip() == "Operating Co"
+    return p[["ipo_dt", "proceeds_mm", "ritter_comparable"]]
 
 
 def _cumulative_series(deals: pd.DataFrame, cutoff_md: tuple[int, int]):
@@ -158,7 +165,9 @@ def build_pace() -> bool:
             "**How it's computed.** A Ritter-comparable operating-company universe — "
             "excluding SPACs, ADRs, REITs, closed-end funds, banks, and unit offerings, "
             "with an offer price of at least $5. Each year is anchored to the Jay Ritter "
-            "IPO roster, and proceeds are offer price × shares from Bloomberg. Prior-year "
+            "IPO roster, and proceeds are offer price × shares from Bloomberg — this "
+            "year's deals refresh live from the Terminal on every run, so the curve "
+            "picks up a new listing the day after it prices. Prior-year "
             "dollars are inflation-adjusted to 2026 (×1.95 for 2000, ×1.24 for 2021) so "
             "every curve is in real 2026 dollars, and every deal is included — mega-deals "
             "such as SpaceX (~$75B) show as real steps rather than being smoothed "
@@ -241,15 +250,61 @@ def _since_open_map() -> dict:
     return out
 
 
+def _tracker_frame() -> tuple[pd.DataFrame, dict]:
+    """Master rows, best source per lane: live BEQS for priced, the live Claude
+    web-search research for the forward pipeline, the cached tracker workbook for
+    whichever of those two didn't pull (and for anything neither lane covers).
+    Returns (frame, provenance) — provenance is stamped onto the display JSON so
+    the page can say which lane is live."""
+    from ..pull import ipo as pull_ipo
+    wb = pull_ipo.read_tracker_master()
+    wb.columns = [str(c).strip() for c in wb.columns]
+    wb_status = wb["Status"].astype(str).str.strip()
+    wb_name = _os.path.basename(pull_ipo._tracker_path() or "tracker workbook")
+    prov = {}
+
+    priced = pull_ipo.latest_priced()
+    if priced is not None and not priced.empty:
+        prov["priced"] = f"Bloomberg BEQS {pull_ipo.PRICED_SCREEN} (live)"
+    else:
+        priced = wb[wb_status == "Priced"]
+        prov["priced"] = wb_name
+
+    pipeline = pull_ipo.latest_pipeline()
+    if pipeline is not None and not pipeline.empty:
+        prov["pipeline"] = f"Claude web-search research ({pull_ipo.PIPELINE_MODEL})"
+    else:
+        pipeline = wb[wb_status.isin(["Pipeline", "Withdrawn"])]
+        prov["pipeline"] = wb_name
+
+    # cross-lane check: a name can't be both forward-looking and already priced.
+    # The research pass works from press coverage and lags the tape, so it can
+    # carry a company the Terminal already shows as priced (PayPay, 2026-07-31).
+    # The priced lane is the harder fact, so it wins.
+    from ..pull.ipo import roster_key
+    priced_keys = set(priced["Company"].map(roster_key)) - {""}
+    if priced_keys and not pipeline.empty:
+        clash = pipeline["Company"].map(roster_key).isin(priced_keys)
+        for name in pipeline.loc[clash, "Company"]:
+            store.log_run("compute:ipo", "check",
+                          f"dropped '{name}' from the pipeline board — already priced")
+        pipeline = pipeline[~clash]
+
+    other = wb[~wb_status.isin(["Priced", "Pipeline", "Withdrawn"])]
+    frame = pd.concat([priced, pipeline, other], ignore_index=True)
+    # lake bookkeeping, not a tracker field — the display layer passes unknown
+    # columns straight through (§8.2), so drop it before it reaches the page
+    frame = frame.drop(columns=["pulled_at"], errors="ignore")
+    return frame, prov
+
+
 def build_ipo_tables() -> bool:
     """Emit the IPO tracker rows (build_data/ipo_tracker.json) for the collapsible
-    tabular section — priced table + forward pipeline board. One row per company
-    from the tracker Master tab; KPIs / filtering / sorting happen client-side so a
-    new run with extra columns needs no code change (spec §8.2). Empty → null,
-    never 0; Since Offer stays a fraction; money is USD millions (§3)."""
-    from ..pull import ipo as pull_ipo
-    m = pull_ipo.read_tracker_master()
-    m.columns = [str(c).strip() for c in m.columns]
+    tabular section — priced table + forward pipeline board. One row per company;
+    KPIs / filtering / sorting happen client-side so a new run with extra columns
+    needs no code change (spec §8.2). Empty → null, never 0; Since Offer stays a
+    fraction; money is USD millions (§3)."""
+    m, prov = _tracker_frame()
 
     cols = [c for c in _TRACKER_COLS if c in m.columns]
     cols += [c for c in m.columns if c not in cols]  # schema-growth passthrough
@@ -268,11 +323,14 @@ def build_ipo_tables() -> bool:
         return str(v).strip()
 
     rows = [{c: _clean(c, r.get(c)) for c in cols} for _, r in m.iterrows()]
-    # attach derived Since Open (%) to priced rows (from the Priced_<year> tab)
+    # Since Open (%) — the BEQS pull derives it per row; the workbook's Master tab
+    # doesn't carry it, so fall back to the Priced_<year> tab's first-day-open field.
     open_map = _since_open_map()
     for row in rows:
-        row["Since Open (%)"] = (open_map.get(_ticker_root(row.get("Ticker")))
-                                 if row.get("Status") == "Priced" else None)
+        if row.get("Status") != "Priced":
+            row["Since Open (%)"] = None
+        elif row.get("Since Open (%)") is None:
+            row["Since Open (%)"] = open_map.get(_ticker_root(row.get("Ticker")))
     if "Since Open (%)" not in cols:  # derived col — keep the manifest accurate
         i = cols.index("Since Offer (%)") + 1 if "Since Offer (%)" in cols else len(cols)
         cols.insert(i, "Since Open (%)")
@@ -284,8 +342,11 @@ def build_ipo_tables() -> bool:
         "columns": cols, "rows": rows,
         "stage_order": ["Terms set", "Public S-1", "Confidential filing",
                         "Stated intent", "Rumored", "Withdrawn"],
-        "source": pull_ipo._tracker_path() and __import__("os").path.basename(pull_ipo._tracker_path()),
+        "source": f"priced: {prov['priced']} · pipeline: {prov['pipeline']}",
+        "provenance_by_lane": prov,
     })
+    store.log_run("compute:ipo", "detail",
+                  f"tracker priced={prov['priced']} pipeline={prov['pipeline']}")
     return True
 
 
