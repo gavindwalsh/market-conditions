@@ -125,15 +125,15 @@ def grouped_lane(name: str):
 
 # ---- progress accounting -------------------------------------------------------
 def tape_missing() -> list[str]:
-    """Days in [TAPE_START, yesterday] absent from the lake or stored without
-    quote signing — mirrors backfill_tape's quotes-lane 'have' rule."""
+    """Days in [TAPE_START, yesterday] that still need work. Delegates to
+    massive._have_days so this and backfill_tape cannot drift apart — they used
+    to carry independent copies of the rule, and a methodology change made both
+    report 'nothing to do' while the lanes silently recomputed nothing."""
     import pandas as pd
-    from src.pull.massive import RETAIL_TABLE, _day_signing
+    from src.pull.massive import RETAIL_TABLE, _have_days
     tdir = os.path.join(LAKE, RETAIL_TABLE)
     os.makedirs(tdir, exist_ok=True)
-    have = {f.split(".")[0] for f in os.listdir(tdir)
-            if f.endswith(".parquet")
-            and _day_signing(os.path.join(tdir, f)) != "none"}
+    have = _have_days(tdir, quotes=True)
     return [d for d in pd.bdate_range(TAPE_START, _yesterday()).strftime("%Y-%m-%d")
             if d not in have]
 

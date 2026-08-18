@@ -102,7 +102,13 @@ def pull_all():
             while d.weekday() >= 5:  # Sat/Sun → step back to Friday
                 d -= timedelta(days=1)
             bday = d.isoformat()
-        if not _os.path.exists(_os.path.join(store.LAKE_DIR, massive.RETAIL_TABLE, f"{bday}.parquet")):
+        # Version-aware since 2026-08: a day stored under an older classifier
+        # methodology is NOT done. File-existence alone would leave the newest
+        # day frozen on the old method after a change, which is precisely the
+        # mixed-methodology state the version guard exists to prevent.
+        _tdir = _os.path.join(store.LAKE_DIR, massive.RETAIL_TABLE)
+        _done = _os.path.isdir(_tdir) and bday in massive._have_days(_tdir)
+        if not _done:
             _safe("massive:tape", massive.process_tape_day, bday)
         else:
             store.log_run("massive:tape", "skip", f"{bday} already in lake")

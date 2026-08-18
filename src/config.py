@@ -64,7 +64,7 @@ UNIVERSES = {
 # factor empirically vs Nasdaq RTAT; revisit monthly with the §7.2 re-check.
 RETAIL_SCALE_FACTOR = 3.0
 
-# ---- retail per-print size cap (added 2026-07-31, CIO) -----------------------
+# ---- retail identification filters (added 2026-08, CIO) ----------------------
 # Per-print notional ceiling for retail IDENTIFICATION in the §5.1 classifier.
 # BJZZ imposes NO size filter; it assumes institutions are a small share of
 # off-exchange subpenny prints, and Battalio-Jennings-Saglam-Wu show that
@@ -76,7 +76,34 @@ RETAIL_SCALE_FACTOR = 3.0
 # KEPT in the universe — retail genuinely trades them — so the separation has
 # to happen per print, which is the only level where the two populations are
 # still distinguishable. Applies to retail_* columns only; tape_* stay whole.
-RETAIL_MAX_PRINT_USD = 50_000.0
+#
+# $200k, not the $50k first tried: RF1 is insensitive to the threshold (every
+# cap from $25k to $5M lands 2026-07-30 within ±$1B — the contamination sits in
+# prints above $1M), but the GROSS metrics are not. $200k retains ~60% of
+# identified dollars vs ~40% at $50k, and matches the SEC's own natural-person
+# line — the Order Competition Rule excepts segmented orders at/above $200k,
+# and amended Rule 605 tops its notional buckets out there. A print cap should
+# sit at or below the order-level threshold since orders split across prints.
+RETAIL_MAX_PRINT_USD = 200_000.0
+
+# Sale conditions removed from identification: prices NOT set by supply and
+# demand at that moment, so institutional by construction — and their computed
+# prices land on subpennies constantly, which is exactly what the classifier
+# keys on. A size cap only catches these when they are large; an average-price
+# print of $30k sails through. Filtering the mechanism is more surgical than
+# using size as a proxy for it. Massive/Polygon unified stock condition ids.
+#   2  Average Price Trade      10  Derivatively Priced
+#   21 Price Variation Trade    52  Contingent Trade   53 Qualified Contingent
+# Deliberately NOT excluded: 37 (odd lot — strongly retail) and 14 (intermarket
+# sweep — an ordinary marketable order type).
+RETAIL_EXCLUDE_CONDITIONS = {2, 10, 21, 52, 53}
+
+# Stamped into every stored day so a methodology change forces a reprocess and
+# a mixed-methodology lake can never render. BUMP THIS whenever the classifier's
+# output would change for the same input tape.
+#   1 = pre-2026-08 (no size cap, no condition filter, half-penny regime dead)
+#   2 = size cap + condition filter + detected half-penny regime + diagnostics
+RETAIL_METHOD_VERSION = 2
 
 # ---- curated ETF universe (OP5/OP6/OP7, LV6, LV13) ---------------------------
 # ticker → (category, leverage). §A3 honesty: this is a curated top-of-complex

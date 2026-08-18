@@ -196,6 +196,60 @@ def _day_signing(path: str) -> str:
 
 # ---- RF1 daily tape processor -------------------------------------------------
 RETAIL_TABLE = "massive_retail_daily"   # per-symbol-per-day classifier aggregates
+# Long-format per-symbol cut of the identified-ELIGIBLE set by notional / sale
+# condition / quoted spread, BEFORE the size and condition filters. This is what
+# makes a future threshold change arithmetic on the lake instead of another
+# ~2TB tape pull: any cap or condition list is recoverable by summing buckets.
+RETAIL_BUCKETS_TABLE = "massive_retail_buckets"
+
+
+def _day_method_version(path: str) -> int:
+    """Classifier methodology version stamped into a stored day.
+    0 = written before the stamp existed, i.e. pre-2026-08 methodology."""
+    try:
+        return int(pd.read_parquet(path, columns=["method_version"])
+                   ["method_version"].iloc[0])
+    except Exception:  # noqa: BLE001 — column absent on older days / holidays
+        return 0
+
+
+def _is_holiday_marker(path: str) -> bool:
+    """Holiday days are a one-row {date, ticker:_HOLIDAY_} frame with no other
+    columns — they must stay 'done' forever or every reprocess re-asks S3 for a
+    file that does not exist."""
+    try:
+        t = pd.read_parquet(path, columns=["ticker"])["ticker"]
+        return bool(len(t)) and bool((t == "_HOLIDAY_").all())
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _have_days(tdir: str, quotes: bool = True) -> set[str]:
+    """Days needing no work. ONE definition, shared by backfill_tape and the EC2
+    lane runner — they previously carried independent copies of this rule and
+    could disagree about what was complete.
+
+    Done = holiday marker, OR (current method_version AND, in quotes mode,
+    midpoint-signed). Days predating the stamp report version 0 and are always
+    reprocessed. That is the whole point: the pre-2026-08 rule treated any
+    signed day as complete, so a methodology change made the lanes no-op while
+    logging success — a box that ran, synced, and recomputed nothing.
+    """
+    from .. import config as _cfg
+    have: set[str] = set()
+    for f in os.listdir(tdir):
+        if not f.endswith(".parquet"):
+            continue
+        p, d = os.path.join(tdir, f), f.split(".")[0]
+        if _is_holiday_marker(p):
+            have.add(d)
+            continue
+        if _day_method_version(p) != _cfg.RETAIL_METHOD_VERSION:
+            continue
+        if quotes and _day_signing(p) == "none":
+            continue
+        have.add(d)
+    return have
 
 
 def process_tape_day(day: str, keep_files: bool = False,
@@ -237,12 +291,30 @@ def process_tape_day(day: str, keep_files: bool = False,
             else:
                 raise
         from .. import config as _cfg
-        agg = classify_day(trades_f, quotes_f,
-                           max_print_usd=_cfg.RETAIL_MAX_PRINT_USD)
+        # regular-session bounds for the open/close 30-minute buckets. SIP
+        # timestamps are epoch ns; the ET->UTC offset moves with DST, so derive
+        # it from the trade date rather than hardcoding an offset.
+        _open = pd.Timestamp(f"{day} 09:30:00", tz="America/New_York")
+        _close = pd.Timestamp(f"{day} 16:00:00", tz="America/New_York")
+        agg, buckets = classify_day(
+            trades_f, quotes_f,
+            max_print_usd=_cfg.RETAIL_MAX_PRINT_USD,
+            exclude_conditions=_cfg.RETAIL_EXCLUDE_CONDITIONS,
+            session_open_ns=int(_open.value), session_close_ns=int(_close.value),
+            with_buckets=True)
         agg.insert(0, "date", day)
+        # self-describing: the have-rule reads method_version to decide whether a
+        # stored day predates the current methodology (see _day_method_version).
+        agg["method_version"] = _cfg.RETAIL_METHOD_VERSION
+        agg["max_print_usd"] = float(_cfg.RETAIL_MAX_PRINT_USD)
         tdir = os.path.join(store.LAKE_DIR, RETAIL_TABLE)
         os.makedirs(tdir, exist_ok=True)
         agg.to_parquet(os.path.join(tdir, f"{day}.parquet"), index=False)
+        if buckets is not None and not buckets.empty:
+            buckets.insert(0, "date", day)
+            bdir = os.path.join(store.LAKE_DIR, RETAIL_BUCKETS_TABLE)
+            os.makedirs(bdir, exist_ok=True)
+            buckets.to_parquet(os.path.join(bdir, f"{day}.parquet"), index=False)
         return agg
     finally:
         if not keep_files:
@@ -275,14 +347,8 @@ def backfill_tape(start: str, max_days: int = 5, end: str | None = None,
                     pass
     # quotes lane treats trades-only days as MISSING (re-does them, upgrading
     # to midpoint signing); trades-only lane treats any stored day as done.
-    have = set()
-    for f in os.listdir(tdir):
-        if not f.endswith(".parquet"):
-            continue
-        d = f.split(".")[0]
-        if quotes and _day_signing(os.path.join(tdir, f)) == "none":
-            continue
-        have.add(d)
+    # Version-aware since 2026-08 — see _have_days.
+    have = _have_days(tdir, quotes=quotes)
     end_d = date.fromisoformat(end) if end else date.today() - timedelta(days=1)
     days = [d for d in pd.bdate_range(date.fromisoformat(start), end_d)
             .strftime("%Y-%m-%d") if d not in have]

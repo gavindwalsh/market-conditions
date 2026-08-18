@@ -260,7 +260,15 @@ def cmd_launch(args):
     ami = aws_json("ssm", "get-parameters", "--names", AMI_SSM)["Parameters"][0]["Value"]
     ensure_launch_template(ami, sg_id, userdata_b64(bucket))
     upload_bootstrap(bucket)
-    seed_lake(bucket)
+    if args.no_seed:
+        # REPROCESS mode. seed_lake pushes the LOCAL lake up to S3; on a
+        # methodology change the local copy is the OLD schema, so seeding would
+        # shove stale days over ones the box has already recomputed (aws s3 sync
+        # copies whenever sizes differ, regardless of which side is newer).
+        # Harmless when gap-filling, wrong when reprocessing.
+        print("  --no-seed: skipping lake seed (reprocess mode)")
+    else:
+        seed_lake(bucket)
 
     spot = not args.on_demand
     iid, err = _run_instances(spot)
@@ -315,8 +323,12 @@ def cmd_status(args):
 def cmd_pull(args):
     lake = local_lake()
     print(f"merging s3 lake into {lake} (add/update only — never deletes)")
+    # --exact-timestamps: plain `sync` skips a remote file when the LOCAL copy
+    # is newer, which on a reprocess is exactly the case (the old day was
+    # written locally after the box wrote the new one). Without this the
+    # reprocessed days never land and everything looks fine.
     sh(["aws", "s3", "sync", f"s3://{bucket_name()}/lake/", lake,
-        "--only-show-errors", "--region", REGION])
+        "--exact-timestamps", "--only-show-errors", "--region", REGION])
     print("done. now (from the main checkout):  python refresh_backfill.py")
 
 
@@ -349,6 +361,9 @@ def main():
     ap.add_argument("--on-demand", action="store_true",
                     help="launch on-demand instead of Spot")
     ap.add_argument("--yes", action="store_true", help="skip confirm prompts")
+    ap.add_argument("--no-seed", action="store_true",
+                    help="launch: skip seeding the local lake to S3 — REQUIRED "
+                         "for a methodology reprocess, see cmd_launch")
     args = ap.parse_args()
     {"launch": cmd_launch, "status": cmd_status,
      "pull": cmd_pull, "terminate": cmd_terminate}[args.cmd](args)
