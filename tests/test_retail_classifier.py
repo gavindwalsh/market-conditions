@@ -8,6 +8,7 @@ import tempfile
 import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from src import config  # noqa: E402
 from src.compute.retail import classify_day  # noqa: E402
 
 NS = 1_000_000_000  # 1s in ns
@@ -178,24 +179,46 @@ def test_condition_filter_excludes_non_market_prices():
         # same signature, AVERAGE PRICE TRADE (2) — small, so the cap misses it
         dict(ticker="CND", sip_timestamp=3 * NS, price=10.0180, size=100, exchange=4,
              conditions="12,2"),
-        # DERIVATIVELY PRICED (10)
+        # QUALIFIED CONTINGENT (53)
         dict(ticker="CND", sip_timestamp=4 * NS, price=10.0180, size=100, exchange=4,
-             conditions="10"),
+             conditions="53"),
         # ODD LOT (37) must NOT be excluded — odd lots are strongly retail
         dict(ticker="CND", sip_timestamp=5 * NS, price=10.0180, size=5, exchange=4,
              conditions="37,12"),
+        # DERIVATIVELY PRICED (10) must NOT be excluded — see the regression
+        # guard below for why it was removed from the set
+        dict(ticker="CND", sip_timestamp=6 * NS, price=10.0180, size=100, exchange=4,
+             conditions="10"),
     ]
     d = tempfile.mkdtemp()
     t = _write(pd.DataFrame(trades), os.path.join(d, "t.parquet"))
     q = _write(pd.DataFrame(quotes), os.path.join(d, "q.parquet"))
-    r = classify_day(t, q, exclude_conditions={2, 10, 21, 52, 53}).set_index("ticker").loc["CND"]
-    assert r["retail_ident_trades"] == 2, r["retail_ident_trades"]   # clean + odd lot
-    assert r["excl_cond_trades"] == 2                                # avg-price + derivative
+    # the REAL production set, so this test fails if the set ever drifts
+    r = classify_day(t, q, exclude_conditions=config.RETAIL_EXCLUDE_CONDITIONS
+                     ).set_index("ticker").loc["CND"]
+    assert r["retail_ident_trades"] == 3, r["retail_ident_trades"]   # clean + odd lot + deriv
+    assert r["excl_cond_trades"] == 2                                # avg-price + QCT
     # no cap passed, so nothing excluded for size
     assert r["excl_size_trades"] == 0
-    # and the tape still sees all four
-    assert r["tape_trades"] == 4
+    # and the tape still sees all five
+    assert r["tape_trades"] == 5
     print("PASS sale-condition filter (odd lots kept, computed prices dropped)")
+
+
+def test_derivatively_priced_is_not_excluded():
+    """Regression guard for the 2026-08-18 correction.
+
+    Condition 10 was briefly in the exclusion set. On real tape it fired on
+    3,140,052 prints — 17.4% of the eligible set — averaging $1,391, SMALLER
+    than the $4,128 standard print. It was stripping the most retail-looking
+    flow on the tape, the opposite of what a size-driven filter is for, and
+    moved 2026-07-30 breadth ten points on its own. If it reappears, so has
+    the regression."""
+    assert 10 not in config.RETAIL_EXCLUDE_CONDITIONS, (
+        "condition 10 (Derivatively Priced) excludes retail-SIZED prints — see "
+        "config.RETAIL_EXCLUDE_CONDITIONS for the measured evidence")
+    assert config.RETAIL_EXCLUDE_CONDITIONS == {2, 21, 52, 53}
+    print("PASS condition 10 stays IN the retail set")
 
 
 def test_half_penny_regime_detected_from_quotes():
@@ -262,6 +285,7 @@ if __name__ == "__main__":
     test_trades_only_mode()
     test_size_cap_identification_only()
     test_condition_filter_excludes_non_market_prices()
+    test_derivatively_priced_is_not_excluded()
     test_half_penny_regime_detected_from_quotes()
     test_buckets_reconcile_to_eligible_set()
     print("\nAll retail-classifier tests passed.")

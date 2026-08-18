@@ -94,18 +94,40 @@ RETAIL_MAX_PRINT_USD = 200_000.0
 # keys on. A size cap only catches these when they are large; an average-price
 # print of $30k sails through. Filtering the mechanism is more surgical than
 # using size as a proxy for it. Massive/Polygon unified stock condition ids.
-#   2  Average Price Trade      10  Derivatively Priced
-#   21 Price Variation Trade    52  Contingent Trade   53 Qualified Contingent
+#   2  Average Price Trade    21 Price Variation Trade
+#   52 Contingent Trade       53 Qualified Contingent Trade
+#
+# Every member is justified by its MEASURED print-size profile (2026-08-17, from
+# massive_retail_buckets), because the point of these filters is removing flow
+# too LARGE to be retail:
+#     standard        14,032,885 prints     $4,128  <- the retail baseline
+#     avg_price          901,619 prints    $15,461  excluded
+#     contingent_qct       4,470 prints   $559,284  excluded
+#     contingent           1,853 prints $1,883,432  excluded
+#     price_variation          0 prints        n/a  excluded (never matches)
+#
+# 10 (Derivatively Priced) was in this set and was REMOVED 2026-08-18. It fired
+# on 3,140,052 prints — 17.4% of the eligible tape — averaging $1,391, i.e.
+# SMALLER than the $4,128 standard print. It was stripping the smallest, most
+# retail-looking flow on the tape, the exact opposite of the filter's purpose,
+# and moved 2026-07-30 breadth ten points (43.1% -> 53.3%) on its own.
+# Caveat kept deliberately visible: small size does not PROVE retail (algos
+# slice small too), and the "a computed price makes the subpenny an artifact"
+# argument would still apply at $1,391. This is the conservative call — exclude
+# only where the institutional character is unambiguous AND the size profile
+# agrees. Revisit if condition 10's meaning on this feed is ever pinned down.
+#
 # Deliberately NOT excluded: 37 (odd lot — strongly retail) and 14 (intermarket
 # sweep — an ordinary marketable order type).
-RETAIL_EXCLUDE_CONDITIONS = {2, 10, 21, 52, 53}
+RETAIL_EXCLUDE_CONDITIONS = {2, 21, 52, 53}
 
 # Stamped into every stored day so a methodology change forces a reprocess and
 # a mixed-methodology lake can never render. BUMP THIS whenever the classifier's
 # output would change for the same input tape.
 #   1 = pre-2026-08 (no size cap, no condition filter, half-penny regime dead)
 #   2 = size cap + condition filter + detected half-penny regime + diagnostics
-RETAIL_METHOD_VERSION = 2
+#   3 = condition 10 (Derivatively Priced) dropped from the exclusion set
+RETAIL_METHOD_VERSION = 3
 
 # ---- RF1 breadth (replaced the dollar net-flow series 2026-08, CIO) ---------
 # Minimum identified retail dollars in a name on a day for it to count toward

@@ -94,7 +94,8 @@ institutional blocks being identified as retail: the §5.1 classifier had no
 trade-size filter, so SPY and QQQ carried scaled net flow at 64% and 58% of
 their own consolidated volume. Chronic, not one day — index ETFs flipped RF1's
 sign on 50 of 143 days. Changes: $200k per-print cap; sale-condition filter
-(average-price, derivatively-priced, price-variation, contingent); half-penny
+(average-price, price-variation, contingent — derivatively-priced was tried and
+removed, it excluded retail-SIZED prints); half-penny
 tick regime finally wired (specified since Nov 2025, never passed, so the whole
 series was scored on the penny grid); `massive_retail_buckets` stores the
 pre-filter cut so future thresholds need no re-pull; `method_version` stamping
