@@ -59,7 +59,8 @@ deploy.py, infra/      S3 + CloudFront push to lens.avos.co/<slug>
 
 ## Phases (§8)
 1. **Bloomberg + free** — SC/OP/VC/MH/IS + LV(1,6,7,8,11,13,14,15). Ship + deploy.
-2. **+ Massive stocks** — retail flows RF1–6, OP8, MH9, SC5. Gate: RF9 ≥ 0.6.
+2. **+ Massive stocks** — retail flows RF1–6 + RF10, OP8, MH9, SC5.
+   Gate: retail capture factor fitted against FINRA, not assumed.
 3. **+ Massive options/OPRA** — vol engine (§5.10), LV2–5/9/10/12, RF7–8.
 
 Set the active phase in `src/config.py` (`PHASE = 1`).
@@ -85,7 +86,28 @@ OPRA daily file is small (~80MB gz, ~1 min process). Tape backfill to
 2026-05-08 running. Blockers list: see the session summary / run_log —
 AAII (403 members-only), ICI weekly link-mining (OP4), RF6 pagination,
 LV9 sanity-gated (non-synchronous closes), IS1/3/5/6 (no DAPI path; EDGAR
-424B4 route sketched), LV14 seed rates UNVERIFIED, Nasdaq key for RF9.
+424B4 route sketched), LV14 seed rates UNVERIFIED.
+
+**2026-08: retail classifier v2 — contamination fix + RF1 redefined.**
+A −$65.5B RF1 print on 2026-07-30 (the Situational Awareness unwind) traced to
+institutional blocks being identified as retail: the §5.1 classifier had no
+trade-size filter, so SPY and QQQ carried scaled net flow at 64% and 58% of
+their own consolidated volume. Chronic, not one day — index ETFs flipped RF1's
+sign on 50 of 143 days. Changes: $200k per-print cap; sale-condition filter
+(average-price, derivatively-priced, price-variation, contingent); half-penny
+tick regime finally wired (specified since Nov 2025, never passed, so the whole
+series was scored on the penny grid); `massive_retail_buckets` stores the
+pre-filter cut so future thresholds need no re-pull; `method_version` stamping
+with a guard that withholds the panel while the lake mixes methodologies.
+**RF1 is now a breadth index** (share of ≥$10M names retail net bought) — the
+dollar sum destroyed 86–99% of the signal through cross-name cancellation and
+the residual was smaller than the contamination. RF4 rebuilt on breadth (the
+dollar version was biased toward reading retail as panic sellers, since
+institutional de-risking clusters on down days). RF2/RF10 anchor on retail
+wholesalers only (was every reporting firm, ~29% of which is not retail), and
+the ×3 capture factor is now fitted against FINRA reported volume. RF9 retired
+— it was to calibrate against Nasdaq RTAT, which is BJZZ-derived and so likely
+carries the same contamination.
 
 **2026-07-10: 27-item CIO chart review implemented.** See the §4 amendment
 block in DASHBOARD-SPEC.md for the full change list. Highlights: SC1-3/VC4/

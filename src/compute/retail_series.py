@@ -49,6 +49,10 @@ CEILING_FRAC = 0.50
 # tape for the ratio to mean anything.
 CEILING_MIN_TAPE_USD = 100_000_000.0
 
+# RF4's primary regression window, in trading days. Single source of truth —
+# refresh_backfill.py prints the unlock countdown from this.
+RF4_WINDOW = 63
+
 
 def _ceiling_breaches(df: pd.DataFrame, scale: float) -> pd.DataFrame:
     """Symbol-days whose scaled net retail flow exceeds CEILING_FRAC of that
@@ -540,7 +544,7 @@ def _build_rf4(bdf: pd.DataFrame) -> bool:
     as panic sellers on exactly the days the metric exists to describe. Breadth
     is near-immune (contamination in one name moves it by ~1/N)."""
     spx = store.read_latest("bbg_spx")
-    if spx is None or len(bdf) < 63:
+    if spx is None or len(bdf) < RF4_WINDOW:
         return False
     spx = spx.copy()
     spx["date"] = pd.to_datetime(spx["date"])
@@ -548,10 +552,10 @@ def _build_rf4(bdf: pd.DataFrame) -> bool:
     spx["ret"] = spx["value"].pct_change() * 100.0
     m = (bdf[["date", "value"]].merge(spx[["date", "ret"]], on="date", how="inner")
                .sort_values("date").dropna(subset=["ret"]))
-    if len(m) < 63:
+    if len(m) < RF4_WINDOW:
         return False
     ret, net_b = m["ret"].to_numpy(float), m["value"].to_numpy(float)
-    m["b63"] = _roll_dipbuy_beta(ret, net_b, 63)
+    m["b63"] = _roll_dipbuy_beta(ret, net_b, RF4_WINDOW)
     m["b21"] = _roll_dipbuy_beta(ret, net_b, 21)
     d63 = m[["date", "b63"]].rename(columns={"b63": "value"}).dropna()
     d21 = m[["date", "b21"]].rename(columns={"b21": "value"}).dropna()

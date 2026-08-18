@@ -52,16 +52,18 @@ UNIVERSES = {
     "lev_etf_complex": "US leveraged ETFs (leverage=Y)",  # OP7, LV6, LV13
 }
 
-# ---- retail scale factor (decided 2026-07-09, CIO) ---------------------------
-# The §5.1 classifier identifies ~1/3 of retail activity (BHJOS capture rate;
+# ---- retail capture factor — FALLBACK ONLY since 2026-08 ---------------------
+# FALLBACK capture factor. The §5.1 classifier identifies a fraction of retail
+# activity (BHJOS capture rate;
 # confirmed empirically: our 6.6% identified participation vs ~20% consensus
 # total). DOLLAR-DENOMINATED stock-tape retail metrics (RF1 net flow, RF2
 # participation) are scaled by this factor to ESTIMATED TOTALS, labeled as such
 # in every tooltip. NOT applied to options small-lot metrics (RF7/RF8 — that
 # proxy already reconciles to market totals vs Citadel ch.11) nor to ratios
-# (RF3/RF5, scale-invariant) nor RF4 (a regression slope shown on the identified
-# floor, not ×3-scaled — its shape is scale-invariant). Provisional until RF9 fits the
-# factor empirically vs Nasdaq RTAT; revisit monthly with the §7.2 re-check.
+# (RF3, scale-invariant), nor RF1 (a COUNT since 2026-08 — see
+# RETAIL_BREADTH_MIN_USD), nor RF4 (a regression slope on breadth).
+# This value is now only the FALLBACK: _fit_capture measures the factor
+# against FINRA reported wholesaler volume whenever enough weeks overlap.
 RETAIL_SCALE_FACTOR = 3.0
 
 # ---- retail identification filters (added 2026-08, CIO) ----------------------
@@ -263,9 +265,10 @@ _REGISTRY_ROWS = [
     _m("OP7", "flows", "Leveraged ETF AUM", "BBG", "daily", 1, "2018→"),
     # Panel 3 — Retail Flows
     # RF1D/RF2D dropped 2026-07-10 per CIO — RF1/RF2 are now the daily views.
-    _m("RF1", "retail", "Retail net flow — daily (est. total)", "Massive", "daily", 2, "2016→", "5.1"),
-    # RF10 sits 2nd in the panel (dollar-level companion to RF1's net view);
-    # id is internal — cards render by registry order, not id number.
+    _m("RF1", "retail", "Retail breadth — daily", "Massive", "daily", 2, "2016→", "5.1"),
+    # RF10 sits 2nd in the panel (the dollar answer to RF1's directional one —
+    # breadth says which way, RF10 says how much); id is internal, cards render
+    # by registry order, not id number.
     _m("RF10", "retail", "Retail dollar volume — weekly (est. total)", "Massive+FINRA", "weekly", 2, "2023→", "5.1"),
     _m("RF2", "retail", "Retail participation (FINRA-anchored)", "Massive+FINRA", "weekly", 2, "2016→", "5.1"),
     _m("RF3", "retail", "Retail concentration", "Massive", "daily", 2, "2016→", "5.1"),
@@ -277,7 +280,11 @@ _REGISTRY_ROWS = [
     # LV3 moved Leverage->Retail 2026-07-10 (retail 0DTE/short-dated options mix);
     # LV2 (0DTE share whole-market) dropped same day — redundant given LV3's 0DTE bucket.
     _m("LV3", "retail", "Volume by DTE bucket", "Massive OPRA", "daily", 3, "at feed"),
-    _m("RF9", "retail", "Validation series (vs RTAT10)", "Nasdaq", "daily", 2, "rolling"),
+    # RF9 (validation vs Nasdaq RTAT10) RETIRED 2026-08. It existed to calibrate
+    # the retail capture factor, but RTAT is itself BJZZ-derived and so likely
+    # carries the same institutional contamination we removed — calibrating to
+    # it would re-import the error. The factor is now fitted against FINRA's
+    # REPORTED wholesaler volume instead (compute/retail_series._fit_capture).
     # Panel 4 — Leverage & Its Price — card order set by CIO 2026-07-24:
     # LV15, LV13, LV6, LV8. LV9 + the LVT snapshot table removed (not helpful);
     # LV16 (short interest aggregate) removed 2026-07-27, same reason.

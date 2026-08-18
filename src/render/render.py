@@ -82,6 +82,20 @@ CHART_BOOT = """
               itemStyle:{color:color,opacity:s.role==='nowcast'?0.55:1},
               data:(s.points||[]).map(function(p){return [p.date,p.value];})};
     });
+    /* optional horizontal reference line (m.ref_line), drawn on the FIRST series
+       only so it appears once. Used by breadth-style oscillators where a fixed
+       level is the whole point of the chart — the 50 line on RF1 separates
+       "retail bought in more names than it sold" from the reverse, and the
+       series is unreadable without it.
+       NOTE: this whole string is %%-formatted at the bottom, so any literal
+       percent sign in here must be written doubled. */
+    if(m.ref_line!==undefined && m.ref_line!==null && series.length){
+      series[0].markLine={silent:true,symbol:'none',
+        label:{show:true,position:'insideEndTop',formatter:String(m.ref_line),
+               fontSize:9,color:'#8A8A8A'},
+        lineStyle:{color:'#8A8A8A',type:'dashed',width:1},
+        data:[{yAxis:m.ref_line}]};
+    }
     /* legend so multi-series charts are readable without the tooltip */
     var legend = m.series.length>1 ? {top:0,left:2,itemWidth:12,itemHeight:7,
         itemGap:8,textStyle:{fontSize:10,color:'#5A5A5A'},icon:'roundRect',

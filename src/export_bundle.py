@@ -103,11 +103,15 @@ Metrics: {manifest['metric_count']} across {manifest['panel_count']} panels · p
 - `tile.value` is the latest reading; `tile.percentile` is its rank within its
   OWN trailing history (0–100), or `null` when history is too short to rank —
   in that case report the level, not a percentile.
-- `status.level` matters. `provisional`, `uncalibrated`, and `classifier floor`
-  mean the metric is not production-grade — weight it accordingly and say so.
-- Dollar-denominated retail metrics may be ×3-scaled to an ESTIMATED TOTAL
-  (see each metric's `notes`); ratios/slopes are shown unscaled. Don't compare
-  a scaled level against an unscaled one.
+- `status.level` matters. `provisional` and `uncalibrated` mean the metric is
+  not production-grade — weight it accordingly and say so. `suspect` is
+  stronger: a data-quality alarm fired for the latest reading and it should
+  not be quoted at all.
+- Dollar-denominated retail metrics are scaled to an ESTIMATED TOTAL by a
+  capture factor (see each metric's `notes`); ratios, counts and slopes are
+  shown unscaled. Don't compare a scaled level against an unscaled one. The
+  factor is fitted against FINRA's reported wholesaler volume where enough
+  overlapping weeks exist, and assumed otherwise — the badge says which.
 - `asof` varies by `cadence` (daily / weekly / quarterly) — check per metric
   before saying "today".
 

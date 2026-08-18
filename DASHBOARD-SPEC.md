@@ -110,8 +110,8 @@ Field mnemonics/series IDs marked **[verified]** were tested live in the 2026-07
 > - **New:** LVT — snapshot table for no-history leverage reads (LV5 GEX, LV7
 >   box, LV10 wings, LV14 broker rates); each returns to a chart as history
 >   accrues. LV16 gained real history via a SHORT_INT bdh backfill (2023-11→).
-> - **Chart forms:** RF1 daily bars; RF3 bars ($B) + share lines dual-axis;
->   RF5/OP8 bars; MH9 bars+line dual-axis; LV3/OP6/MH5 stacked bars; LV6
+> - **Chart forms:** RF1 daily line, 0-100% with a 50% reference line;
+>   RF3 bars ($B) + share lines dual-axis; MH9 bars+line dual-axis; LV3/OP6/MH5 stacked bars; LV6
 >   signed daily bars; IS2 monthly bars; IS7 weekly bars (insurance filers
 >   excluded from the count).
 > - **Fixes:** realized-vol legs → BBG convention (360 trading days, log
@@ -166,15 +166,14 @@ The §3 principle reassigns the heavy per-name pulls off Bloomberg. Reassigned m
 
 | ID | Metric | Construction | Source | Cadence | Phase | Hist |
 |---|---|---|---|---|---|---|
-| RF1 | Retail net flow ($, shares) | subpenny identification + **quote-midpoint signing** (§5.1) | Massive trades + NBBO | daily | 2 | 2016→ backfill |
-| RF2 | Retail participation | identified retail volume / total tape volume | RF1 pipeline | daily | 2 | 2016→ |
+| RF1 | Retail breadth | share of names with ≥$10M identified retail where retail was a net buyer (§5.1) | Massive trades + NBBO | daily | 2 | 2016→ backfill |
+| RF2 | Retail participation | identified retail $ / total tape $, ×capture factor, anchored to FINRA retail-wholesaler volume | RF1 pipeline + FINRA | weekly | 2 | 2016→ |
+| RF10 | Retail dollar volume | identified retail $ ×capture factor, spliced onto FINRA retail-wholesaler history | RF1 pipeline + FINRA | weekly | 2 | 2023→ |
 | RF3 | Retail concentration | share of retail $ in top-10 SPX names; in semis; in leveraged ETFs | RF1 × SC1/SC3 memberships | daily | 2 | 2016→ |
-| RF4 | Buy-the-dip sensitivity | rolling OLS slope of daily retail net flow ($B) on SPX % return, sign-flipped (+ = buys dips); 63d + 21d windows | RF1 + BBG SPX returns | daily | 2 | 2016→ |
-| RF5 | Avg retail trade size | identified retail $ / trade count | RF1 pipeline | daily | 2 | 2016→ |
+| RF4 | Buy-the-dip sensitivity | rolling OLS slope of daily retail **breadth** on SPX % return, sign-flipped (+ = buys dips); 63d + 21d windows | RF1 + BBG SPX returns | daily | 2 | 2016→ |
 | RF6 | Wholesaler volume (structural check) | weekly non-ATS volume, top wholesalers | FINRA Query API `WeeklySummary` | weekly (2–4-wk lag) | 1 | 2016→ |
 | RF7 | Small-lot options premium | premium $ where trade size < 10 contracts (retail **proxy**, labeled as such) | Massive OPRA trades | daily | 3 | at feed |
 | RF8 | Small-lot call share / semi premium | RF7 split call/put; filtered to semi underlyings | RF7 pipeline | daily | 3 | at feed |
-| RF9 | Validation series | RF1 vs RTAT10 overlap correlation (§7) | Nasdaq `NDAQ/RTAT10` | daily | 2 | rolling |
 
 ### Panel 4 — Leverage & Its Price
 
@@ -245,7 +244,7 @@ The §3 principle reassigns the heavy per-name pulls off Bloomberg. Reassigned m
 
 ## 5. Methodology appendix (constructions that need exact definitions)
 
-**5.1 Retail flow classifier (RF1).** Universe: all US common + ETPs, price ≥ $1. Identify: off-exchange (TRF) prints with subpenny price improvement — price fractional part in (0, 0.4)¢ or (0.6, 1.0)¢; exclude exact half-penny and round-penny. Sign: **quote-midpoint method** (Barber-Huang-Jorion-Odean-Schwarz, JF 2024): trade below prevailing NBBO midpoint → retail sell; above → buy; at midpoint → excluded. Do **not** use original BJZZ subpenny-position signing (28% error rate; midpoint signing ≈ 5%). Known properties, to display in panel footnotes: captures ~⅓ of retail trades; levels are floors, not totals; trends are the product. **Scaling (decided 2026-07-09, CIO):** dollar-denominated stock-tape retail metrics (RF1 net flow, RF2 participation) render **scaled ×3.0 to estimated totals** (`config.RETAIL_SCALE_FACTOR`), labeled as such in each tooltip with the unscaled floor recoverable by division. The factor was confirmed empirically (6.6% identified participation vs ~20% consensus total) and is provisional until RF9 fits it against RTAT; re-checked at the monthly §7.2 calibration. NOT applied to options small-lot metrics (RF7/RF8 reconcile to market totals as-is via the wholesaler-share lens) nor to scale-invariant ratios (RF3/RF4/RF5). **Half-penny tick regime:** for symbols quoted in half-pennies under the SEC tick reform (phased from Nov 2025), the subpenny bands must be recomputed relative to the half-penny grid — maintain a per-symbol tick-regime table, re-validated monthly against RF9.
+**5.1 Retail flow classifier (RF1).** Universe: all US common + ETPs, price ≥ $1. **Identify:** off-exchange (TRF) prints with subpenny price improvement — price fractional part in (0, 0.4)¢ or (0.6, 1.0)¢; exclude exact half-penny and round-penny. **Sign:** **quote-midpoint method** (Barber-Huang-Jorion-Odean-Schwarz, JF 2024): trade below prevailing NBBO midpoint → retail sell; above → buy; at midpoint → excluded. Do **not** use original BJZZ subpenny-position signing (28% error rate; midpoint signing ≈ 5%). **Two filters BJZZ lacks (added 2026-08).** BJZZ assumes institutions are a small share of off-exchange subpenny prints; Battalio-Jennings-Saglam-Wu show that assumption fails, and it failed badly here — on 2026-07-30 SPY and QQQ carried scaled net flow at 64% and 58% of their own consolidated volume, which is arithmetically impossible for retail. (a) **Per-print size cap** `config.RETAIL_MAX_PRINT_USD` = $200k: BJZZ's only institutional guard is the 0.4–0.6¢ exclusion band, which sheds ATS midpoint crosses but not VWAP/benchmark/negotiated prints struck away from the mid. (b) **Sale-condition filter** `config.RETAIL_EXCLUDE_CONDITIONS` = {2, 10, 21, 52, 53} — average-price, derivatively-priced, price-variation and contingent trades are institutional by construction and their computed prices land on subpennies constantly. Odd-lot (37) and ISO (14) are deliberately kept. Both filters apply to `retail_*` only; every `tape_*` aggregate stays whole-market. Both are also **measured** (`excl_size_*`, `excl_cond_*`), and `massive_retail_buckets` stores the pre-filter eligible set cut by notional / condition / spread so either threshold can be re-cut from the lake without another tape pull. **Scaling.** RF1 is a COUNT (breadth) and carries no scale factor. Dollar metrics (RF2, RF10, RF3 bars) are scaled by a **capture factor fitted against FINRA's reported retail-wholesaler volume** — `mean(FINRA wholesaler $ ÷ identified $)` over overlapping weeks (`retail_series._fit_capture`), falling back to `config.RETAIL_SCALE_FACTOR` and keeping the *uncalibrated* badge when too few weeks overlap. NOT applied to options small-lot metrics (RF7/RF8) nor to scale-invariant ratios (RF3 share lines, RF4 slope). **Half-penny tick regime:** for symbols on the SEC half-penny tick (phased from Nov 2025) the subpenny bands are recomputed on the 0.5¢ grid. The per-symbol regime is **detected from the quotes file** (a symbol quoting on the half-cent grid is on the half-penny tick) and stored per symbol-day, so it maintains itself as the reform phases symbols in. NOTE: this was specified but never wired until 2026-08 — every day before that was scored on the penny grid regardless of actual tick. **Methodology version:** every stored day carries `method_version`; a bump forces a full reprocess and the compute refuses to build while the lake holds mixed versions.
 
 **5.2 Small-lot proxy (RF7/RF8, LV12).** Trades < 10 contracts = retail proxy. Label as *proxy* everywhere it renders (§A3 honesty: this is an observed regularity, not an identification).
 
@@ -283,7 +282,7 @@ Validation: reconcile engine IV vs BBG OVDV on the VC6 10-name set within ±1 vo
 ## 7. Validation & QC (definition of done, per §A11/§A12 adapted)
 
 1. **Deterministic rerun:** same stored inputs → byte-identical HTML (excluding run timestamp).
-2. **RF9 calibration gate:** before RF1–RF5 render as trusted, correlation of RF1 daily net flow vs RTAT10 overlap names ≥ 0.6 over a trailing 60d window; below → panel renders with an explicit "uncalibrated" banner. Re-check monthly (guards the half-penny regime drift, §5.1).
+2. **Capture-factor calibration:** the dollar retail metrics (RF2, RF10, RF3 bars) render as trusted only once the capture factor is FITTED against FINRA reported retail-wholesaler volume over at least `config.RETAIL_FIT_MIN_WEEKS` overlapping weeks; below that they fall back to the assumed factor and carry an explicit "uncalibrated" badge. (Replaced the RF9/RTAT gate 2026-08: RTAT is itself BJZZ-derived and so likely carries the same institutional contamination, making it unfit as an independent anchor.) Separately, an **arithmetic-impossibility alarm** flags any liquid symbol-day whose scaled net exceeds 50% of that symbol's own consolidated volume — it alarms, it never corrects.
 3. **Cross-checks wired as tests:** LV7 vs boxtrades.com (±25bp); MH2 BBG vs FRED ICE BofA (±10bp); LV1 vs LV2 SPX subset (Phase 3); OP5 vs ICI weekly direction; **§5.10 vol engine vs BBG OVDV on the VC6 10-name set (±1 vol pt) before member-breadth views (LV10, VC4) render trusted**.
 4. **Sanity bounds per metric** (config-declared): e.g., shares sum to ≤ 100%, spreads ≥ 0 where structural, ratios within historical ×5 band → violations flag, never silently clip.
 5. **Every displayed number** has as-of date + source tag; every proxy labeled proxy; every nowcast dashed. No unlabeled estimate ships (§A3).
@@ -293,7 +292,7 @@ Validation: reconcile engine IV vs BBG OVDV on the VC6 10-name set within ±1 vo
 ## 8. Build order
 
 1. **Phase 1 (Bloomberg + free):** scaffold, layered store, render skeleton with house style → SC(1–4) / OP(1–7) / VC(1–3,5,6, SPX-level 4) / MH / IS / LV(1,6,7,8,11,13,14,15,16) → first full HTML, deployed to `lens.avos.co/market-conditions`. SC5 shows the BBG top-50 fallback until Phase 2. *Gate: dashboard useful daily with zero new data spend.*
-2. **Phase 2 (Massive stocks):** trades+NBBO ingestion, RF1–RF6, RF9 calibration, OP8, MH9, SC5 (full member set), 2016→ backfill. *Gate: RF9 ≥ 0.6.*
+2. **Phase 2 (Massive stocks):** trades+NBBO ingestion, RF1–RF6, RF10, capture-factor calibration, OP8, MH9, SC5 (full member set), 2016→ backfill. *Gate: capture factor fitted against FINRA, not assumed.*
 3. **Phase 3 (Massive options/OPRA):** flat-file aggregation, §5.10 vol engine, LV2–LV5, LV9, LV10, LV12, VC4 member-breadth view, RF7–RF8. *Gates: LV1 vs LV2 SPX cross-check passes; engine IV vs BBG OVDV on the VC6 10-name set within ±1 vol pt.*
 4. Each phase folds into the existing page — same tiles, new rows — never bolt-on sections (§A12).
 

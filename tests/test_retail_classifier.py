@@ -166,6 +166,94 @@ def test_size_cap_identification_only():
     print("PASS per-print size cap (identification only, tape_* preserved)")
 
 
+def test_condition_filter_excludes_non_market_prices():
+    """Sale conditions marking a price not set by supply and demand at that
+    moment are institutional by construction, and their computed prices land on
+    subpennies constantly — a size cap only catches the large ones."""
+    quotes = [dict(ticker="CND", sip_timestamp=1 * NS, bid_price=10.00, ask_price=10.02)]
+    trades = [
+        # clean retail buy above mid
+        dict(ticker="CND", sip_timestamp=2 * NS, price=10.0180, size=100, exchange=4,
+             conditions="12"),
+        # same signature, AVERAGE PRICE TRADE (2) — small, so the cap misses it
+        dict(ticker="CND", sip_timestamp=3 * NS, price=10.0180, size=100, exchange=4,
+             conditions="12,2"),
+        # DERIVATIVELY PRICED (10)
+        dict(ticker="CND", sip_timestamp=4 * NS, price=10.0180, size=100, exchange=4,
+             conditions="10"),
+        # ODD LOT (37) must NOT be excluded — odd lots are strongly retail
+        dict(ticker="CND", sip_timestamp=5 * NS, price=10.0180, size=5, exchange=4,
+             conditions="37,12"),
+    ]
+    d = tempfile.mkdtemp()
+    t = _write(pd.DataFrame(trades), os.path.join(d, "t.parquet"))
+    q = _write(pd.DataFrame(quotes), os.path.join(d, "q.parquet"))
+    r = classify_day(t, q, exclude_conditions={2, 10, 21, 52, 53}).set_index("ticker").loc["CND"]
+    assert r["retail_ident_trades"] == 2, r["retail_ident_trades"]   # clean + odd lot
+    assert r["excl_cond_trades"] == 2                                # avg-price + derivative
+    # no cap passed, so nothing excluded for size
+    assert r["excl_size_trades"] == 0
+    # and the tape still sees all four
+    assert r["tape_trades"] == 4
+    print("PASS sale-condition filter (odd lots kept, computed prices dropped)")
+
+
+def test_half_penny_regime_detected_from_quotes():
+    """The regime was specified but never wired — nothing passed
+    half_penny_symbols, so every symbol was scored on the penny grid. It is now
+    detected from the quotes file. p_e4=200060 is retail on the half-penny grid
+    (%50=10, in 1-19) but NOT on the penny grid (%100=60, outside 1-39/61-99),
+    so this print is identified only if detection works."""
+    quotes = [
+        # quotes on the half-cent marks -> half-penny tick
+        dict(ticker="HALF", sip_timestamp=1 * NS, bid_price=20.005, ask_price=20.015),
+        # ordinary penny-tick control
+        dict(ticker="PENNY", sip_timestamp=1 * NS, bid_price=20.00, ask_price=20.02),
+    ]
+    trades = [
+        dict(ticker="HALF", sip_timestamp=2 * NS, price=20.0060, size=100, exchange=4),
+        dict(ticker="PENNY", sip_timestamp=2 * NS, price=20.0060, size=100, exchange=4),
+    ]
+    d = tempfile.mkdtemp()
+    t = _write(pd.DataFrame(trades), os.path.join(d, "t.parquet"))
+    q = _write(pd.DataFrame(quotes), os.path.join(d, "q.parquet"))
+    r = classify_day(t, q).set_index("ticker")   # half_penny_symbols=None -> detect
+    assert bool(r.loc["HALF"]["half_penny"]) is True
+    assert bool(r.loc["PENNY"]["half_penny"]) is False
+    assert r.loc["HALF"]["retail_ident_trades"] == 1     # reachable only on the 0.5c grid
+    assert r.loc["PENNY"]["retail_ident_trades"] == 0    # correctly rejected on the penny grid
+    print("PASS half-penny regime detected from quotes")
+
+
+def test_buckets_reconcile_to_eligible_set():
+    """The bucket table is what makes a future cap/condition change arithmetic
+    on the lake instead of another tape pull, so every dimension must cover the
+    SAME pre-filter eligible set."""
+    quotes = [dict(ticker="BKT", sip_timestamp=1 * NS, bid_price=10.00, ask_price=10.02)]
+    trades = [
+        dict(ticker="BKT", sip_timestamp=2 * NS, price=10.0180, size=50, exchange=4,
+             conditions="12"),
+        dict(ticker="BKT", sip_timestamp=3 * NS, price=10.0020, size=100000, exchange=4,
+             conditions="12"),
+        dict(ticker="BKT", sip_timestamp=4 * NS, price=10.0180, size=200, exchange=4,
+             conditions="2"),
+    ]
+    d = tempfile.mkdtemp()
+    t = _write(pd.DataFrame(trades), os.path.join(d, "t.parquet"))
+    q = _write(pd.DataFrame(quotes), os.path.join(d, "q.parquet"))
+    agg, bk = classify_day(t, q, max_print_usd=200_000.0,
+                           exclude_conditions={2}, with_buckets=True)
+    per_dim = bk.groupby("dim")["trades"].sum()
+    assert set(per_dim.index) == {"size", "cond", "spread"}
+    assert per_dim.nunique() == 1 and int(per_dim.iloc[0]) == 3, per_dim.to_dict()
+    # buckets span the PRE-filter set, so they exceed what identification keeps
+    row = agg.set_index("ticker").loc["BKT"]
+    assert row["retail_ident_trades"] == 1          # 1 excluded by size, 1 by condition
+    assert float(bk[bk["dim"] == "size"][["buy_usd", "sell_usd"]].to_numpy().sum()) > \
+        float(row["retail_usd"])
+    print("PASS bucket table reconciles across dimensions")
+
+
 if __name__ == "__main__":
     test_signing_and_bands()
     test_at_mid_excluded()
@@ -173,4 +261,7 @@ if __name__ == "__main__":
     test_quote_update_respected()
     test_trades_only_mode()
     test_size_cap_identification_only()
+    test_condition_filter_excludes_non_market_prices()
+    test_half_penny_regime_detected_from_quotes()
+    test_buckets_reconcile_to_eligible_set()
     print("\nAll retail-classifier tests passed.")
