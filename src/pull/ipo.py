@@ -37,7 +37,13 @@ _EQS_WANT = ["Ticker", "Name", "IPO Dt", "IPO Sh Px", "IPO Sh Offered", "GICS Se
 
 # name-pattern tagging (§2.4.4). Ritter join is the authoritative operating-co
 # filter; these are best-effort vehicle classes for the all-in series.
-_SPAC_RE = re.compile(r"ACQUISITION|MERGER CORP|BLANK CHECK|CAPITAL CORP|SPAC", re.I)
+# \bSPAC\b, not bare SPAC: unanchored, it matches INSIDE "SPACE" and
+# "AEROSPACE", so every space company was tagged a blank-check vehicle. Found
+# 2026-08-18 — it had mislabelled three priced 2026 deals: SPACE EXPLORATION
+# TECHN-CL A ($75,000mm), APPLIED AEROSPACE & DEFENSE ($650mm) and YORK SPACE
+# SYSTEMS INC ($629mm). The first is large enough to distort the
+# operating-company issuance totals on its own.
+_SPAC_RE = re.compile(r"ACQUISITION|MERGER CORP|BLANK CHECK|CAPITAL CORP|\bSPAC\b", re.I)
 _BANK_RE = re.compile(r"BANCORP|BANCSHARES|FINANCIAL CORP|SAVINGS|BANCERT|BANK", re.I)
 _FUND_RE = re.compile(r"\bFUND\b|TRUST|PORTFOLIO|ETF|INCOME FD|VAR RT|PREF", re.I)
 
@@ -417,11 +423,12 @@ _KEY_NAMES = (".claude_api_key", ".anthropic_api_key")
 def _key_roots() -> list[str]:
     roots = [BASE]
     head, tail = os.path.split(BASE)
-    while head and head != BASE:            # .../<repo>/.claude/worktrees/<name>
-        head, tail = os.path.split(head)
-        if tail == ".claude":
-            roots.append(head)              # the main checkout above .claude/
-            break
+    while tail:                             # .../<repo>/.claude/worktrees/<name>
+        if tail == ".claude":               # tail == "" at the filesystem root:
+            roots.append(head)              # os.path.split("C:\\") -> ("C:\\", "")
+            break                           # so this is what terminates the walk
+        head, tail = os.path.split(head)    # (BASE has no .claude when run from
+                                            #  the main checkout — walk to root)
     return roots
 
 _GICS_SECTORS = [
