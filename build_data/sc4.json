@@ -1553,7 +1553,7 @@
         },
         {
           "date": "2026-08-17",
-          "value": 34.61
+          "value": 34.46
         }
       ],
       "role": "avos",
@@ -1563,8 +1563,8 @@
   "source": "BBG DSPX Index",
   "tile": {
     "delta": null,
-    "percentile": 92.14,
-    "value": 34.61
+    "percentile": 91.84,
+    "value": 34.46
   },
   "tooltip": "Cboe implied dispersion — how much single names are expected to move independently of the index.",
   "unit": ""

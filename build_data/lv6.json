@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-14",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "LV6",
   "name": "Leveraged-ETF rebalance notional",
@@ -518,10 +518,6 @@
         {
           "date": "2025-07-31",
           "value": 3.979
-        },
-        {
-          "date": "2025-08-14",
-          "value": 3.97
         },
         {
           "date": "2025-08-15",
@@ -1526,6 +1522,10 @@
         {
           "date": "2026-08-14",
           "value": 5.27
+        },
+        {
+          "date": "2026-08-17",
+          "value": 5.279
         }
       ],
       "role": "avos",
@@ -2042,10 +2042,6 @@
         {
           "date": "2025-07-31",
           "value": 1.918
-        },
-        {
-          "date": "2025-08-14",
-          "value": 2.077
         },
         {
           "date": "2025-08-15",
@@ -3050,6 +3046,10 @@
         {
           "date": "2026-08-14",
           "value": 3.267
+        },
+        {
+          "date": "2026-08-17",
+          "value": 2.504
         }
       ],
       "role": "context",
@@ -3059,7 +3059,7 @@
   "source": "BBG AUM × Massive moves",
   "tile": {
     "delta": null,
-    "percentile": 99.23,
+    "percentile": 99.26,
     "value": 5.3
   },
   "tooltip": "Rebalance capacity per 1% index move (structural); second line = realized forced end-of-day flow magnitude, 5-day average.",

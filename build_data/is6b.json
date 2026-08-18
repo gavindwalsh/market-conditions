@@ -1,5 +1,5 @@
 {
-  "asof": "2026-08-14",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "IS6B",
   "name": "Corporate cash-equity flow (Russell 3000)",
@@ -1328,10 +1328,6 @@
           "value": -1.825
         },
         {
-          "date": "2025-08-14",
-          "value": -1.79
-        },
-        {
           "date": "2025-08-15",
           "value": -1.794
         },
@@ -2334,6 +2330,10 @@
         {
           "date": "2026-08-14",
           "value": -1.622
+        },
+        {
+          "date": "2026-08-17",
+          "value": -1.631
         }
       ],
       "role": "avos",
@@ -3660,10 +3660,6 @@
           "value": 0.391
         },
         {
-          "date": "2025-08-14",
-          "value": 0.383
-        },
-        {
           "date": "2025-08-15",
           "value": 0.384
         },
@@ -4666,6 +4662,10 @@
         {
           "date": "2026-08-14",
           "value": 0.351
+        },
+        {
+          "date": "2026-08-17",
+          "value": 0.353
         }
       ],
       "role": "context",
@@ -5992,10 +5992,6 @@
           "value": -1.434
         },
         {
-          "date": "2025-08-14",
-          "value": -1.406
-        },
-        {
           "date": "2025-08-15",
           "value": -1.41
         },
@@ -6998,6 +6994,10 @@
         {
           "date": "2026-08-14",
           "value": -1.271
+        },
+        {
+          "date": "2026-08-17",
+          "value": -1.278
         }
       ],
       "role": "benchmark",
@@ -7007,8 +7007,8 @@
   "source": "BBG RAY CF_DECR/INCR_CAP_STOCK",
   "tile": {
     "delta": null,
-    "percentile": 7.34,
-    "value": 1.62
+    "percentile": 7.88,
+    "value": 1.63
   },
   "tooltip": "Russell 3000 buybacks vs equity sold for cash, share of market cap (trailing 12m) — not net issuance: excludes cash M&A and employee share issuance.",
   "unit": " % of mkt cap"

@@ -1761,7 +1761,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": 5.716
+          "value": 5.525
         }
       ],
       "role": "avos",
@@ -3521,7 +3521,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": 5.754
+          "value": 5.71
         }
       ],
       "role": "context",
@@ -3531,8 +3531,8 @@
   "source": "BBG VIX/VXN vs realized",
   "tile": {
     "delta": null,
-    "percentile": 63.03,
-    "value": 5.72
+    "percentile": 60.72,
+    "value": 5.53
   },
   "tooltip": "Implied vol minus what was subsequently realized — the toll option buyers paid; ends ~1 month ago by construction.",
   "unit": " vol pts"

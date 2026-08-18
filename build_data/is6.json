@@ -1,9 +1,9 @@
 {
-  "asof": "2026-08-14",
+  "asof": "2026-08-17",
   "cadence": "daily",
   "id": "IS6",
   "name": "US net corporate equity issuance (% of GDP)",
-  "notes": "**What it shows.** How much equity the US nonfinancial corporate sector is issuing or retiring, as a share of the economy. Negative means companies are buying back more than they sell — equity is being withdrawn from the market. This is the definitive level: it is the only measure on the dashboard that captures **cash M&A retirement** (a company bought for cash retires its shares) and **shares issued to employees** through RSU vesting and option exercise. It is scaled by GDP rather than shown in dollars because the published history reaches 1947, and on a dollar axis the first fifty years are invisible against today's magnitudes.\n\n**How it's computed.** FRED series `NCBCEBQ027S` (Fed Z.1 Financial Accounts — Nonfinancial Corporate Business; Corporate Equities; Liability, Transactions) divided by nominal GDP. The solid line is plotted exactly as published, with no smoothing: each point is one quarter's flow quoted at a seasonally-adjusted annual rate, so it answers 'at the pace of that quarter, how much equity would leave the market in a year.' History is annual from 1947 to 1951 and quarterly from 1952 onward.\n\nThe Fed publishes about ten weeks after quarter-end, so the **dashed segment extends the last published print daily** using Bloomberg: it adds the change in Russell 3000 gross buybacks since that quarter-end, since rising buybacks make net issuance more negative. The buyback change is measured in index points priced at the anchor date's divisor, so the line steps when large filers report and sits still between earnings seasons rather than drifting with market cap. As of this build it is carried 136 days past the 2026-03-31 quarter-end.\n\n**Caveats.** Carried-estimate badge on the dashed segment: it is **directional, not a measurement.** The carry has historically added skill when applied to a four-quarter average, but against a single quarter's print — which is what it extends here — it does no better than simply holding the last print flat, because one quarter's annualized flow is volatile and the buyback adjustment is a twelve-month quantity. Read it as the direction the next print is likely to move, and use the Russell 3000 chart alongside for a measured daily read. Quarter-to-quarter prints are genuinely volatile in their own right — recent quarters have ranged from about −$1.2tn to +$124bn at an annual rate — so read the shape across several quarters, not any single point. **Excludes financial-sector companies**, so bank and insurer buybacks are absent; the obvious FRED series for adding them counts ETF and closed-end-fund share creation as a financial equity liability and would swamp the measure. The Fed also revises prior quarters. This measure and the Russell 3000 chart are **not the same measure and should not be netted** — they differ by roughly 3× for reasons that are only partly resolved.",
+  "notes": "**What it shows.** How much equity the US nonfinancial corporate sector is issuing or retiring, as a share of the economy. Negative means companies are buying back more than they sell — equity is being withdrawn from the market. This is the definitive level: it is the only measure on the dashboard that captures **cash M&A retirement** (a company bought for cash retires its shares) and **shares issued to employees** through RSU vesting and option exercise. It is scaled by GDP rather than shown in dollars because the published history reaches 1947, and on a dollar axis the first fifty years are invisible against today's magnitudes.\n\n**How it's computed.** FRED series `NCBCEBQ027S` (Fed Z.1 Financial Accounts — Nonfinancial Corporate Business; Corporate Equities; Liability, Transactions) divided by nominal GDP. The solid line is plotted exactly as published, with no smoothing: each point is one quarter's flow quoted at a seasonally-adjusted annual rate, so it answers 'at the pace of that quarter, how much equity would leave the market in a year.' History is annual from 1947 to 1951 and quarterly from 1952 onward.\n\nThe Fed publishes about ten weeks after quarter-end, so the **dashed segment extends the last published print daily** using Bloomberg: it adds the change in Russell 3000 gross buybacks since that quarter-end, since rising buybacks make net issuance more negative. The buyback change is measured in index points priced at the anchor date's divisor, so the line steps when large filers report and sits still between earnings seasons rather than drifting with market cap. As of this build it is carried 139 days past the 2026-03-31 quarter-end.\n\n**Caveats.** Carried-estimate badge on the dashed segment: it is **directional, not a measurement.** The carry has historically added skill when applied to a four-quarter average, but against a single quarter's print — which is what it extends here — it does no better than simply holding the last print flat, because one quarter's annualized flow is volatile and the buyback adjustment is a twelve-month quantity. Read it as the direction the next print is likely to move, and use the Russell 3000 chart alongside for a measured daily read. Quarter-to-quarter prints are genuinely volatile in their own right — recent quarters have ranged from about −$1.2tn to +$124bn at an annual rate — so read the shape across several quarters, not any single point. **Excludes financial-sector companies**, so bank and insurer buybacks are absent; the obvious FRED series for adding them counts ETF and closed-end-fund share creation as a financial equity liability and would swamp the measure. The Fed also revises prior quarters. This measure and the Russell 3000 chart are **not the same measure and should not be netted** — they differ by roughly 3× for reasons that are only partly resolved.",
   "panel": "issuance",
   "provenance": "derived",
   "series": [
@@ -1385,7 +1385,7 @@
         },
         {
           "date": "2026-05-27",
-          "value": 0.093
+          "value": 0.092
         },
         {
           "date": "2026-05-28",
@@ -1605,6 +1605,10 @@
         },
         {
           "date": "2026-08-14",
+          "value": 0.168
+        },
+        {
+          "date": "2026-08-17",
           "value": 0.168
         }
       ],
