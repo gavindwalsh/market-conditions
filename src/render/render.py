@@ -631,6 +631,27 @@ national best bid/offer (NBBO) midpoint — above the midpoint is a buy, below i
 a sell, and trades exactly at the midpoint are left out because their direction
 is ambiguous.
 
+That signature alone is not sufficient, because institutions also trade
+off-exchange at sub-penny prices. The published method assumes they are a small
+enough share to ignore; in practice they are not. Institutional orders worked
+through a broker's algorithm print in the same place, with the same sub-penny
+fingerprint, and the largest of them are big enough to swamp a day's genuine
+retail flow in a heavily traded name. We therefore add a filter the published
+method lacks: any single print above $50,000 in value is excluded from
+identification. Retail orders are almost never that large, so the cap removes
+institutional prints while leaving retail intact, and it separates them at the
+level of the individual print — the only level at which the two are still
+distinguishable. Broad-market ETFs are deliberately kept in the universe rather
+than excluded, because retail genuinely trades them heavily. Note that the cap
+applies only to identifying retail trades; the total-market volume figures these
+metrics are measured against are always the full, unfiltered tape.
+
+As a backstop, any stock whose estimated net retail flow exceeds half its entire
+day's trading value is flagged rather than published: net flow that large is
+impossible for real retail activity and means non-retail volume has slipped
+through. The flag marks the reading as untrustworthy; it does not quietly adjust
+the number, because a contaminated figure cannot be corrected after the fact.
+
 This signature captures only about a third of true retail activity — the part
 that leaves the sub-penny fingerprint. Dollar-denominated retail metrics are
 therefore multiplied by a scale factor of ×3.0 to estimate market-wide totals.

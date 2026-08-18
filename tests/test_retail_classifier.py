@@ -129,10 +129,48 @@ def test_trades_only_mode():
     print("PASS trades-only mode (ident + labeled BJZZ + MOC)")
 
 
+def test_size_cap_identification_only():
+    """max_print_usd excludes oversized prints from IDENTIFICATION while leaving
+    every tape_* aggregate whole-market. Guards the 2026-07-31 fix: institutional
+    blocks printing subpenny off-exchange were being read as retail (SPY showed
+    -$11.6B net on 216-share average prints on 2026-07-30)."""
+    quotes = [dict(ticker="CAP", sip_timestamp=1 * NS, bid_price=10.00, ask_price=10.02)]
+    trades = [
+        # small subpenny SELL below mid 10.01 → $500.10, under any sane cap
+        dict(ticker="CAP", sip_timestamp=2 * NS, price=10.0020, size=50, exchange=4),
+        # block subpenny SELL, same signature → $1,000,200. Institutional.
+        dict(ticker="CAP", sip_timestamp=3 * NS, price=10.0020, size=100_000, exchange=4),
+    ]
+    d = tempfile.mkdtemp()
+    t = _write(pd.DataFrame(trades), os.path.join(d, "t.parquet"))
+    q = _write(pd.DataFrame(quotes), os.path.join(d, "q.parquet"))
+    un = classify_day(t, q).set_index("ticker").loc["CAP"]
+    cap = classify_day(t, q, max_print_usd=50_000.0).set_index("ticker").loc["CAP"]
+
+    # uncapped: the block dominates the "retail" total
+    assert un["retail_trades"] == 2
+    assert abs(un["retail_sell_usd"] - (10.0020 * 50 + 10.0020 * 100_000)) < 1e-6
+    # capped: only the genuine small print survives identification
+    assert cap["retail_trades"] == 1
+    assert abs(cap["retail_sell_usd"] - 10.0020 * 50) < 1e-6
+    assert abs(cap["retail_ident_usd"] - 10.0020 * 50) < 1e-6
+    assert abs(cap["retail_net_usd_bjzz"] + 10.0020 * 50) < 1e-6   # fallback capped too
+    # tape_* must be untouched — RF2/MH9 denominators stay whole-market
+    for col in ("tape_usd", "tape_volume", "tape_trades", "offexch_volume",
+                "oddlot_trades"):
+        assert un[col] == cap[col], col
+    assert cap["tape_volume"] == 50 + 100_000
+    # None disables the cap entirely (pre-fix behaviour reproducible)
+    assert classify_day(t, q, max_print_usd=None).set_index(
+        "ticker").loc["CAP"]["retail_trades"] == 2
+    print("PASS per-print size cap (identification only, tape_* preserved)")
+
+
 if __name__ == "__main__":
     test_signing_and_bands()
     test_at_mid_excluded()
     test_half_penny_regime()
     test_quote_update_respected()
     test_trades_only_mode()
+    test_size_cap_identification_only()
     print("\nAll retail-classifier tests passed.")

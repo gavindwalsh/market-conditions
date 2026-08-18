@@ -236,7 +236,9 @@ def process_tape_day(day: str, keep_files: bool = False,
                 quotes_f = None
             else:
                 raise
-        agg = classify_day(trades_f, quotes_f)
+        from .. import config as _cfg
+        agg = classify_day(trades_f, quotes_f,
+                           max_print_usd=_cfg.RETAIL_MAX_PRINT_USD)
         agg.insert(0, "date", day)
         tdir = os.path.join(store.LAKE_DIR, RETAIL_TABLE)
         os.makedirs(tdir, exist_ok=True)

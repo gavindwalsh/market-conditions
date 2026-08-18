@@ -28,6 +28,39 @@ def _daily() -> pd.DataFrame | None:
     return df
 
 
+# ---- arithmetic-impossibility alarm (added 2026-07-31) -----------------------
+# |scaled net| can never exceed ~half a symbol's consolidated dollar volume:
+# net <= gross by definition, and identified retail gross <= tape, so a net
+# above half the tape would require retail to be more than the whole market on
+# one side. Breaches are therefore proof of non-retail contamination.
+#
+# This ALARMS, it does not correct. Clamping cannot recover a clean number,
+# because both inputs to any clamp are already contaminated — on 2026-07-30 even
+# clamping SPY to its own historical median one-sidedness still left -$15.5B of
+# a -$34.7B print. The correction is the per-print cap
+# (config.RETAIL_MAX_PRINT_USD); this guard exists so that if the cap ever fails
+# to hold the line, an impossible number is flagged instead of rendered.
+CEILING_FRAC = 0.50
+# Materiality floor. Without it the alarm is useless: on 2026-07-30 it fired on
+# 477 symbol-days, 472 of them under $1M of daily tape — illiquid names where the
+# classifier happens to catch nearly every print, so the ×3 scaling alone pushes
+# the ratio past 100%. Those 477 were 0.005% of the day's tape and $0.008B of
+# RF1. Real contamination shows up in liquid names (SPY, QQQ), so require enough
+# tape for the ratio to mean anything.
+CEILING_MIN_TAPE_USD = 100_000_000.0
+
+
+def _ceiling_breaches(df: pd.DataFrame, scale: float) -> pd.DataFrame:
+    """Symbol-days whose scaled net retail flow exceeds CEILING_FRAC of that
+    symbol's consolidated dollar volume, restricted to symbols with at least
+    CEILING_MIN_TAPE_USD of tape. Empty frame = clean."""
+    d = df[df["tape_usd"] >= CEILING_MIN_TAPE_USD].copy()
+    d["ceiling_ratio"] = d["retail_net_usd"].abs() * scale / d["tape_usd"]
+    out = d[d["ceiling_ratio"] > CEILING_FRAC]
+    return out[["date", "ticker", "retail_net_usd", "tape_usd", "ceiling_ratio"]] \
+        .sort_values("ceiling_ratio", ascending=False)
+
+
 def build() -> dict[str, bool]:
     df = _daily()
     if df is None:
@@ -82,6 +115,20 @@ def build() -> dict[str, bool]:
 
     from .. import config as _cfg
     F = _cfg.RETAIL_SCALE_FACTOR
+    # arithmetic-impossibility alarm — see _ceiling_breaches
+    breaches = _ceiling_breaches(df, F)
+    latest_breach = breaches[breaches["date"].astype(str) == asof]
+    if not breaches.empty:
+        worst = "; ".join(
+            f"{r.date} {r.ticker} {r.ceiling_ratio * 100:.0f}% of tape"
+            for r in breaches.head(5).itertuples())
+        store.log_run("retail:RF1", "warn",
+                      f"{len(breaches)} symbol-day(s) breach the "
+                      f"{CEILING_FRAC:.0%} consolidated-volume ceiling — "
+                      f"non-retail contamination is leaking past the "
+                      f"per-print cap. Worst: {worst}",
+                      breaches=int(len(breaches)),
+                      latest_day_breaches=int(len(latest_breach)))
     signed = day[day["signing"] == "midpoint"].copy()
     rf1 = not signed.empty
     if rf1:
@@ -96,9 +143,17 @@ def build() -> dict[str, bool]:
             "tile": {"value": round(float(signed["net_b"].iloc[-1]), 2), "delta": None,
                      "percentile": util.trailing_percentile(signed["net_b"])},
             "provenance": "massive_tape",
-            "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
-            "tooltip": "Estimated total retail net buying per day — classifier floor ×3 "
-                       "until the RF9 calibration lands.",
+            "status": ({"level": "suspect",
+                        "label": "×3 est. · contamination flag"}
+                       if not latest_breach.empty else
+                       {"level": "uncalibrated", "label": "×3 est. · uncalibrated"}),
+            "tooltip": ("Estimated total retail net buying per day — classifier floor ×3 "
+                        "until the RF9 calibration lands."
+                        + ("  NOTE: the latest day breaches the consolidated-volume "
+                           "ceiling in " + ", ".join(latest_breach["ticker"].head(4))
+                           + " — non-retail flow is leaking into the classifier and "
+                             "this reading is not trustworthy."
+                           if not latest_breach.empty else "")),
             "notes": (
                 "**What it shows.** Estimated net dollar flow from retail traders each "
                 "day — buys minus sells — scaled to a whole-market figure. Positive "
@@ -106,17 +161,26 @@ def build() -> dict[str, bool]:
                 "the daily push and pull of the retail crowd.\n\n"
                 "**How it's computed.** Every retail trade is identified and signed by "
                 "the quote-midpoint classifier described in \"Retail identification and "
-                "scaling\" above — off-exchange sub-penny prints, signed buy or sell "
-                "against the NBBO midpoint. Each day's net identified dollars are summed "
-                "and multiplied by the ×3 scale factor to estimate the market-wide "
-                "total: `RF1 = 3.0 × Σ(signed identified retail $)`, plotted in billions "
-                "of dollars per day.\n\n"
-                "**Caveats.** The ×3 factor is provisional, so the series carries an "
-                "*uncalibrated* badge until it is fit against Nasdaq's Retail Activity "
-                "Tracker and clears the calibration gate (see the shared section). "
-                "Trades executing exactly at the midpoint are excluded because their "
-                "direction is ambiguous, so this is a net-direction estimate, not a "
-                "gross-volume one — for gross retail dollar volume see RF10."
+                "scaling\" above — off-exchange sub-penny prints under the $50,000 "
+                "per-print size cap, signed buy or sell against the NBBO midpoint. Each "
+                "day's net identified dollars are summed and multiplied by the ×3 scale "
+                "factor to estimate the market-wide total: "
+                "`RF1 = 3.0 × Σ(signed identified retail $)`, plotted in billions of "
+                "dollars per day.\n\n"
+                "**Caveats.** The scale factor is the weak link, and more so since the "
+                "size cap was added. The ×3 was chosen for the uncapped classifier, "
+                "which counted institutional blocks as retail; the cap removes roughly "
+                "60% of identified dollars while keeping about 98% of prints, so the "
+                "factor now sits on a much smaller and cleaner base and is very likely "
+                "too low. Treat the *level* of this series as unreliable until the "
+                "factor is refit against Nasdaq's Retail Activity Tracker and clears the "
+                "calibration gate (see the shared section); the day-to-day *shape* is "
+                "the part to read. Trades executing exactly at the midpoint are excluded "
+                "because their direction is ambiguous, so this is a net-direction "
+                "estimate, not a gross-volume one — for gross retail dollar volume see "
+                "RF10. Days flagged with a contamination badge should not be read at "
+                "all: non-retail volume has slipped past the cap in at least one "
+                "heavily traded name."
             ),
         })
     # RF2: weekly participation splice — FINRA T1+T2 non-ATS anchor, a T1-only

@@ -12,6 +12,19 @@ Method (Barber-Huang-Jorion-Odean-Schwarz, JF 2024 — per spec §5.1):
   half-penny regime (§5.1): for symbols on the SEC half-penny tick, bands are
              recomputed on the 0.5¢ grid: sub5 = price_e4 % 50, retail iff
              0 < sub5 < 20 or 30 < sub5 < 50. Regime table is per-symbol input.
+  size cap : per-print notional ceiling on IDENTIFICATION (max_print_usd).
+             BJZZ has no size filter — it assumes institutions are a small
+             share of off-exchange subpenny prints. Battalio-Jennings-Saglam-Wu
+             show that assumption fails: known institutional prints ARE
+             identified as retail. BJZZ's only institutional guard is the
+             0.4-0.6c exclusion band, which sheds ATS midpoint crosses but not
+             VWAP/benchmark/negotiated prints struck AWAY from the mid.
+             Found 2026-07-31: on 2026-07-30 that leak put SPY at -$11.6B and
+             QQQ at -$8.9B identified net on 216- and 133-share average prints
+             (VOO, same index but retail-held, averages 14 shares) — 64% and
+             58% of each ETF's ENTIRE consolidated volume once x3-scaled, which
+             is arithmetically impossible for genuine retail net flow. The cap
+             applies to `cand` only, so the tape_* aggregates stay whole-market.
 
 Engine: DuckDB out-of-core — reads trades+quotes files (csv.gz or parquet)
 directly, streams the ASOF join, returns per-symbol daily aggregates. Raw tape
@@ -31,7 +44,8 @@ TRF_EXCHANGE = 4  # FINRA TRF/ADF exchange id on the Massive/Polygon feed
 
 
 def classify_day(trades_src: str, quotes_src: str | None = None,
-                 half_penny_symbols: set[str] | None = None) -> pd.DataFrame:
+                 half_penny_symbols: set[str] | None = None,
+                 max_print_usd: float | None = None) -> pd.DataFrame:
     """Run the classifier over one day's tape.
 
     trades_src / quotes_src: paths DuckDB can read (parquet or csv[.gz]).
@@ -43,6 +57,10 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
       whether it is ever shown. Discovered necessary 2026-07-08: the Massive
       Stocks tier carries trades but no quotes entitlement.
     half_penny_symbols: symbols on the half-penny tick regime (§5.1).
+    max_print_usd: per-print notional ceiling for retail IDENTIFICATION (see the
+      module docstring). None disables it, reproducing the pre-cap behaviour.
+      Every retail_* column is affected; every tape_* column is NOT — the cap
+      lands in `cand`, while the tape CTE reads unfiltered `trades`.
 
     Returns per-symbol aggregates:
       [ticker, retail_buy_usd, retail_sell_usd, retail_net_usd, retail_buy_sh,
@@ -76,6 +94,10 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
         con.executemany("INSERT INTO hp_syms VALUES (?)", [(t,) for t in hp])
 
     signing = "midpoint" if quotes_src else "none"
+    # size cap: identification-side only. Guarded as a float literal so the
+    # f-string can never carry caller text into the SQL.
+    cap_expr = ("" if max_print_usd is None
+                else f" AND t.price * t.size <= {float(max_print_usd)}")
     cols = {r[0] for r in con.execute(
         f"DESCRIBE SELECT * FROM '{trades_src}' LIMIT 0").fetchall()}
     has_conds = "conditions" in cols
@@ -121,7 +143,7 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
                     ELSE (p_e4 % 100) BETWEEN 1 AND 39 OR (p_e4 % 100) BETWEEN 61 AND 99
                END AS is_subpenny
         FROM trades t LEFT JOIN hp_syms h USING (ticker)
-        WHERE t.exchange = {TRF_EXCHANGE} AND t.price >= 1.0
+        WHERE t.exchange = {TRF_EXCHANGE} AND t.price >= 1.0{cap_expr}
     ),
     {signed_cte}
     retail AS (

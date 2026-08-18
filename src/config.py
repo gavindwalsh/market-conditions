@@ -64,6 +64,20 @@ UNIVERSES = {
 # factor empirically vs Nasdaq RTAT; revisit monthly with the §7.2 re-check.
 RETAIL_SCALE_FACTOR = 3.0
 
+# ---- retail per-print size cap (added 2026-07-31, CIO) -----------------------
+# Per-print notional ceiling for retail IDENTIFICATION in the §5.1 classifier.
+# BJZZ imposes NO size filter; it assumes institutions are a small share of
+# off-exchange subpenny prints, and Battalio-Jennings-Saglam-Wu show that
+# assumption fails. BJZZ's only institutional guard is the 0.4-0.6c exclusion
+# band, which sheds ATS midpoint crosses but not VWAP/benchmark/negotiated
+# prints struck away from the mid. Those leaked badly on 2026-07-30 (SPY and
+# QQQ x3 net at 64% and 58% of their own consolidated volume — impossible for
+# real retail net flow; see compute/retail.py). Index ETFs are deliberately
+# KEPT in the universe — retail genuinely trades them — so the separation has
+# to happen per print, which is the only level where the two populations are
+# still distinguishable. Applies to retail_* columns only; tape_* stay whole.
+RETAIL_MAX_PRINT_USD = 50_000.0
+
 # ---- curated ETF universe (OP5/OP6/OP7, LV6, LV13) ---------------------------
 # ticker → (category, leverage). §A3 honesty: this is a curated top-of-complex
 # universe, NOT all US ETFs — coverage is labeled on every tile it feeds.
