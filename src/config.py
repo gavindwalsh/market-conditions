@@ -105,6 +105,50 @@ RETAIL_EXCLUDE_CONDITIONS = {2, 10, 21, 52, 53}
 #   2 = size cap + condition filter + detected half-penny regime + diagnostics
 RETAIL_METHOD_VERSION = 2
 
+# ---- RF1 breadth (replaced the dollar net-flow series 2026-08, CIO) ---------
+# Minimum identified retail dollars in a name on a day for it to count toward
+# the breadth reading. Below this the universe fills with thousands of barely
+# traded microcaps whose net sign is a coin flip, pinning breadth at ~50% and
+# washing out the signal: at no floor the four measured days read 51.4/49.8/
+# 51.6/48.9, at $10M they read 43.1/53.4/48.6/39.6 — real movement, and far
+# larger than the ~1.6pp sampling error on the ~1,000 names that clear the bar.
+#
+# Why breadth replaced dollars at all: summing net flow across ~3,000 names
+# destroys 86-99% of the information (sum|net| ~$5.5B vs |sum net| ~$0.4B), and
+# what survives is 16-500x SMALLER than the contamination the cap removes, so
+# any residual leak dominates it. BJZZ's validated result is a cross-sectional
+# per-name imbalance; a market-wide dollar total was always the unvalidated
+# extension. A count across names is scale-invariant (no ×3 factor at all) and
+# contamination stays local — one bad name is one name out of a thousand.
+RETAIL_BREADTH_MIN_USD = 10_000_000.0
+
+# ---- FINRA retail-wholesaler anchor (added 2026-08) -------------------------
+# RF2/RF10 anchor on FINRA's published weekly non-ATS volume. Until now that
+# used EVERY reporting firm, which lumps the bank facilitation desks in with the
+# retail wholesalers — Goldman, Morgan Stanley, BofA and JPM alone were ~14% of
+# non-ATS in the week of 2026-07-20, and none of that is retail flow.
+# Matched case-insensitively against `marketParticipantName` in the OTC feed.
+#
+# Caveat worth keeping visible: Jane Street and HRT are genuine retail
+# wholesalers but also run large ETF and institutional books, so this set is an
+# UPPER bound on retail wholesaling, not a clean partition. The fitted capture
+# factor below absorbs a constant bias; it cannot absorb a drifting one.
+RETAIL_WHOLESALERS = (
+    "CITADEL SECURITIES",      # ~27% of non-ATS
+    "VIRTU AMERICAS",          # ~16%
+    "G1 EXECUTION SERVICES",   # ~10% (Susquehanna)
+    "JANE STREET CAPITAL",     # ~10%
+    "HRT FINANCIAL",           # ~9%
+    "TWO SIGMA SECURITIES",    # ~3%
+    "UBS SECURITIES",          # ~2%
+)
+
+# Minimum overlapping weeks before the capture factor is FIT rather than
+# assumed. Below this RF2/RF10 fall back to RETAIL_SCALE_FACTOR and keep the
+# 'uncalibrated' badge — the factor stops being a guess only once it is measured
+# against reported volume, which is what retires the badge.
+RETAIL_FIT_MIN_WEEKS = 8
+
 # ---- curated ETF universe (OP5/OP6/OP7, LV6, LV13) ---------------------------
 # ticker → (category, leverage). §A3 honesty: this is a curated top-of-complex
 # universe, NOT all US ETFs — coverage is labeled on every tile it feeds.

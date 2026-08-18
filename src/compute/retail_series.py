@@ -2,7 +2,7 @@
 aggregates (massive.RETAIL_TABLE). §5.1 floor/trend caveat renders on every
 tile. These soft-skip until the first process_tape_day run lands.
 
-RF1  net retail flow ($, daily)        RF2  retail participation (of tape $)
+RF1  retail breadth (% of names bought)  RF2  retail participation (of tape $)
 MH9  off-exchange + odd-lot share
 RF3/RF4 (concentration, buy-the-dip) land after the first real tape days —
 they join memberships and SPX returns onto the same aggregates.
@@ -61,10 +61,118 @@ def _ceiling_breaches(df: pd.DataFrame, scale: float) -> pd.DataFrame:
         .sort_values("ceiling_ratio", ascending=False)
 
 
+ALL_OFF = {"RF1": False, "RF2": False, "RF10": False, "MH9": False,
+           "RF3": False, "RF4": False}
+
+
+def _wholesaler_otc(fin: pd.DataFrame | None) -> pd.DataFrame | None:
+    """FINRA weekly non-ATS rows for the RETAIL WHOLESALERS only, labelled on
+    the Friday week-end date (the feed's weekStartDate is a Monday).
+
+    Previously RF2/RF10 anchored on every reporting firm, which counts the bank
+    facilitation desks — Goldman, Morgan Stanley, BofA and JPM were ~14% of
+    non-ATS in one sampled week and none of it is retail."""
+    import re
+    if fin is None or fin.empty:
+        return None
+    from .. import config as _cfg
+    o = fin[fin["summaryTypeCode"] == "OTC_W_FIRM"].copy()
+    o = o[o["tierIdentifier"].isin(["T1", "T2"])]   # OTCE is pink-sheet, no NMS denominator
+    pat = "|".join(re.escape(w) for w in _cfg.RETAIL_WHOLESALERS)
+    o = o[o["marketParticipantName"].fillna("").str.upper().str.contains(pat)]
+    if o.empty:
+        return None
+    o["week"] = pd.to_datetime(o["weekStartDate"]) + pd.Timedelta(days=4)
+    return o
+
+
+def _fit_capture(day: pd.DataFrame, fin: pd.DataFrame | None,
+                 grouped: pd.DataFrame | None) -> tuple[float, str]:
+    """Capture factor MEASURED against FINRA's reported wholesaler volume.
+
+    The classifier identifies only a fraction of retail activity. Until 2026-08
+    that fraction was asserted (×3) and slated for calibration against Nasdaq
+    RTAT — but RTAT is itself BJZZ-derived and so probably carries the same
+    institutional contamination we just removed, meaning calibrating to it would
+    re-import the error. FINRA publishes actual wholesaler share volume, which
+    is reported rather than estimated, so fit against that instead:
+
+        factor = mean(FINRA wholesaler $ ÷ our identified $) over common weeks
+
+    Returns (factor, source) where source is 'fitted' or 'assumed'. Falling back
+    to the assumed factor keeps the 'uncalibrated' badge on; a fitted factor is
+    what retires it.
+    """
+    from .. import config as _cfg
+    assumed = (float(_cfg.RETAIL_SCALE_FACTOR), "assumed")
+    o = _wholesaler_otc(fin)
+    if o is None or grouped is None or grouped.empty:
+        return assumed
+    # need BOTH tiers published for a week to be complete (T1 ~2wk lag, T2 ~4wk)
+    both_tiers = o.groupby("week")["tierIdentifier"].agg(lambda t: {"T1", "T2"} <= set(t))
+    weeks = both_tiers[both_tiers].index
+    if len(weeks) < _cfg.RETAIL_FIT_MIN_WEEKS:
+        return assumed
+    g = grouped.copy()
+    g["date"] = pd.to_datetime(g["date"])
+    g["week"] = g["date"] + pd.to_timedelta(4 - g["date"].dt.weekday, unit="D")
+    g["notional"] = g["close"] * g["volume"]
+    px = g.groupby("week")["notional"].sum() / g.groupby("week")["volume"].sum()
+    fin_sh = o[o["week"].isin(weeks)].groupby("week")["totalWeeklyShareQuantity"].sum()
+    fin_usd = (fin_sh * px.reindex(fin_sh.index)).dropna()
+    ours = day.set_index("date")["ident_usd"].resample("W-FRI").agg(["sum", "count"])
+    ours = ours[ours["count"] >= 3]["sum"]
+    ov = fin_usd.index.intersection(ours.index)
+    if len(ov) < _cfg.RETAIL_FIT_MIN_WEEKS:
+        return assumed
+    ratio = (fin_usd.loc[ov] / ours.loc[ov]).replace([float("inf")], pd.NA).dropna()
+    if ratio.empty or not (0 < float(ratio.mean()) < 100):
+        return assumed
+    return float(ratio.mean()), "fitted"
+
+
+def _version_guard() -> str | None:
+    """Refuse to build while the lake mixes classifier methodologies.
+
+    A reprocess rewrites history day by day, so for a couple of hours the lake
+    legitimately holds both the old and new methodology. Rendering across that
+    boundary splices two different definitions into one chart — the exact
+    failure this whole change exists to prevent. Returns a reason string when
+    the panel must stay dark, None when the lake is uniform.
+    """
+    import os
+    from .. import config as _cfg
+    tdir = os.path.join(store.LAKE_DIR, massive.RETAIL_TABLE)
+    if not os.path.isdir(tdir):
+        return None
+    seen: dict[int, int] = {}
+    for f in os.listdir(tdir):
+        if not f.endswith(".parquet"):
+            continue
+        p = os.path.join(tdir, f)
+        if massive._is_holiday_marker(p):
+            continue          # holidays carry no methodology
+        v = massive._day_method_version(p)
+        seen[v] = seen.get(v, 0) + 1
+    if not seen:
+        return None
+    cur = _cfg.RETAIL_METHOD_VERSION
+    if set(seen) == {cur}:
+        return None
+    return (f"lake holds mixed classifier versions {dict(sorted(seen.items()))} "
+            f"(current={cur}) — retail panel withheld until the reprocess "
+            f"completes; a spliced chart would mix two methodologies")
+
+
 def build() -> dict[str, bool]:
     df = _daily()
     if df is None:
         return {"RF1": False, "RF2": False, "MH9": False}
+
+    stale = _version_guard()
+    if stale:
+        store.log_run("compute:retail", "warn", stale)
+        return dict(ALL_OFF)
 
     for c, default in (("retail_ident_usd", None), ("retail_ident_trades", None),
                        ("moc_volume", 0), ("signing", "midpoint")):
@@ -114,7 +222,15 @@ def build() -> dict[str, bool]:
         store.write_display(mid, payload)
 
     from .. import config as _cfg
-    F = _cfg.RETAIL_SCALE_FACTOR
+    # FINRA + grouped are read once here: the capture factor is fitted against
+    # them BEFORE any dollar metric uses it (was a hardcoded 3.0).
+    fin = store.read_latest("finra_weekly_otc")
+    grouped = massive.read_grouped()
+    F, F_SRC = _fit_capture(day, fin, grouped)
+    _cal = ({"level": "provisional", "label": f"x{F:.1f} fitted"} if F_SRC == "fitted"
+            else {"level": "uncalibrated", "label": f"x{F:.1f} est. - uncalibrated"})
+    store.log_run("compute:retail", "detail",
+                  f"capture factor {F:.2f} ({F_SRC}) vs FINRA retail wholesalers")
     # arithmetic-impossibility alarm — see _ceiling_breaches
     breaches = _ceiling_breaches(df, F)
     latest_breach = breaches[breaches["date"].astype(str) == asof]
@@ -129,58 +245,69 @@ def build() -> dict[str, bool]:
                       f"per-print cap. Worst: {worst}",
                       breaches=int(len(breaches)),
                       latest_day_breaches=int(len(latest_breach)))
-    signed = day[day["signing"] == "midpoint"].copy()
-    rf1 = not signed.empty
+    # ---- RF1: retail breadth ------------------------------------------------
+    # Share of actively-traded names where retail was a net buyer. Replaced the
+    # dollar net-flow series 2026-08 — see config.RETAIL_BREADTH_MIN_USD for why
+    # a count beats a sum here. Scale-invariant, so NO ×3 factor and no
+    # calibration badge; contamination in one name moves it by ~1/N.
+    bmin = _cfg.RETAIL_BREADTH_MIN_USD
+    _d = df.copy()
+    _d["date"] = pd.to_datetime(_d["date"])
+    _sig = set(day.loc[day["signing"] == "midpoint", "date"])
+    act = _d[(_d["retail_usd"] >= bmin) & (_d["date"].isin(_sig))]
+    rf1 = not act.empty
     if rf1:
-        signed["net_b"] = signed["net"] * F / 1e9
-        s_rf1 = _display_series(signed[["date", "net_b"]].rename(columns={"net_b": "value"}),
-                                "Est. total retail net flow ($B/day)", unit="$B")
-        s_rf1["kind"] = "bar"
+        _g = act.groupby("date")
+        bdf = pd.DataFrame({
+            "value": _g.apply(lambda x: float((x["retail_net_usd"] > 0).mean() * 100.0),
+                              include_groups=False),
+            "names": _g.size(),
+        }).reset_index().sort_values("date")
+        s_rf1 = _display_series(bdf[["date", "value"]], "Retail breadth (% of names bought)",
+                                unit="%")
         store.write_display("RF1", {
-            "id": "RF1", "name": "Retail net flow — daily (est. total)", "panel": "retail",
+            "id": "RF1", "name": "Retail breadth — daily", "panel": "retail",
             "source": "Massive tape (classifier)", "cadence": "daily",
-            "asof": asof, "unit": " $B/day", "series": [s_rf1],
-            "tile": {"value": round(float(signed["net_b"].iloc[-1]), 2), "delta": None,
-                     "percentile": util.trailing_percentile(signed["net_b"])},
+            "asof": asof, "unit": "%", "series": [s_rf1],
+            "y_min": 0, "y_max": 100, "ref_line": 50.0,
+            "tile": {"value": round(float(bdf["value"].iloc[-1]), 1), "delta": None,
+                     "percentile": util.trailing_percentile(bdf["value"])},
             "provenance": "massive_tape",
-            "status": ({"level": "suspect",
-                        "label": "×3 est. · contamination flag"}
+            "status": ({"level": "suspect", "label": "contamination flag"}
                        if not latest_breach.empty else
-                       {"level": "uncalibrated", "label": "×3 est. · uncalibrated"}),
-            "tooltip": ("Estimated total retail net buying per day — classifier floor ×3 "
-                        "until the RF9 calibration lands."
-                        + ("  NOTE: the latest day breaches the consolidated-volume "
-                           "ceiling in " + ", ".join(latest_breach["ticker"].head(4))
-                           + " — non-retail flow is leaking into the classifier and "
-                             "this reading is not trustworthy."
-                           if not latest_breach.empty else "")),
+                       {"level": "provisional", "label": "classifier"}),
+            "tooltip": (
+                f"Share of names with at least ${bmin/1e6:.0f}M of retail activity where "
+                f"retail bought more than it sold. Above 50% = buying in more names than "
+                f"selling. Latest reading covers {int(bdf['names'].iloc[-1]):,} names."
+                + ("  NOTE: the latest day breaches the consolidated-volume ceiling in "
+                   + ", ".join(latest_breach["ticker"].head(4))
+                   + " — non-retail flow is leaking into the classifier."
+                   if not latest_breach.empty else "")),
             "notes": (
-                "**What it shows.** Estimated net dollar flow from retail traders each "
-                "day — buys minus sells — scaled to a whole-market figure. Positive "
-                "bars are net buying, negative bars net selling; together they track "
-                "the daily push and pull of the retail crowd.\n\n"
-                "**How it's computed.** Every retail trade is identified and signed by "
-                "the quote-midpoint classifier described in \"Retail identification and "
-                "scaling\" above — off-exchange sub-penny prints under the $50,000 "
-                "per-print size cap, signed buy or sell against the NBBO midpoint. Each "
-                "day's net identified dollars are summed and multiplied by the ×3 scale "
-                "factor to estimate the market-wide total: "
-                "`RF1 = 3.0 × Σ(signed identified retail $)`, plotted in billions of "
-                "dollars per day.\n\n"
-                "**Caveats.** The scale factor is the weak link, and more so since the "
-                "size cap was added. The ×3 was chosen for the uncapped classifier, "
-                "which counted institutional blocks as retail; the cap removes roughly "
-                "60% of identified dollars while keeping about 98% of prints, so the "
-                "factor now sits on a much smaller and cleaner base and is very likely "
-                "too low. Treat the *level* of this series as unreliable until the "
-                "factor is refit against Nasdaq's Retail Activity Tracker and clears the "
-                "calibration gate (see the shared section); the day-to-day *shape* is "
-                "the part to read. Trades executing exactly at the midpoint are excluded "
-                "because their direction is ambiguous, so this is a net-direction "
-                "estimate, not a gross-volume one — for gross retail dollar volume see "
-                "RF10. Days flagged with a contamination badge should not be read at "
-                "all: non-retail volume has slipped past the cap in at least one "
-                "heavily traded name."
+                "**What it shows.** How broadly retail leaned one way. For every stock "
+                "with meaningful retail activity we ask a single question — did retail "
+                "buy more than it sold? — and plot the share that answer yes. Above 50% "
+                "means retail was a net buyer in more names than it was a net seller; "
+                "below 50% means the reverse. It is the retail equivalent of an "
+                "advance/decline line: a measure of how many, not how much.\n\n"
+                "**How it's computed.** Each trading day, every stock with at least "
+                f"${bmin/1e6:.0f} million of identified retail dollars is scored as a net "
+                "buy or a net sell using the quote-midpoint classifier described in "
+                "\"Retail identification and scaling\" above. The reading is the "
+                "percentage scored as net buys. The activity floor matters: without it "
+                "the count fills with thousands of barely-traded small caps whose "
+                "direction is close to a coin flip, which pins the line near 50% and "
+                "hides the signal.\n\n"
+                "**Caveats.** This deliberately answers *how many* rather than *how "
+                "much* — it cannot tell you the dollars retail traded, and a day when "
+                "retail buys a few names heavily while selling many lightly will read "
+                "below 50%. For dollar volume see RF10, which is anchored to FINRA's "
+                "reported figures. The measure is a count, so it carries no scale "
+                "factor and needs no calibration, and contamination in any single name "
+                "can move it by only about one name's worth — but it still rests on the "
+                "classifier correctly identifying which trades are retail. Days carrying "
+                "a contamination flag should not be read."
             ),
         })
     # RF2: weekly participation splice — FINRA T1+T2 non-ATS anchor, a T1-only
@@ -191,16 +318,10 @@ def build() -> dict[str, bool]:
     wk2 = wk2[wk2["count"] >= 3]
     wkdf2 = wk2["mean"].rename("value").reset_index()
     series2 = []
-    fin = store.read_latest("finra_weekly_otc")
-    grouped = massive.read_grouped()
     fin_cut = None  # last week covered by an emitted FINRA-anchored series
     ours_w = wkdf2.set_index("date")["value"]
-    if fin is not None and grouped is not None:
-        otc = fin[fin["summaryTypeCode"] == "OTC_W_FIRM"].copy()
-        # T1+T2 only: OTCE is pink-sheet volume absent from our NMS denominator
-        otc = otc[otc["tierIdentifier"].isin(["T1", "T2"])]
-        # FINRA weekStartDate is Monday -> label on the Friday week-end
-        otc["week"] = pd.to_datetime(otc["weekStartDate"]) + pd.Timedelta(days=4)
+    otc = _wholesaler_otc(fin)
+    if otc is not None and grouped is not None:
         has_both = otc.groupby("week")["tierIdentifier"].agg(lambda t: {"T1", "T2"} <= set(t))
         complete = has_both[has_both].index  # T1 ~2wk lag, T2 ~4wk — need both tiers
         g = grouped.copy()
@@ -245,6 +366,15 @@ def build() -> dict[str, bool]:
     done = wkdf2[wkdf2["date"] <= day["date"].iloc[-1]]
     if done.empty:
         done = wkdf2
+    # Fewer than one full week in the lake (a fresh or partial reprocess) leaves
+    # nothing to tile off. Bail out with RF1/MH9 already written rather than
+    # raise: build() runs under _safe(), so an IndexError here would take the
+    # whole retail panel down with it — including RF1, which needs none of this.
+    if done.empty:
+        store.log_run("compute:retail", "warn",
+                      "RF2/RF10/RF3/RF4 skipped — no complete week in the lake yet")
+        return {"RF1": rf1, "RF2": False, "RF10": False, "MH9": False,
+                "RF3": False, "RF4": False}
     store.write_display("RF2", {
         "id": "RF2", "name": "Retail participation — weekly (est. total)", "panel": "retail",
         "source": "FINRA weekly OTC × Massive tape (classifier)", "cadence": "weekly",
@@ -252,7 +382,7 @@ def build() -> dict[str, bool]:
         "tile": {"value": round(float(done["value"].iloc[-1]), 1), "delta": None,
                  "percentile": util.trailing_percentile(done["value"], min_history=52)},
         "provenance": "finra+massive",
-        "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
+        "status": _cal,
         "tooltip": "Retail share of tape volume — solid bars are the FINRA-anchored official "
                    "trend, lighter bars our estimate covering FINRA's publication lag.",
         "notes": (
@@ -287,10 +417,8 @@ def build() -> dict[str, bool]:
     wk_usd = day.set_index("date")["ret_usd_b"].resample("W-FRI").agg(["sum", "count"])
     wk_usd = wk_usd[wk_usd["count"] >= 3]["sum"]
     series10, fin_cut10, cal10 = [], None, None
-    if fin is not None and grouped is not None:
-        o = fin[fin["summaryTypeCode"] == "OTC_W_FIRM"].copy()
-        o = o[o["tierIdentifier"].isin(["T1", "T2"])]
-        o["week"] = pd.to_datetime(o["weekStartDate"]) + pd.Timedelta(days=4)
+    o = _wholesaler_otc(fin)
+    if o is not None and grouped is not None:
         cmpl = o.groupby("week")["tierIdentifier"].agg(lambda t: {"T1", "T2"} <= set(t))
         cmpl = cmpl[cmpl].index  # both tiers published (T1 ~2wk lag, T2 ~4wk)
         g10 = grouped.copy()
@@ -331,7 +459,7 @@ def build() -> dict[str, bool]:
                  "percentile": util.trailing_percentile(
                      full10.reset_index(drop=True), value=tile10, min_history=52)},
         "provenance": "finra+massive",
-        "status": {"level": "uncalibrated", "label": "×3 est. · uncalibrated"},
+        "status": _cal,
         "tooltip": "Estimated total retail dollars traded per week — gross activity, not net "
                    "(see RF1 for net). FINRA-anchored history spliced with the recent Massive tape.",
         "notes": (
@@ -378,7 +506,7 @@ def build() -> dict[str, bool]:
           ))
 
     rf3 = _build_rf3(df, F)
-    rf4 = _build_rf4(day)
+    rf4 = _build_rf4(bdf) if rf1 else False
     return {"RF1": rf1, "RF2": True, "RF10": True, "MH9": True,
             "RF3": rf3, "RF4": rf4}
 
@@ -397,27 +525,32 @@ def _roll_dipbuy_beta(ret: np.ndarray, net_b: np.ndarray, win: int) -> list[floa
     return out
 
 
-def _build_rf4(day: pd.DataFrame) -> bool:
-    """RF4 buy-the-dip sensitivity: rolling OLS slope of daily retail net flow
-    ($B, identified floor) on the SPX daily % return, sign-flipped so a positive
-    reading = retail buys into declines. Two windows — 63d (3-month, the primary
-    trend) and 21d (1-month, faster but noisier context). Contemporaneous; the
-    shape is scale-invariant. Unlocks once >=63 midpoint-signed days carrying an
-    SPX return have accumulated (the 63d window fills)."""
-    signed = day[day["signing"] == "midpoint"].copy()
+def _build_rf4(bdf: pd.DataFrame) -> bool:
+    """RF4 buy-the-dip sensitivity: rolling OLS slope of daily retail BREADTH on
+    the SPX daily % return, sign-flipped so a positive reading = retail buys into
+    declines. Two windows — 63d (3-month, the primary trend) and 21d (1-month,
+    faster but noisier context). Contemporaneous.
+
+    Rebuilt on breadth 2026-08 (was net flow in $B). Two reasons. Breadth is a
+    count, so the reading no longer inherits the classifier's dollar-scale
+    problems. More importantly, the old input carried a bias that pointed the
+    answer the wrong way: institutional de-risking clusters on down days, so
+    block selling misread as retail selling arrived disproportionately when SPX
+    fell, giving a positive slope and therefore a NEGATIVE RF4 — retail rendered
+    as panic sellers on exactly the days the metric exists to describe. Breadth
+    is near-immune (contamination in one name moves it by ~1/N)."""
     spx = store.read_latest("bbg_spx")
-    if spx is None or len(signed) < 63:
+    if spx is None or len(bdf) < 63:
         return False
     spx = spx.copy()
     spx["date"] = pd.to_datetime(spx["date"])
     spx = spx.sort_values("date")                       # pct_change needs date order
     spx["ret"] = spx["value"].pct_change() * 100.0
-    m = (signed.merge(spx[["date", "ret"]], on="date", how="inner")
+    m = (bdf[["date", "value"]].merge(spx[["date", "ret"]], on="date", how="inner")
                .sort_values("date").dropna(subset=["ret"]))
     if len(m) < 63:
         return False
-    m["net_b"] = m["net"] / 1e9
-    ret, net_b = m["ret"].to_numpy(float), m["net_b"].to_numpy(float)
+    ret, net_b = m["ret"].to_numpy(float), m["value"].to_numpy(float)
     m["b63"] = _roll_dipbuy_beta(ret, net_b, 63)
     m["b21"] = _roll_dipbuy_beta(ret, net_b, 21)
     d63 = m[["date", "b63"]].rename(columns={"b63": "value"}).dropna()
@@ -427,31 +560,34 @@ def _build_rf4(day: pd.DataFrame) -> bool:
     store.write_display("RF4", {
         "id": "RF4", "name": "Buy-the-dip sensitivity", "panel": "retail",
         "source": "Massive tape × BBG SPX", "cadence": "daily",
-        "asof": d63["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " $B/1%",
-        "series": [_display_series(d63, "3-month", role="avos", unit="$B/1%"),
-                   _display_series(d21, "1-month", role="context", unit="$B/1%")],
+        "asof": d63["date"].iloc[-1].strftime("%Y-%m-%d"), "unit": " pts/1%",
+        "series": [_display_series(d63, "3-month", role="avos", unit="pts/1%"),
+                   _display_series(d21, "1-month", role="context", unit="pts/1%")],
         "tile": {"value": round(float(d63["value"].iloc[-1]), 2), "delta": None,
                  "percentile": util.trailing_percentile(d63["value"])},
         "provenance": "massive_tape",
-        "status": {"level": "provisional", "label": "classifier floor"},
-        "tooltip": "Net retail $B bought per 1% SPX decline — higher = retail buys dips harder.",
+        "status": {"level": "provisional", "label": "classifier"},
+        "tooltip": "Breadth points gained per 1% SPX decline — higher = retail buys dips "
+                   "across more names.",
         "notes": (
-            "**What it shows.** How hard retail leans into weakness — the dollars of net "
-            "retail buying that arrive per 1% S&P 500 decline. A positive, rising reading "
-            "means retail buys harder as the market falls (dip-buying); a negative reading "
-            "means retail sells into declines.\n\n"
+            "**What it shows.** How hard retail leans into weakness — how much wider "
+            "retail buying spreads across the market for each 1% the S&P 500 falls. A "
+            "positive, rising reading means retail buys into more names as the market "
+            "drops (dip-buying); a negative reading means retail retreats as it falls.\n\n"
             "**How it's computed.** A rolling ordinary-least-squares slope of daily "
-            "identified retail net flow (in $B) regressed on the S&P 500 daily percent "
-            "return, sign-flipped so that a positive value means buying into declines: "
-            "`RF4 = −slope(net flow $B on SPX % return)`. Two contemporaneous windows are "
+            "retail breadth (RF1, in percentage points) against the S&P 500 daily percent "
+            "return, sign-flipped so a positive value means buying into declines: "
+            "`RF4 = −slope(breadth on SPX % return)`. Two contemporaneous windows are "
             "shown — a 63-day (3-month) primary trend and a 21-day (1-month) context line "
-            "that reacts faster but is roughly 4× noisier. See Retail identification and "
-            "scaling above for the underlying classifier.\n\n"
-            "**Caveats.** Built on the identified floor of retail flow, not the ×3-scaled "
-            "total — but as a regression slope its shape is scale-invariant. It unlocks "
-            "only once at least 63 signed days carrying an S&P 500 return have "
-            "accumulated, and carries the *classifier floor* badge marking it provisional "
-            "until calibration."
+            "that reacts faster but is roughly 4× noisier.\n\n"
+            "**Caveats.** Until August 2026 this was built on retail net flow in dollars, "
+            "which carried a bias that pointed the answer the wrong way: institutional "
+            "selling misidentified as retail arrives disproportionately on down days, so "
+            "the metric read retail as selling into declines on exactly the days it "
+            "exists to describe. Breadth is a count across names and is nearly immune to "
+            "that. It still unlocks only once 63 signed days carrying an S&P 500 return "
+            "have accumulated, and it measures how *widely* retail buys, not how much — "
+            "a day when retail buys a few names very heavily registers weakly here."
         ),
     })
     return True
