@@ -106,7 +106,8 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
                  exclude_conditions: set[int] | None = None,
                  session_open_ns: int | None = None,
                  session_close_ns: int | None = None,
-                 with_buckets: bool = False):
+                 with_buckets: bool = False,
+                 spill_dir: str | None = None):
     """Run the classifier over one day's tape.
 
     trades_src / quotes_src: paths DuckDB can read (parquet or csv[.gz]).
@@ -126,6 +127,8 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     session_open_ns / session_close_ns: regular-session bounds in epoch ns, used
       only for the open/close 30-minute buckets. None → those come back 0.
     with_buckets: also return the long-format bucket frame (see below).
+    spill_dir: where DuckDB spills. Defaults to the trades file's directory —
+      see the tmpfs note below; do NOT let this land on /tmp for a real day.
 
     Returns the per-symbol aggregate frame, or `(aggregate, buckets)` when
     with_buckets=True. Bucket rows are (ticker, dim, bucket, buy_usd, sell_usd,
@@ -142,10 +145,25 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     # PER-PROCESS spill dir: two backfill lanes sharing one spill directory
     # collide on spill files and hard-crash DuckDB (found 2026-07-09 — solo
     # runs fine, concurrent dies minutes in with no Python traceback)
-    spill = os.path.join(tempfile.gettempdir(),
+    #
+    # Spill NEXT TO THE TRADES FILE, not in gettempdir(). On Amazon Linux 2023
+    # (the backfill box) /tmp is a TMPFS — RAM — so "spilling to disk" spilled
+    # into memory, and DuckDB died with
+    #   Out of Memory Error: failed to offload data block ... (6.5 GiB/6.5)
+    # while ~294 GB of real disk sat unused. Found 2026-08-18, an hour into a
+    # 156-day reprocess that had completed ZERO days. Latent since the engine
+    # was written; only surfaced once the signed set was materialised, which
+    # needs far more spill than the old fully-streaming query. The trades file
+    # is already multi-GB, so its directory is guaranteed to be real storage.
+    spill_root = (spill_dir or os.path.dirname(os.path.abspath(trades_src))
+                  or tempfile.gettempdir())
+    spill = os.path.join(spill_root,
                          f"duckdb_spill_{os.getpid()}_{uuid.uuid4().hex[:8]}")
     os.makedirs(spill, exist_ok=True)
     con.execute(f"SET temp_directory='{spill}'")
+    # ...and let DuckDB actually use it. The default cap is derived from the
+    # temp volume, which is what bound us at 6.5 GiB when it was tmpfs.
+    con.execute("SET max_temp_directory_size='200GB'")
     con.execute("SET preserve_insertion_order=false")  # allows streaming aggregation
     # hard cap: two backfill lanes ran concurrent classifies at DuckDB's default
     # (~80% RAM each) and OOM-killed each other (2026-07-09). 10GB each keeps
@@ -201,12 +219,17 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     c_hi = "NULL" if session_close_ns is None else str(int(session_close_ns))
 
     # ---- signed set, materialised once -------------------------------------
-    # Every subpenny TRF candidate, with its prevailing quote. Materialised so
-    # the aggregate and the bucket cut share ONE ASOF join (the expensive step).
+    # Every subpenny TRF candidate, with its prevailing quote, written ONCE to a
+    # parquet file on the spill volume. Both the aggregate and the bucket cut
+    # then read it, so the expensive ASOF join runs once. Deliberately a FILE
+    # and not a TEMP TABLE: a temp table lives in DuckDB's buffer pool and has
+    # to spill under memory pressure, which is what blew up on the box; a
+    # parquet file streams in and out with a flat memory profile.
     # LEFT so prints with no prevailing quote survive and can be counted.
+    sgn_path = os.path.join(spill, "sgn.parquet").replace("\\", "/")
     if quotes_src:
         sgn_sql = f"""
-        CREATE TEMP TABLE sgn AS
+        COPY (
         WITH trades AS (
             SELECT ticker, sip_timestamp, price, size, {conds_expr},
                    price*size AS notional,
@@ -242,10 +265,11 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
         FROM cand c
         ASOF LEFT JOIN quotes q
           ON c.ticker = q.ticker AND c.sip_timestamp >= q.sip_timestamp
+        ) TO '{sgn_path}' (FORMAT PARQUET, COMPRESSION ZSTD)
         """
     else:
         sgn_sql = f"""
-        CREATE TEMP TABLE sgn AS
+        COPY (
         WITH trades AS (
             SELECT ticker, sip_timestamp, price, size, {conds_expr},
                    price*size AS notional,
@@ -266,6 +290,7 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
                    THEN (p_e4 % 50)  BETWEEN 1 AND 19 OR (p_e4 % 50)  BETWEEN 31 AND 49
                    ELSE (p_e4 % 100) BETWEEN 1 AND 39 OR (p_e4 % 100) BETWEEN 61 AND 99
               END
+        ) TO '{sgn_path}' (FORMAT PARQUET, COMPRESSION ZSTD)
         """
     con.execute(sgn_sql)
 
@@ -311,7 +336,7 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
                                                                       AS pi_usd,
                SUM(CASE WHEN {KEEP} AND {OPEN30}  THEN notional END)  AS open30_usd,
                SUM(CASE WHEN {KEEP} AND {CLOSE30} THEN notional END)  AS close30_usd
-        FROM sgn GROUP BY ticker
+        FROM '{sgn_path}' GROUP BY ticker
     ),
     tape AS (
         SELECT ticker,
@@ -376,11 +401,11 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
                SUM(CASE WHEN side=-1 THEN notional END) AS sell_usd,
                COUNT(*)                                 AS trades
         FROM (
-            SELECT ticker, side, notional, 'size'   AS dim, {size_case}   AS bucket FROM sgn
+            SELECT ticker, side, notional, 'size'   AS dim, {size_case}   AS bucket FROM '{sgn_path}'
             UNION ALL
-            SELECT ticker, side, notional, 'cond'   AS dim, cond_group    AS bucket FROM sgn
+            SELECT ticker, side, notional, 'cond'   AS dim, cond_group    AS bucket FROM '{sgn_path}'
             UNION ALL
-            SELECT ticker, side, notional, 'spread' AS dim, {spread_case} AS bucket FROM sgn
+            SELECT ticker, side, notional, 'spread' AS dim, {spread_case} AS bucket FROM '{sgn_path}'
         )
         WHERE bucket IS NOT NULL
         GROUP BY ticker, dim, bucket
