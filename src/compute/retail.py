@@ -166,9 +166,12 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     con.execute("SET max_temp_directory_size='200GB'")
     con.execute("SET preserve_insertion_order=false")  # allows streaming aggregation
     # hard cap: two backfill lanes ran concurrent classifies at DuckDB's default
-    # (~80% RAM each) and OOM-killed each other (2026-07-09). 10GB each keeps
-    # two lanes + OS comfortable; DuckDB spills the excess to disk.
-    con.execute("SET memory_limit='10GB'")
+    # (~80% RAM each) and OOM-killed each other (2026-07-09). DuckDB spills the
+    # excess to disk (to the real disk, see the tmpfs note above). The lane
+    # runner lowers this as lane count rises — 4 lanes at 10GB would promise
+    # 40GB on a 30GB box.
+    _mem = float(os.environ.get("MCD_DUCKDB_MEM_GB", "10"))
+    con.execute(f"SET memory_limit='{_mem}GB'")
     con.execute("SET threads=4")
 
     signing = "midpoint" if quotes_src else "none"

@@ -210,15 +210,27 @@ def main():
     print(f"lane_runner: bucket={BUCKET} region={REGION}", flush=True)
     procs: dict[str, Process] = {}
 
+    # DuckDB buffer-pool budget per lane. 4 lanes at the 10GB default would
+    # promise 40GB on a 30GB box; spill goes to real disk now, but the kernel
+    # can still OOM-kill if several lanes peak together. ~24GB total, floor 4GB.
+    os.environ["MCD_DUCKDB_MEM_GB"] = str(max(4, 24 // max(TAPE_LANES, 1)))
     missing = tape_missing()
     print(f"tape: {len(missing)} days missing/unsigned in "
           f"[{TAPE_START}, {_yesterday()}]", flush=True)
     if missing:
-        if len(missing) >= 10 and TAPE_LANES > 1:
-            mid = len(missing) // 2
-            chunks = [(missing[0], missing[mid - 1]), (missing[mid], missing[-1])]
-        else:
-            chunks = [(missing[0], missing[-1])]
+        # Split into TAPE_LANES contiguous date ranges. This used to hardcode
+        # TWO chunks regardless of TAPE_LANES, so raising the constant silently
+        # did nothing. Ranges must not overlap — each lane re-derives its own
+        # `have` set inside its range.
+        n = TAPE_LANES if len(missing) >= 10 * TAPE_LANES else 1
+        n = max(1, min(n, len(missing)))
+        size = (len(missing) + n - 1) // n
+        chunks = []
+        for k in range(n):
+            seg = missing[k * size:(k + 1) * size]
+            if seg:
+                chunks.append((seg[0], seg[-1]))
+        print(f"tape: {len(chunks)} lane(s) over {len(missing)} days", flush=True)
         for i, (lo, hi) in enumerate(chunks, 1):
             procs[f"tape{i}"] = Process(target=tape_lane, args=(f"tape{i}", lo, hi))
     procs["opra"] = Process(target=opra_lane, args=("opra",))
