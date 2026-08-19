@@ -32,7 +32,13 @@ BUCKET = os.environ["MCD_BUCKET"]
 REGION = os.environ.get("MCD_REGION", "us-east-2")
 
 TAPE_START = "2026-01-02"     # quotes lanes re-do trades-only days (signing upgrade)
-TAPE_LANES = 2                # >2-3 heavy lanes → Massive S3 503s (session notes)
+TAPE_LANES = 4                # raised 2->4 2026-08-19. Measured the box mid-run:
+                              # 75% idle CPU, 10% disk util, 188 Mbps against a
+                              # 12.5 Gbps NIC (1.5%). Nothing local was saturated
+                              # — throughput was bounded by our own concurrency.
+                              # The older note said >2-3 lanes draws Massive S3
+                              # 503s; that is now measured, not assumed. Watch
+                              # the lane log for SlowDown/503 and back off if so.
 OPRA_START = "2024-01-01"     # extends the existing 2024-08-30+ OPRA history
 GROUPED_START = "2016-01-04"  # matches pull_grouped_phase2 target
 SYNC_EVERY = 600
