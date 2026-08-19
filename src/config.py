@@ -127,7 +127,11 @@ RETAIL_EXCLUDE_CONDITIONS = {2, 21, 52, 53}
 #   1 = pre-2026-08 (no size cap, no condition filter, half-penny regime dead)
 #   2 = size cap + condition filter + detected half-penny regime + diagnostics
 #   3 = condition 10 (Derivatively Priced) dropped from the exclusion set
-RETAIL_METHOD_VERSION = 3
+#   4 = NULL-conditions fix: a NULL `conditions` made excl_cond NULL, so KEEP
+#       was NULL and the print counted as neither kept nor excluded — it just
+#       vanished. Cost 1,694,779 prints ($8.4B) on 2026-07-30 alone, ~9% of the
+#       eligible tape, and inflated the fitted capture factor to 21.4.
+RETAIL_METHOD_VERSION = 4
 
 # ---- RF1 breadth (replaced the dollar net-flow series 2026-08, CIO) ---------
 # Minimum identified retail dollars in a name on a day for it to count toward

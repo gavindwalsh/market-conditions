@@ -96,8 +96,19 @@ def _bucket_case(col: str, buckets) -> str:
 
 def _cond_match(code: int) -> str:
     """Match one sale-condition code inside the quoted CSV `conditions` string
-    (e.g. "14,12,37,41"). int() guards the f-string against caller text."""
-    return (f"(',' || CAST(conditions AS VARCHAR) || ',') LIKE '%,{int(code)},%'")
+    (e.g. "14,12,37,41"). int() guards the f-string against caller text.
+
+    COALESCE is load-bearing. Without it a NULL `conditions` makes the whole
+    concatenation NULL, `NULL LIKE ...` is NULL, and the resulting excl_cond is
+    NULL — so `KEEP = NOT excl_cond AND ...` is NULL too and the print matches
+    NEITHER the keep set NOR the excluded set. It just vanishes. On 2026-07-30
+    that silently discarded 1,694,779 prints ($8.4B, averaging $4,970 — squarely
+    retail-sized) and inflated the fitted capture factor to 21.4. Found
+    2026-08-19 because the counts would not reconcile: ident + excl_size +
+    excl_cond came to 1.69M LESS than the eligible set, and an overlap cannot be
+    negative."""
+    return (f"(',' || COALESCE(CAST(conditions AS VARCHAR), '') || ',') "
+            f"LIKE '%,{int(code)},%'")
 
 
 def classify_day(trades_src: str, quotes_src: str | None = None,
@@ -205,8 +216,10 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     excl = sorted(int(c) for c in (exclude_conditions or set()))
     cond_excl_expr = (" OR ".join(_cond_match(c) for c in excl)
                       if (has_conds and excl) else "FALSE")
+    # COALESCE for the same NULL-limbo reason as _cond_match: a NULL here would
+    # make KEEP NULL and drop the print from every bucket silently.
     size_excl_expr = ("FALSE" if max_print_usd is None
-                      else f"notional > {float(max_print_usd)}")
+                      else f"COALESCE(notional, 0) > {float(max_print_usd)}")
     # Collapse conditions to a short group label INSIDE the candidate scan, so
     # `sgn` never carries the raw CSV string for ~18M rows.
     cond_group_expr = ("CASE " + " ".join(

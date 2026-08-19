@@ -248,6 +248,45 @@ def test_half_penny_regime_detected_from_quotes():
     print("PASS half-penny regime detected from quotes")
 
 
+def test_null_conditions_do_not_vanish():
+    """Regression guard for the 2026-08-19 NULL-limbo bug.
+
+    A NULL `conditions` made the LIKE chain NULL, so excl_cond was NULL and
+    `KEEP = NOT excl_cond AND ...` was NULL too — the print counted as neither
+    kept NOR excluded and silently disappeared. On real tape that lost 1,694,779
+    prints ($8.4B, avg $4,970) in one day and inflated the capture factor to
+    21.4. The invariant below is the real guard: every eligible print must land
+    in exactly one of kept / size-excluded / condition-excluded."""
+    quotes = [dict(ticker="NUL", sip_timestamp=1 * NS, bid_price=10.00, ask_price=10.02)]
+    trades = [
+        dict(ticker="NUL", sip_timestamp=2 * NS, price=10.0180, size=100, exchange=4,
+             conditions=None),                       # NULL -> must still be KEPT
+        dict(ticker="NUL", sip_timestamp=3 * NS, price=10.0020, size=50, exchange=4,
+             conditions=""),                         # empty -> kept
+        dict(ticker="NUL", sip_timestamp=4 * NS, price=10.0180, size=100, exchange=4,
+             conditions="12"),                       # ordinary -> kept
+        dict(ticker="NUL", sip_timestamp=5 * NS, price=10.0180, size=100, exchange=4,
+             conditions="2"),                        # avg-price -> excluded
+    ]
+    d = tempfile.mkdtemp()
+    t = _write(pd.DataFrame(trades), os.path.join(d, "t.parquet"))
+    q = _write(pd.DataFrame(quotes), os.path.join(d, "q.parquet"))
+    agg, bk = classify_day(t, q, max_print_usd=200_000.0,
+                           exclude_conditions=config.RETAIL_EXCLUDE_CONDITIONS,
+                           with_buckets=True)
+    r = agg.set_index("ticker").loc["NUL"]
+    assert r["retail_ident_trades"] == 3, r["retail_ident_trades"]
+    assert r["excl_cond_trades"] == 1
+    # THE INVARIANT: nothing may fall between the cracks
+    eligible = int(bk[bk.dim == "size"]["trades"].sum())
+    accounted = int(r["retail_ident_trades"] + r["excl_size_trades"]
+                    + r["excl_cond_trades"])
+    assert accounted >= eligible, (
+        f"{eligible - accounted} print(s) vanished — kept+excluded must cover "
+        f"every eligible print (overlap makes accounted >= eligible)")
+    print("PASS NULL/empty conditions are kept, nothing vanishes")
+
+
 def test_buckets_reconcile_to_eligible_set():
     """The bucket table is what makes a future cap/condition change arithmetic
     on the lake instead of another tape pull, so every dimension must cover the
@@ -287,5 +326,6 @@ if __name__ == "__main__":
     test_condition_filter_excludes_non_market_prices()
     test_derivatively_priced_is_not_excluded()
     test_half_penny_regime_detected_from_quotes()
+    test_null_conditions_do_not_vanish()
     test_buckets_reconcile_to_eligible_set()
     print("\nAll retail-classifier tests passed.")
