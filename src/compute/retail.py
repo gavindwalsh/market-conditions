@@ -196,21 +196,30 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     # under $1 are excluded from detection — subpenny quoting is legal there
     # under Rule 612 and would produce false positives.
     con.execute("CREATE TEMP TABLE hp_syms(ticker VARCHAR)")
+    # hp_frac keeps the MEASURED half-cent quote fraction for every symbol, not
+    # just the ones over the threshold. Stored per symbol-day as
+    # half_penny_frac, so "zero symbols detected" is diagnosable: a fraction of
+    # ~0 everywhere means the SEC tick regime genuinely is not active on these
+    # names; fractions sitting just under the threshold would mean the threshold
+    # is wrong. Without this the answer is unobservable and the regime silently
+    # does nothing — which is exactly how it stayed dead for months.
+    con.execute("CREATE TEMP TABLE hp_frac(ticker VARCHAR, frac DOUBLE)")
     if half_penny_symbols is not None:
         for t in sorted(half_penny_symbols):
             con.execute("INSERT INTO hp_syms VALUES (?)", [t])
+            con.execute("INSERT INTO hp_frac VALUES (?, NULL)", [t])
     elif quotes_src:
         con.execute(f"""
-            INSERT INTO hp_syms
-            SELECT ticker FROM (
-                SELECT ticker,
-                       SUM(CASE WHEN (CAST(ROUND(bid_price*10000) AS BIGINT) % 100) = 50
-                                THEN 1 ELSE 0 END)::DOUBLE / COUNT(*) AS frac
-                FROM '{quotes_src}'
-                WHERE bid_price >= 1.0
-                GROUP BY ticker
-            ) WHERE frac > {HALF_PENNY_QUOTE_FRAC}
+            INSERT INTO hp_frac
+            SELECT ticker,
+                   SUM(CASE WHEN (CAST(ROUND(bid_price*10000) AS BIGINT) % 100) = 50
+                            THEN 1 ELSE 0 END)::DOUBLE / COUNT(*) AS frac
+            FROM '{quotes_src}'
+            WHERE bid_price >= 1.0
+            GROUP BY ticker
         """)
+        con.execute(f"INSERT INTO hp_syms SELECT ticker FROM hp_frac "
+                    f"WHERE frac > {HALF_PENNY_QUOTE_FRAC}")
 
     # ---- filter expressions ------------------------------------------------
     excl = sorted(int(c) for c in (exclude_conditions or set()))
@@ -388,6 +397,7 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
            COALESCE(moc_volume, 0)      AS moc_volume,
            -- added 2026-08 (method_version 2)
            COALESCE(half_penny, FALSE)  AS half_penny,
+           hp_frac.frac                 AS half_penny_frac,
            COALESCE(excl_size_usd, 0)   AS excl_size_usd,
            COALESCE(excl_size_trades, 0) AS excl_size_trades,
            COALESCE(excl_cond_usd, 0)   AS excl_cond_usd,
@@ -402,6 +412,7 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
            COALESCE(open30_usd, 0)      AS open30_usd,
            COALESCE(close30_usd, 0)     AS close30_usd
     FROM tape LEFT JOIN retail USING (ticker)
+                    LEFT JOIN hp_frac USING (ticker)
     ORDER BY ticker
     """).df()
 
@@ -409,7 +420,7 @@ def classify_day(trades_src: str, quotes_src: str | None = None,
     if with_buckets:
         # Cut over the pre-filter eligible set on purpose: that is what makes a
         # different cap or condition list recoverable without another tape pull.
-        size_case = _bucket_case("notional", SIZE_BUCKETS)
+        size_case = _bucket_case("COALESCE(notional, 0)", SIZE_BUCKETS)
         spread_case = _bucket_case("spread", SPREAD_BUCKETS)
         buckets = con.execute(f"""
         SELECT ticker, dim, bucket,
