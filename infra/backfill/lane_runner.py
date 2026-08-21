@@ -32,18 +32,17 @@ BUCKET = os.environ["MCD_BUCKET"]
 REGION = os.environ.get("MCD_REGION", "us-east-2")
 
 TAPE_START = "2026-01-02"     # quotes lanes re-do trades-only days (signing upgrade)
-TAPE_LANES = 2                # back to 2 on 2026-08-20. Raising it to 4 the day
-                              # before looked justified — the box was 75% idle on
-                              # CPU and using 1.5% of its NIC, and one 4-lane run
-                              # completed 156 days with ZERO 503s. That reading
-                              # was wrong, because Massive's limit is a DAILY
-                              # BUDGET, not a per-run rate: after ~6-7TB across
-                              # three passes in 48h it returned 48x 503 then 403
-                              # Forbidden, and the run died 50/158 days in. Four
-                              # lanes did not avoid the ceiling, it just reached
-                              # it sooner and wasted more requests on retries
-                              # while getting there. The original "greater than
-                              # 2-3 lanes draws 503s" note was right.
+TAPE_LANES = 4                # Massive's ceiling is a DAILY BUDGET, not a rate:
+                              # a 4-lane run pulled 2.2TB with ZERO 503s, and the
+                              # failure on 2026-08-20 came only once CUMULATIVE
+                              # volume was high (~6-7TB/48h), then cleared
+                              # overnight. Lane count does not change total bytes
+                              # or request count for a given day range — it only
+                              # changes wall-clock. So more lanes finish MORE days
+                              # before any ceiling, which is strictly better. The
+                              # real cost of extra lanes was wasted retries once
+                              # blocked, and tape_lane now detects that state
+                              # instead of mistaking it for completion.
 OPRA_START = "2024-01-01"     # extends the existing 2024-08-30+ OPRA history
 GROUPED_START = "2016-01-04"  # matches pull_grouped_phase2 target
 SYNC_EVERY = 600
@@ -80,20 +79,47 @@ def _write_lane(name: str, **kw):
 
 
 # ---- lane workers (each its own process; private scratch via TAPE_SCRATCH) ----
+def _range_remaining(lo: str, hi: str) -> int:
+    """Days inside [lo, hi] that still need work. This is the honest test for
+    whether a lane has FINISHED, as distinct from merely FAILING."""
+    import pandas as pd
+    from src.pull.massive import RETAIL_TABLE, _have_days
+    have = _have_days(os.path.join(LAKE, RETAIL_TABLE), quotes=True)
+    return sum(1 for d in pd.bdate_range(lo, hi).strftime("%Y-%m-%d")
+               if d not in have)
+
+
 def tape_lane(name: str, lo: str, hi: str):
     os.environ["TAPE_SCRATCH"] = os.path.join(LAKE, f"_tape_scratch_{name}")
     from src.pull.massive import backfill_tape
-    total, stall = 0, 0
-    while stall < 2:  # two consecutive empty batches = range done (or all-skips)
+    total, empty = 0, 0
+    while True:
+        # Ask whether work REMAINS before deciding anything. The old loop exited
+        # after two empty batches and unconditionally wrote state="done" — its
+        # own comment said "range done (or all-skips)", conflating the two. On
+        # 2026-08-20 Massive started 503ing, every day in a batch failed, and all
+        # four lanes reported "done" with 110 days outstanding. A run that is
+        # blocked must not look identical to a run that is finished.
+        left = _range_remaining(lo, hi)
+        if left == 0:
+            _write_lane(name, state="done", range=[lo, hi], done_total=total,
+                        remaining=0)
+            print(f"{name}: done ({total} days)", flush=True)
+            return
         done = backfill_tape(lo, end=hi, max_days=TAPE_BATCH, quotes=True)
         total += len(done)
-        stall = stall + 1 if not done else 0
+        empty = empty + 1 if not done else 0
         _write_lane(name, state="running", range=[lo, hi], done_total=total,
-                    last_batch=done)
-        if not done and stall < 2:
-            time.sleep(30)
-    _write_lane(name, state="done", range=[lo, hi], done_total=total)
-    print(f"{name}: done ({total} days)", flush=True)
+                    last_batch=done, remaining=left)
+        if empty >= 2:
+            _write_lane(name, state="BLOCKED", range=[lo, hi], done_total=total,
+                        remaining=left)
+            print(f"{name}: BLOCKED — {left} day(s) still to do but two "
+                  f"consecutive batches produced nothing (upstream throttling?). "
+                  f"NOT marking done.", flush=True)
+            return
+        if not done:
+            time.sleep(60)
 
 
 def opra_lane(name: str):
